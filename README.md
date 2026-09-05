@@ -143,12 +143,13 @@ compare against.
 
 ## Trademarks
 
-Product and company names mentioned here — including in the name of this package —
-are the trademarks of their respective owners. They appear only to say which API
-this client addresses, which is what trademark law calls nominative use.
+Trademarks mentioned here — including in the name of this package — are the
+property of their respective owners. They appear to identify the API this client
+addresses, and for no other purpose: nothing here is a claim about who made this
+package or who stands behind it.
 
 This is an unofficial client, generated from the published API description. It IS
-NOT affiliated with, endorsed by, or connected to whoever operates that API.
+NOT affiliated with, endorsed by, or connected to the operator of that API.
 
 ## License
 

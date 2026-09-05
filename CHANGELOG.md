@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 — 2026-09-05
+
+Generated from an OpenAPI description version 2.1.14 (sha256 `0eeb4d9ea2227966a9b4d04de6f4064d3ec2ce52c8bdbaf9bb9c310cf0975948`).
+
+No breaking changes to the public API.
+
 ## 1.2.0 — 2026-09-05
 
 Generated from an OpenAPI description version 2.1.14 (sha256 `0eeb4d9ea2227966a9b4d04de6f4064d3ec2ce52c8bdbaf9bb9c310cf0975948`).

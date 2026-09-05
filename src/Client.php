@@ -54,7 +54,7 @@ final class Client
         string $password,
         ClientConfig $config
     ): self {
-        return self::build($config, new Authentication\BasicAuthAuthentication($username, $password));
+        return self::withAuthenticators($config, new Authentication\BasicAuthAuthentication($username, $password));
     }
 
     /**
@@ -66,7 +66,7 @@ final class Client
         string $apiKey,
         ClientConfig $config
     ): self {
-        return self::build($config, new Authentication\ApiKeyAuthentication($apiKey));
+        return self::withAuthenticators($config, new Authentication\ApiKeyAuthentication($apiKey));
     }
 
     /**
@@ -78,7 +78,29 @@ final class Client
         string $token,
         ClientConfig $config
     ): self {
-        return self::build($config, new Authentication\OAuth2Authentication($token));
+        return self::withAuthenticators($config, new Authentication\OAuth2Authentication($token));
+    }
+
+    /**
+     * A client signing with authenticators you assemble yourself.
+     *
+     * Every other factory on this class is a shorthand for this one. Reach for it directly
+     * when the description cannot say what your API needs: a scheme this package does not
+     * generate an authenticator for, a combination the description does not declare, or a
+     * signing scheme of your own — implement `Authentication\Authenticator` and pass it.
+     *
+     * Note the argument order: `$config` comes first, because the authenticators are
+     * variadic and have to come last.
+     *
+     * @throws UnsupportedValueException
+     * @throws NoHttpClientException
+     */
+    public static function withAuthenticators(ClientConfig $config, Authenticator ...$authenticators): self
+    {
+        $factory = new Psr17Factory();
+        $httpClient = $config->httpClient->isDefined() ? $config->httpClient->get() : HttpClientResolver::resolve($factory, $factory);
+
+        return new self($config->baseUrl, $httpClient, $factory, $factory, new AuthenticatorRegistry(array_values($authenticators)));
     }
 
     /**
@@ -87,25 +109,15 @@ final class Client
      * For operations the description leaves without a security requirement, and for
      * callers whose own HTTP client already authenticates — see
      * `ClientConfig::withHttpClient()`. A request whose requirements no registered
-     * authenticator satisfies goes out unsigned.
+     * authenticator satisfies goes out unsigned, which is the point here and a mistake
+     * anywhere else: to send credentials, use one of the `with…()` factories above, or
+     * `withAuthenticators()` for a combination they do not cover.
      *
      * @throws UnsupportedValueException
      * @throws NoHttpClientException
      */
     public static function create(ClientConfig $config): self
     {
-        return self::build($config);
-    }
-
-    /**
-     * @throws UnsupportedValueException
-     * @throws NoHttpClientException
-     */
-    private static function build(ClientConfig $config, Authenticator ...$authenticators): self
-    {
-        $factory = new Psr17Factory();
-        $httpClient = $config->httpClient->isDefined() ? $config->httpClient->get() : HttpClientResolver::resolve($factory, $factory);
-
-        return new self($config->baseUrl, $httpClient, $factory, $factory, new AuthenticatorRegistry(array_values($authenticators)));
+        return self::withAuthenticators($config);
     }
 }

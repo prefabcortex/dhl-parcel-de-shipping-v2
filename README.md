@@ -40,6 +40,8 @@ Every link below points at a file under `examples/` to read and copy from.
 - **ApiKey** (API key): `Client::withApiKey(..., $config)` — see [`examples/Auth/ApiKey.php`](examples/Auth/ApiKey.php)
 - **OAuth2** (OAuth2): `Client::withOAuth(..., $config)` — see [`examples/Auth/OAuth2.php`](examples/Auth/OAuth2.php)
 
+For a scheme this package generates no authenticator for, or a signature the description cannot express, implement `Authentication\Authenticator` and pass it to `Client::withAuthenticators($config, ...)`.
+
 ### Operations
 
 #### General

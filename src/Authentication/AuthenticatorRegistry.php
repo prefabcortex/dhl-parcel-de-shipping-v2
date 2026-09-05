@@ -25,6 +25,17 @@ use function in_array;
  * OpenAPI `security` block. A request whose requirements none of the registered authenticators
  * satisfy goes out unsigned — the server, not the client, decides what that is worth.
  *
+ * That last rule stays deliberately quiet, and it is worth saying why, because it once hid a real
+ * defect: for a description requiring two schemes at once, no generated factory could register
+ * both, so every client sent every request unsigned and only the server ever said so. The fix
+ * belonged where the factories are written, not here. Throwing instead would break the case this
+ * silence exists for — a description may name a scheme this package generates no authenticator for
+ * (`openIdConnect`, `mutualTLS`), and its caller signs that part in their own PSR-18 client. From
+ * inside here, "signed elsewhere" and "forgotten" look exactly alike.
+ *
+ * To register several schemes for one request, call the factory the client emits for that
+ * requirement, or `Client::withAuthenticators()`.
+ *
  * @internal plumbing of the generated package, not part of its public contract: only the
  *                    generated operations and client touch this, and it may change in any release
  */

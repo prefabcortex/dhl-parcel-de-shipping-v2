@@ -1,0 +1,174 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_bool;
+use function is_string;
+use function sprintf;
+
+final readonly class VASDhlRetoure implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $refNo
+     * @param Option<ContactAddress>   $returnAddress
+     * @param Option<bool>             $goGreenPlus
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $billingNumber, private Option $refNo, private Option $returnAddress, private Option $goGreenPlus, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $billingNumber, array $additionalProperties = []): self
+    {
+        return new self($billingNumber, None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    public function getBillingNumber(): string
+    {
+        return $this->billingNumber;
+    }
+
+    public function withBillingNumber(string $billingNumber): self
+    {
+        return new self($billingNumber, $this->refNo, $this->returnAddress, $this->goGreenPlus, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getRefNo(): Option
+    {
+        return $this->refNo;
+    }
+
+    public function withRefNo(string $refNo): self
+    {
+        return new self($this->billingNumber, Some::create($refNo), $this->returnAddress, $this->goGreenPlus, $this->additionalProperties);
+    }
+
+    /**
+     * Combines name, address, contact information. The recommended way is to use the mandatory attribute addressStreet and submit the streetname and housenumber together â€“ alternatively addressHouse + addressStreet can be used. For many international addresses there is no house number, please do not set a period or any other sign to indicate that the address does not have a housenumber.
+     *
+     * @return Option<ContactAddress>
+     */
+    public function getReturnAddress(): Option
+    {
+        return $this->returnAddress;
+    }
+
+    public function withReturnAddress(ContactAddress $returnAddress): self
+    {
+        return new self($this->billingNumber, $this->refNo, Some::create($returnAddress), $this->goGreenPlus, $this->additionalProperties);
+    }
+
+    /**
+     * GoGreen Plus enables sustainable shipping by investing in measures to reduce greenhouse gas emissions at DHL.
+     *
+     * @return Option<bool>
+     */
+    public function getGoGreenPlus(): Option
+    {
+        return $this->goGreenPlus;
+    }
+
+    public function withGoGreenPlus(bool $goGreenPlus): self
+    {
+        return new self($this->billingNumber, $this->refNo, $this->returnAddress, Some::create($goGreenPlus), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $billingNumber = null;
+        $refNo = None::create();
+        $returnAddress = None::create();
+        $goGreenPlus = None::create();
+        if (array_key_exists('billingNumber', $data)) {
+            $billingNumberRaw = $data['billingNumber'];
+            if (!is_string($billingNumberRaw)) {
+                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+            }
+            $billingNumber = $billingNumberRaw;
+            unset($data['billingNumber']);
+        }
+        if (array_key_exists('refNo', $data)) {
+            $refNoRaw = $data['refNo'];
+            if (!is_string($refNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "refNo" must be string, got %s.', get_debug_type($refNoRaw)));
+            }
+            $refNo = Some::create($refNoRaw);
+            unset($data['refNo']);
+        }
+        if (array_key_exists('returnAddress', $data)) {
+            $returnAddressRaw = $data['returnAddress'];
+            if (!is_array($returnAddressRaw)) {
+                throw new MalformedDataException(sprintf('Property "returnAddress" must be object, got %s.', get_debug_type($returnAddressRaw)));
+            }
+            /** @var array<string, mixed> $returnAddressRawTyped */
+            $returnAddressRawTyped = $returnAddressRaw;
+            $returnAddress = Some::create(ContactAddress::fromArray($returnAddressRawTyped));
+            unset($data['returnAddress']);
+        }
+        if (array_key_exists('goGreenPlus', $data)) {
+            $goGreenPlusRaw = $data['goGreenPlus'];
+            if (!is_bool($goGreenPlusRaw)) {
+                throw new MalformedDataException(sprintf('Property "goGreenPlus" must be bool, got %s.', get_debug_type($goGreenPlusRaw)));
+            }
+            $goGreenPlus = Some::create($goGreenPlusRaw);
+            unset($data['goGreenPlus']);
+        }
+        $additionalProperties = $data;
+        if ($billingNumber === null) {
+            throw new MalformedDataException('Required property "billingNumber" is missing from the document.');
+        }
+
+        return new self($billingNumber, $refNo, $returnAddress, $goGreenPlus, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['billingNumber'] = $this->billingNumber;
+        $refNoOption = $this->refNo;
+        if ($refNoOption->isDefined()) {
+            $refNo = $refNoOption->get();
+            $dataArray['refNo'] = $refNo;
+        }
+        $returnAddressOption = $this->returnAddress;
+        if ($returnAddressOption->isDefined()) {
+            $returnAddress = $returnAddressOption->get();
+            $dataArray['returnAddress'] = $returnAddress->toArray();
+        }
+        $goGreenPlusOption = $this->goGreenPlus;
+        if ($goGreenPlusOption->isDefined()) {
+            $goGreenPlus = $goGreenPlusOption->get();
+            $dataArray['goGreenPlus'] = $goGreenPlus;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

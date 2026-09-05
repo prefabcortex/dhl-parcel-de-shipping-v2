@@ -1,0 +1,175 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Http;
+
+use function array_key_exists;
+use function is_array;
+use function is_string;
+use function json_decode;
+use function preg_match;
+use function preg_replace;
+use function strlen;
+use function substr;
+
+/**
+ * Turns an error response body into the message its exception carries.
+ *
+ * APIs put the human-readable part of an error under one of a handful of names — RFC 7807 calls
+ * it `detail` with `title` as the summary, plenty of others just say `message`. The first of
+ * those that actually holds a string wins; a body that is not JSON, or holds none of them, leaves
+ * the status description standing on its own.
+ *
+ * This used to be emitted into the constructor of every generated exception class, which put the
+ * same ten lines — and the same two `mixed` values — into a package once per error status per
+ * operation. There is nothing operation-specific about it.
+ *
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ */
+final class ErrorMessage
+{
+    /**
+     * What a status code means, or the empty string for a code this does not name.
+     *
+     * The generator asks this too, to fill in the description of an error response the
+     * specification left unnamed, so the wording exists once rather than once per side of the
+     * generation.
+     *
+     * Error statuses only. A success status reaching {@see describeStatus()} means no response
+     * declared it, and answering "OK" to that would be the one misleading thing to say.
+     *
+     * Wording follows IANA's HTTP Status Code Registry, which is also where the RFC behind any
+     * one of these codes is to be looked up. A `match` rather than a constant array on purpose:
+     * this file is copied into every generated package and reprinted there, and reprinting puts
+     * an array literal on a single line — forty entries and fifteen hundred characters of it.
+     */
+    public static function statusText(int $status): string
+    {
+        return match ($status) {
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            402 => 'Payment Required',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            406 => 'Not Acceptable',
+            407 => 'Proxy Authentication Required',
+            408 => 'Request Timeout',
+            409 => 'Conflict',
+            410 => 'Gone',
+            411 => 'Length Required',
+            412 => 'Precondition Failed',
+            413 => 'Content Too Large',
+            414 => 'URI Too Long',
+            415 => 'Unsupported Media Type',
+            416 => 'Range Not Satisfiable',
+            417 => 'Expectation Failed',
+            418 => 'I\'m a teapot',
+            421 => 'Misdirected Request',
+            422 => 'Unprocessable Content',
+            423 => 'Locked',
+            424 => 'Failed Dependency',
+            425 => 'Too Early',
+            426 => 'Upgrade Required',
+            428 => 'Precondition Required',
+            429 => 'Too Many Requests',
+            431 => 'Request Header Fields Too Large',
+            451 => 'Unavailable For Legal Reasons',
+            500 => 'Internal Server Error',
+            501 => 'Not Implemented',
+            502 => 'Bad Gateway',
+            503 => 'Service Unavailable',
+            504 => 'Gateway Timeout',
+            505 => 'HTTP Version Not Supported',
+            506 => 'Variant Also Negotiates',
+            507 => 'Insufficient Storage',
+            508 => 'Loop Detected',
+            510 => 'Not Extended',
+            511 => 'Network Authentication Required',
+            default => '',
+        };
+    }
+
+    /**
+     *  In precedence order: RFC 7807's fields first, then the common informal one.
+     */
+    private const array DETAIL_KEYS = ['detail', 'title', 'message'];
+    /**
+     * How much of a detail field reaches the message, in bytes. It is API-controlled text on its
+     * way into a log line and a stack trace, so it gets a ceiling; the description in front of it
+     * is ours and is always short, which is why the cap sits on the detail and not on the result.
+     */
+    private const int DETAIL_LIMIT = 512;
+
+    /**
+     * @param string $rawResponse the response body, JSON or not
+     * @param string $description what the status code means, e.g. "Bad Request"
+     */
+    public static function describe(string $rawResponse, string $description): string
+    {
+        $detail = self::detailOf($rawResponse);
+
+        return '' === $detail ? $description : $description . ': ' . $detail;
+    }
+
+    /**
+     * The same, for the one exception thrown at a status no response declared and which therefore
+     * has no description of its own to go by.
+     *
+     * Deliberately not the response's reason phrase: HTTP/2 dropped it, so it is routinely empty,
+     * and where it is present it is text an upstream proxy chose — one more thing being written
+     * into a log line unread.
+     *
+     * @param string $rawResponse the response body, JSON or not
+     */
+    public static function describeStatus(string $rawResponse, int $status): string
+    {
+        $text = self::statusText($status);
+
+        return self::describe($rawResponse, '' === $text ? 'HTTP ' . $status : $text);
+    }
+
+    /**
+     *  The first detail field holding a string, or the empty string if there is none.
+     */
+    private static function detailOf(string $rawResponse): string
+    {
+        $decoded = json_decode($rawResponse, true);
+        if (!is_array($decoded)) {
+            return '';
+        }
+        foreach (self::DETAIL_KEYS as $key) {
+            if (array_key_exists($key, $decoded) && is_string($decoded[$key])) {
+                return self::readable($decoded[$key]);
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * A detail field as one line of log, bounded: control characters out, length capped, and the
+     * omitted byte count named so the reader knows the message is not the whole answer.
+     */
+    private static function readable(string $detail): string
+    {
+        // JSON escapes these, so they survive decoding as real bytes — a newline would split the
+        // one line this is meant to be, and a NUL byte is not text at all.
+        $detail = (string) preg_replace('/[\x00-\x1F\x7F]+/', ' ', $detail);
+        if (strlen($detail) <= self::DETAIL_LIMIT) {
+            return $detail;
+        }
+        // The cap counts bytes, so it can land inside a multi-byte character and leave a lead byte
+        // standing alone. Give back the fragment rather than an invalid string — at most three
+        // steps. mb_substr would say this in one call, and would put an ext-mbstring requirement
+        // into every generated package for the sake of it.
+        $kept = substr($detail, 0, self::DETAIL_LIMIT);
+        while ('' !== $kept && 1 !== preg_match('//u', $kept)) {
+            $kept = substr($kept, 0, -1);
+        }
+
+        return $kept . '… (+' . (strlen($detail) - strlen($kept)) . ' more bytes, see getRawResponse())';
+    }
+}

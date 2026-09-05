@@ -1,0 +1,173 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use DateTime;
+use DateTimeInterface;
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class VASIdentCheck implements SelfNormalizingModel
+{
+    /**
+     * @param Option<DateTimeInterface>       $dateOfBirth
+     * @param Option<VASIdentCheckMinimumAge> $minimumAge
+     * @param array<int|string, mixed>        $additionalProperties
+     */
+    public function __construct(private string $firstName, private string $lastName, private Option $dateOfBirth, private Option $minimumAge, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $firstName, string $lastName, array $additionalProperties = []): self
+    {
+        return new self($firstName, $lastName, None::create(), None::create(), $additionalProperties);
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function withFirstName(string $firstName): self
+    {
+        return new self($firstName, $this->lastName, $this->dateOfBirth, $this->minimumAge, $this->additionalProperties);
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function withLastName(string $lastName): self
+    {
+        return new self($this->firstName, $lastName, $this->dateOfBirth, $this->minimumAge, $this->additionalProperties);
+    }
+
+    /**
+     * date of birth, used in conjunction with minimumAge and shipping date. Format yyyy-mm-dd is used.
+     *
+     * @return Option<DateTimeInterface>
+     */
+    public function getDateOfBirth(): Option
+    {
+        return $this->dateOfBirth;
+    }
+
+    public function withDateOfBirth(DateTimeInterface $dateOfBirth): self
+    {
+        return new self($this->firstName, $this->lastName, Some::create($dateOfBirth), $this->minimumAge, $this->additionalProperties);
+    }
+
+    /**
+     * Checks if recipient will have reached specified age by shipping date.
+     *
+     * @return Option<VASIdentCheckMinimumAge>
+     */
+    public function getMinimumAge(): Option
+    {
+        return $this->minimumAge;
+    }
+
+    public function withMinimumAge(VASIdentCheckMinimumAge $minimumAge): self
+    {
+        return new self($this->firstName, $this->lastName, $this->dateOfBirth, Some::create($minimumAge), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $firstName = null;
+        $lastName = null;
+        $dateOfBirth = None::create();
+        $minimumAge = None::create();
+        if (array_key_exists('firstName', $data)) {
+            $firstNameRaw = $data['firstName'];
+            if (!is_string($firstNameRaw)) {
+                throw new MalformedDataException(sprintf('Property "firstName" must be string, got %s.', get_debug_type($firstNameRaw)));
+            }
+            $firstName = $firstNameRaw;
+            unset($data['firstName']);
+        }
+        if (array_key_exists('lastName', $data)) {
+            $lastNameRaw = $data['lastName'];
+            if (!is_string($lastNameRaw)) {
+                throw new MalformedDataException(sprintf('Property "lastName" must be string, got %s.', get_debug_type($lastNameRaw)));
+            }
+            $lastName = $lastNameRaw;
+            unset($data['lastName']);
+        }
+        if (array_key_exists('dateOfBirth', $data)) {
+            $dateOfBirthRaw = $data['dateOfBirth'];
+            if (!is_string($dateOfBirthRaw)) {
+                throw new MalformedDataException(sprintf('Property "dateOfBirth" must be object, got %s.', get_debug_type($dateOfBirthRaw)));
+            }
+            $date = DateTime::createFromFormat('Y-m-d', $dateOfBirthRaw);
+            if ($date === false) {
+                throw new MalformedDataException('Invalid date format, expected: Y-m-d');
+            }
+            $dateOfBirth = Some::create($date->setTime(0, 0, 0));
+            unset($data['dateOfBirth']);
+        }
+        if (array_key_exists('minimumAge', $data)) {
+            $minimumAgeRaw = $data['minimumAge'];
+            if (!is_string($minimumAgeRaw)) {
+                throw new MalformedDataException(sprintf('Property "minimumAge" must be string, got %s.', get_debug_type($minimumAgeRaw)));
+            }
+            $minimumAge = Some::create(VASIdentCheckMinimumAge::tryFrom($minimumAgeRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid VASIdentCheckMinimumAge.', $minimumAgeRaw)));
+            unset($data['minimumAge']);
+        }
+        $additionalProperties = $data;
+        if ($firstName === null) {
+            throw new MalformedDataException('Required property "firstName" is missing from the document.');
+        }
+        if ($lastName === null) {
+            throw new MalformedDataException('Required property "lastName" is missing from the document.');
+        }
+
+        return new self($firstName, $lastName, $dateOfBirth, $minimumAge, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['firstName'] = $this->firstName;
+        $dataArray['lastName'] = $this->lastName;
+        $dateOfBirthOption = $this->dateOfBirth;
+        if ($dateOfBirthOption->isDefined()) {
+            $dateOfBirth = $dateOfBirthOption->get();
+            $dataArray['dateOfBirth'] = $dateOfBirth->format('Y-m-d');
+        }
+        $minimumAgeOption = $this->minimumAge;
+        if ($minimumAgeOption->isDefined()) {
+            $minimumAge = $minimumAgeOption->get();
+            $dataArray['minimumAge'] = $minimumAge->value;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

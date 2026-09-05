@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\VAS;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Type;
+
+/**
+ * @see VAS
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class VASConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'preferredNeighbour' => new Optional([new Length(null, null, 100), new Type(['string']), new NotNull()]),
+                'preferredLocation' => new Optional([new Length(null, null, 100), new Type(['string']), new NotNull()]),
+                'visualCheckOfAge' => new Optional([...VASVisualCheckOfAgeConstraint::constraints()]),
+                'namedPersonOnly' => new Optional([new Type(['bool']), new NotNull()]),
+                'identCheck' => new Optional([new NotNull(), ...VASIdentCheckConstraint::constraints()]),
+                'signedForByRecipient' => new Optional([new Type(['bool']), new NotNull()]),
+                'endorsement' => new Optional([...VASEndorsementConstraint::constraints()]),
+                'preferredDay' => new Optional([new Type(['string']), new NotNull()]),
+                'noNeighbourDelivery' => new Optional([new Type(['bool']), new NotNull()]),
+                'additionalInsurance' => new Optional([new NotNull(), ...ValueConstraint::constraints()]),
+                'bulkyGoods' => new Optional([new Type(['bool']), new NotNull()]),
+                'cashOnDelivery' => new Optional([new NotNull(), ...VASCashOnDeliveryConstraint::constraints()]),
+                'individualSenderRequirement' => new Optional([new Regex('#[a-zA-Z0-9]{2}#'), new Type(['string']), new NotNull()]),
+                'premium' => new Optional([new Type(['bool']), new NotNull()]),
+                'closestDropPoint' => new Optional([new Type(['bool']), new NotNull()]),
+                'parcelOutletRouting' => new Optional([new Type(['string']), new NotNull()]),
+                'goGreenPlus' => new Optional([new Type(['bool']), new NotNull()]),
+                'dhlRetoure' => new Optional([new NotNull(), ...VASDhlRetoureConstraint::constraints()]),
+                'postalDeliveryDutyPaid' => new Optional([new Type(['bool']), new NotNull()]),
+            ], null, null, true),
+        ];
+    }
+}

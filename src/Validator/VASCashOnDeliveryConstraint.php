@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\VASCashOnDelivery;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
+
+/**
+ * @see VASCashOnDelivery
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class VASCashOnDeliveryConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'amount' => new Optional([new NotNull(), ...ValueConstraint::constraints()]),
+                'bankAccount' => new Optional([new NotNull(), ...BankAccountConstraint::constraints()]),
+                'accountReference' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'transferNote1' => new Required([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'transferNote2' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+            ], null, null, true),
+        ];
+    }
+}

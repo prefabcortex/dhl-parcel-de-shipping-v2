@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\VASIdentCheck;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
+
+/**
+ * @see VASIdentCheck
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class VASIdentCheckConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'firstName' => new Required([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'lastName' => new Required([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'dateOfBirth' => new Optional([new Type(['string']), new NotNull()]),
+                'minimumAge' => new Optional([...VASIdentCheckMinimumAgeConstraint::constraints()]),
+            ], null, null, true),
+        ];
+    }
+}

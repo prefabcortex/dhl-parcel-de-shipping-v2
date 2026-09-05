@@ -1,0 +1,211 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class Document implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>              $b64
+     * @param Option<string>              $zpl2
+     * @param Option<string>              $url
+     * @param Option<DocumentFileFormat>  $fileFormat
+     * @param Option<DocumentPrintFormat> $printFormat
+     * @param array<int|string, mixed>    $additionalProperties
+     */
+    public function __construct(private Option $b64, private Option $zpl2, private Option $url, private Option $fileFormat, private Option $printFormat, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * The Base64 encoded byte stream.
+     *
+     * @return Option<string>
+     */
+    public function getB64(): Option
+    {
+        return $this->b64;
+    }
+
+    public function withB64(string $b64): self
+    {
+        return new self(Some::create($b64), $this->zpl2, $this->url, $this->fileFormat, $this->printFormat, $this->additionalProperties);
+    }
+
+    /**
+     * The document in zpl encoding.
+     *
+     * @return Option<string>
+     */
+    public function getZpl2(): Option
+    {
+        return $this->zpl2;
+    }
+
+    public function withZpl2(string $zpl2): self
+    {
+        return new self($this->b64, Some::create($zpl2), $this->url, $this->fileFormat, $this->printFormat, $this->additionalProperties);
+    }
+
+    /**
+     * URL reference to download document.
+     *
+     * @return Option<string>
+     */
+    public function getUrl(): Option
+    {
+        return $this->url;
+    }
+
+    public function withUrl(string $url): self
+    {
+        return new self($this->b64, $this->zpl2, Some::create($url), $this->fileFormat, $this->printFormat, $this->additionalProperties);
+    }
+
+    /**
+     * format of the encoded bytes.
+     *
+     * @return Option<DocumentFileFormat>
+     */
+    public function getFileFormat(): Option
+    {
+        return $this->fileFormat;
+    }
+
+    public function withFileFormat(DocumentFileFormat $fileFormat): self
+    {
+        return new self($this->b64, $this->zpl2, $this->url, Some::create($fileFormat), $this->printFormat, $this->additionalProperties);
+    }
+
+    /**
+     * The print format used. Customs documents and cash on delivery documents can only be returned in format A4.
+     *
+     * @return Option<DocumentPrintFormat>
+     */
+    public function getPrintFormat(): Option
+    {
+        return $this->printFormat;
+    }
+
+    public function withPrintFormat(DocumentPrintFormat $printFormat): self
+    {
+        return new self($this->b64, $this->zpl2, $this->url, $this->fileFormat, Some::create($printFormat), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $b64 = None::create();
+        $zpl2 = None::create();
+        $url = None::create();
+        $fileFormat = None::create();
+        $printFormat = None::create();
+        if (array_key_exists('b64', $data)) {
+            $b64Raw = $data['b64'];
+            if (!is_string($b64Raw)) {
+                throw new MalformedDataException(sprintf('Property "b64" must be string, got %s.', get_debug_type($b64Raw)));
+            }
+            $b64 = Some::create($b64Raw);
+            unset($data['b64']);
+        }
+        if (array_key_exists('zpl2', $data)) {
+            $zpl2Raw = $data['zpl2'];
+            if (!is_string($zpl2Raw)) {
+                throw new MalformedDataException(sprintf('Property "zpl2" must be string, got %s.', get_debug_type($zpl2Raw)));
+            }
+            $zpl2 = Some::create($zpl2Raw);
+            unset($data['zpl2']);
+        }
+        if (array_key_exists('url', $data)) {
+            $urlRaw = $data['url'];
+            if (!is_string($urlRaw)) {
+                throw new MalformedDataException(sprintf('Property "url" must be string, got %s.', get_debug_type($urlRaw)));
+            }
+            $url = Some::create($urlRaw);
+            unset($data['url']);
+        }
+        if (array_key_exists('fileFormat', $data)) {
+            $fileFormatRaw = $data['fileFormat'];
+            if (!is_string($fileFormatRaw)) {
+                throw new MalformedDataException(sprintf('Property "fileFormat" must be string, got %s.', get_debug_type($fileFormatRaw)));
+            }
+            $fileFormat = Some::create(DocumentFileFormat::tryFrom($fileFormatRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid DocumentFileFormat.', $fileFormatRaw)));
+            unset($data['fileFormat']);
+        }
+        if (array_key_exists('printFormat', $data)) {
+            $printFormatRaw = $data['printFormat'];
+            if (!is_string($printFormatRaw)) {
+                throw new MalformedDataException(sprintf('Property "printFormat" must be string, got %s.', get_debug_type($printFormatRaw)));
+            }
+            $printFormat = Some::create(DocumentPrintFormat::tryFrom($printFormatRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid DocumentPrintFormat.', $printFormatRaw)));
+            unset($data['printFormat']);
+        }
+        $additionalProperties = $data;
+
+        return new self($b64, $zpl2, $url, $fileFormat, $printFormat, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $b64Option = $this->b64;
+        if ($b64Option->isDefined()) {
+            $b64 = $b64Option->get();
+            $dataArray['b64'] = $b64;
+        }
+        $zpl2Option = $this->zpl2;
+        if ($zpl2Option->isDefined()) {
+            $zpl2 = $zpl2Option->get();
+            $dataArray['zpl2'] = $zpl2;
+        }
+        $urlOption = $this->url;
+        if ($urlOption->isDefined()) {
+            $url = $urlOption->get();
+            $dataArray['url'] = $url;
+        }
+        $fileFormatOption = $this->fileFormat;
+        if ($fileFormatOption->isDefined()) {
+            $fileFormat = $fileFormatOption->get();
+            $dataArray['fileFormat'] = $fileFormat->value;
+        }
+        $printFormatOption = $this->printFormat;
+        if ($printFormatOption->isDefined()) {
+            $printFormat = $printFormatOption->get();
+            $dataArray['printFormat'] = $printFormat->value;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

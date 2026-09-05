@@ -1,0 +1,434 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use DateTime;
+use DateTimeInterface;
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class Shipment implements SelfNormalizingModel
+{
+    /**
+     * @param Option<Product>                                $product
+     * @param Option<string>                                 $billingNumber
+     * @param Option<string>                                 $refNo
+     * @param Option<string>                                 $costCenter
+     * @param Option<string>                                 $creationSoftware
+     * @param Option<DateTimeInterface>                      $shipDate
+     * @param Option<Shipper|ShipperReference>               $shipper
+     * @param Option<ContactAddress|Locker|PostOffice|POBox> $consignee
+     * @param Option<ShipmentDetails>                        $details
+     * @param Option<VAS>                                    $services
+     * @param Option<CustomsDetails>                         $customs
+     * @param array<int|string, mixed>                       $additionalProperties
+     */
+    public function __construct(private Option $product, private Option $billingNumber, private Option $refNo, private Option $costCenter, private Option $creationSoftware, private Option $shipDate, private Option $shipper, private Option $consignee, private Option $details, private Option $services, private Option $customs, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Determines the DHL Paket product to be used.
+     *
+     * * V01PAK: DHL PAKET;
+     * * V53WPAK: DHL PAKET International;
+     * * V54EPAK: DHL Europaket;
+     * * V62WP: Warenpost (will be replaced by DHL Kleinpaket from 1.1.2025);
+     * * V62KP: DHL Kleinpaket;
+     * * V66WPI: Warenpost International
+     *
+     * @return Option<Product>
+     */
+    public function getProduct(): Option
+    {
+        return $this->product;
+    }
+
+    public function withProduct(Product $product): self
+    {
+        return new self(Some::create($product), $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * 14 digit long number that identifies the contract the shipment is booked on. Please note that in rare cases the last to characters can be letters. Digit 11 and digit 12 must correspondent to the number of the product, e.g. 333333333301tt can only be used for the product V01PAK (DHL Paket).
+     *
+     * @return Option<string>
+     */
+    public function getBillingNumber(): Option
+    {
+        return $this->billingNumber;
+    }
+
+    public function withBillingNumber(string $billingNumber): self
+    {
+        return new self($this->product, Some::create($billingNumber), $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * A reference number that the user can assign for better association purposes. It appears on shipment labels. To use the reference number for tracking purposes, it should be at least 8 characters long and unique.
+     *
+     * @return Option<string>
+     */
+    public function getRefNo(): Option
+    {
+        return $this->refNo;
+    }
+
+    public function withRefNo(string $refNo): self
+    {
+        return new self($this->product, $this->billingNumber, Some::create($refNo), $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Textfield that appears on the shipment label. It cannot be used to search for the shipment.
+     *
+     * @return Option<string>
+     */
+    public function getCostCenter(): Option
+    {
+        return $this->costCenter;
+    }
+
+    public function withCostCenter(string $costCenter): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, Some::create($costCenter), $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Is only to be indicated by DHL partners.
+     *
+     * @return Option<string>
+     */
+    public function getCreationSoftware(): Option
+    {
+        return $this->creationSoftware;
+    }
+
+    public function withCreationSoftware(string $creationSoftware): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, Some::create($creationSoftware), $this->shipDate, $this->shipper, $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Date the shipment is transferred to DHL. The shipment date can be the current date or a date up to a few days in the future. It must not be in the past. Iso format required: yyyy-mm-dd. On the shipment date the shipment will be automatically closed at your end of day closing time.
+     *
+     * @return Option<DateTimeInterface>
+     */
+    public function getShipDate(): Option
+    {
+        return $this->shipDate;
+    }
+
+    public function withShipDate(DateTimeInterface $shipDate): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, Some::create($shipDate), $this->shipper, $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Shipper information, including contact information and address. Alternatively, a predefined shipper reference can be used.
+     *
+     * @return Option<Shipper|ShipperReference>
+     */
+    public function getShipper(): Option
+    {
+        return $this->shipper;
+    }
+
+    public function withShipper(Shipper|ShipperReference $shipper): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, Some::create($shipper), $this->consignee, $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Consignee address information. Either a doorstep address (contact address) including contact information or a droppoint address. One of packstation (parcel locker), or post office (postfiliale/retail shop).
+     *
+     * @return Option<ContactAddress|Locker|PostOffice|POBox>
+     */
+    public function getConsignee(): Option
+    {
+        return $this->consignee;
+    }
+
+    public function withConsignee(ContactAddress|Locker|PostOffice|POBox $consignee): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, Some::create($consignee), $this->details, $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Details for the shipment, such as dimensions, content.
+     *
+     * @return Option<ShipmentDetails>
+     */
+    public function getDetails(): Option
+    {
+        return $this->details;
+    }
+
+    public function withDetails(ShipmentDetails $details): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, Some::create($details), $this->services, $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * Value added services. Please note that services are specific to products and geographies and/or may require individual setup and billing numbers. Please test and contact your account representative in case of questions.
+     *
+     * @return Option<VAS>
+     */
+    public function getServices(): Option
+    {
+        return $this->services;
+    }
+
+    public function withServices(VAS $services): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, $this->details, Some::create($services), $this->customs, $this->additionalProperties);
+    }
+
+    /**
+     * For international shipments, this section contains information necessary for customs about the exported goods. ExportDocument can contain one or more positions as child element. This data is also transferred as electronic declaration to customs. The custom details are mandatory depending on whether the parcel will go to a country outside the European Customs Union. For DHL Parcel International (V53WPAK) CN23 will returned as a separate document, while for Warenpost International the customs information will be printed onto the shipment label (CN22).
+     *
+     * @return Option<CustomsDetails>
+     */
+    public function getCustoms(): Option
+    {
+        return $this->customs;
+    }
+
+    public function withCustoms(CustomsDetails $customs): self
+    {
+        return new self($this->product, $this->billingNumber, $this->refNo, $this->costCenter, $this->creationSoftware, $this->shipDate, $this->shipper, $this->consignee, $this->details, $this->services, Some::create($customs), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $product = None::create();
+        $billingNumber = None::create();
+        $refNo = None::create();
+        $costCenter = None::create();
+        $creationSoftware = None::create();
+        $shipDate = None::create();
+        $shipper = None::create();
+        $consignee = None::create();
+        $details = None::create();
+        $services = None::create();
+        $customs = None::create();
+        if (array_key_exists('product', $data)) {
+            $productRaw = $data['product'];
+            if (!is_string($productRaw)) {
+                throw new MalformedDataException(sprintf('Property "product" must be string, got %s.', get_debug_type($productRaw)));
+            }
+            $product = Some::create(Product::tryFrom($productRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Product.', $productRaw)));
+            unset($data['product']);
+        }
+        if (array_key_exists('billingNumber', $data)) {
+            $billingNumberRaw = $data['billingNumber'];
+            if (!is_string($billingNumberRaw)) {
+                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+            }
+            $billingNumber = Some::create($billingNumberRaw);
+            unset($data['billingNumber']);
+        }
+        if (array_key_exists('refNo', $data)) {
+            $refNoRaw = $data['refNo'];
+            if (!is_string($refNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "refNo" must be string, got %s.', get_debug_type($refNoRaw)));
+            }
+            $refNo = Some::create($refNoRaw);
+            unset($data['refNo']);
+        }
+        if (array_key_exists('costCenter', $data)) {
+            $costCenterRaw = $data['costCenter'];
+            if (!is_string($costCenterRaw)) {
+                throw new MalformedDataException(sprintf('Property "costCenter" must be string, got %s.', get_debug_type($costCenterRaw)));
+            }
+            $costCenter = Some::create($costCenterRaw);
+            unset($data['costCenter']);
+        }
+        if (array_key_exists('creationSoftware', $data)) {
+            $creationSoftwareRaw = $data['creationSoftware'];
+            if (!is_string($creationSoftwareRaw)) {
+                throw new MalformedDataException(sprintf('Property "creationSoftware" must be string, got %s.', get_debug_type($creationSoftwareRaw)));
+            }
+            $creationSoftware = Some::create($creationSoftwareRaw);
+            unset($data['creationSoftware']);
+        }
+        if (array_key_exists('shipDate', $data)) {
+            $shipDateRaw = $data['shipDate'];
+            if (!is_string($shipDateRaw)) {
+                throw new MalformedDataException(sprintf('Property "shipDate" must be object, got %s.', get_debug_type($shipDateRaw)));
+            }
+            $date = DateTime::createFromFormat('Y-m-d', $shipDateRaw);
+            if ($date === false) {
+                throw new MalformedDataException('Invalid date format, expected: Y-m-d');
+            }
+            $shipDate = Some::create($date->setTime(0, 0, 0));
+            unset($data['shipDate']);
+        }
+        if (array_key_exists('shipper', $data)) {
+            if (!is_array($data['shipper'])) {
+                throw new MalformedDataException('Value did not match any of the expected types.');
+            }
+            /** @var array<string, mixed> $shipperTyped */
+            $shipperTyped = $data['shipper'];
+            if (array_key_exists('name1', $shipperTyped) && array_key_exists('addressStreet', $shipperTyped) && array_key_exists('city', $shipperTyped) && (array_key_exists('country', $shipperTyped) && ((is_int($shipperTyped['country']) || is_string($shipperTyped['country'])) && Country::tryFrom($shipperTyped['country']) !== null))) {
+                $value = Shipper::fromArray($shipperTyped);
+            } elseif (array_key_exists('shipperRef', $shipperTyped)) {
+                $value = ShipperReference::fromArray($shipperTyped);
+            } else {
+                throw new MalformedDataException('Value did not match any of the expected types.');
+            }
+            $shipper = Some::create($value);
+            unset($data['shipper']);
+        }
+        if (array_key_exists('consignee', $data)) {
+            if (!is_array($data['consignee'])) {
+                throw new MalformedDataException('Value did not match any of the expected types.');
+            }
+            /** @var array<string, mixed> $consigneeTyped */
+            $consigneeTyped = $data['consignee'];
+            if (array_key_exists('name', $consigneeTyped) && array_key_exists('lockerID', $consigneeTyped) && array_key_exists('postNumber', $consigneeTyped) && array_key_exists('city', $consigneeTyped) && array_key_exists('postalCode', $consigneeTyped)) {
+                $value_1 = Locker::fromArray($consigneeTyped);
+            } elseif (array_key_exists('name1', $consigneeTyped) && array_key_exists('addressStreet', $consigneeTyped) && array_key_exists('city', $consigneeTyped) && (array_key_exists('country', $consigneeTyped) && ((is_int($consigneeTyped['country']) || is_string($consigneeTyped['country'])) && Country::tryFrom($consigneeTyped['country']) !== null))) {
+                $value_1 = ContactAddress::fromArray($consigneeTyped);
+            } elseif (array_key_exists('name', $consigneeTyped) && array_key_exists('retailID', $consigneeTyped) && array_key_exists('city', $consigneeTyped) && array_key_exists('postalCode', $consigneeTyped)) {
+                $value_1 = PostOffice::fromArray($consigneeTyped);
+            } elseif (array_key_exists('name1', $consigneeTyped) && array_key_exists('poBoxID', $consigneeTyped) && array_key_exists('city', $consigneeTyped) && array_key_exists('postalCode', $consigneeTyped)) {
+                $value_1 = POBox::fromArray($consigneeTyped);
+            } else {
+                throw new MalformedDataException('Value did not match any of the expected types.');
+            }
+            $consignee = Some::create($value_1);
+            unset($data['consignee']);
+        }
+        if (array_key_exists('details', $data)) {
+            $detailsRaw = $data['details'];
+            if (!is_array($detailsRaw)) {
+                throw new MalformedDataException(sprintf('Property "details" must be object, got %s.', get_debug_type($detailsRaw)));
+            }
+            /** @var array<string, mixed> $detailsRawTyped */
+            $detailsRawTyped = $detailsRaw;
+            $details = Some::create(ShipmentDetails::fromArray($detailsRawTyped));
+            unset($data['details']);
+        }
+        if (array_key_exists('services', $data)) {
+            $servicesRaw = $data['services'];
+            if (!is_array($servicesRaw)) {
+                throw new MalformedDataException(sprintf('Property "services" must be object, got %s.', get_debug_type($servicesRaw)));
+            }
+            /** @var array<string, mixed> $servicesRawTyped */
+            $servicesRawTyped = $servicesRaw;
+            $services = Some::create(VAS::fromArray($servicesRawTyped));
+            unset($data['services']);
+        }
+        if (array_key_exists('customs', $data)) {
+            $customsRaw = $data['customs'];
+            if (!is_array($customsRaw)) {
+                throw new MalformedDataException(sprintf('Property "customs" must be object, got %s.', get_debug_type($customsRaw)));
+            }
+            /** @var array<string, mixed> $customsRawTyped */
+            $customsRawTyped = $customsRaw;
+            $customs = Some::create(CustomsDetails::fromArray($customsRawTyped));
+            unset($data['customs']);
+        }
+        $additionalProperties = $data;
+
+        return new self($product, $billingNumber, $refNo, $costCenter, $creationSoftware, $shipDate, $shipper, $consignee, $details, $services, $customs, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $productOption = $this->product;
+        if ($productOption->isDefined()) {
+            $product = $productOption->get();
+            $dataArray['product'] = $product->value;
+        }
+        $billingNumberOption = $this->billingNumber;
+        if ($billingNumberOption->isDefined()) {
+            $billingNumber = $billingNumberOption->get();
+            $dataArray['billingNumber'] = $billingNumber;
+        }
+        $refNoOption = $this->refNo;
+        if ($refNoOption->isDefined()) {
+            $refNo = $refNoOption->get();
+            $dataArray['refNo'] = $refNo;
+        }
+        $costCenterOption = $this->costCenter;
+        if ($costCenterOption->isDefined()) {
+            $costCenter = $costCenterOption->get();
+            $dataArray['costCenter'] = $costCenter;
+        }
+        $creationSoftwareOption = $this->creationSoftware;
+        if ($creationSoftwareOption->isDefined()) {
+            $creationSoftware = $creationSoftwareOption->get();
+            $dataArray['creationSoftware'] = $creationSoftware;
+        }
+        $shipDateOption = $this->shipDate;
+        if ($shipDateOption->isDefined()) {
+            $shipDate = $shipDateOption->get();
+            $dataArray['shipDate'] = $shipDate->format('Y-m-d');
+        }
+        $shipperOption = $this->shipper;
+        if ($shipperOption->isDefined()) {
+            $shipper = $shipperOption->get();
+            $value = $shipper->toArray();
+            $dataArray['shipper'] = $value;
+        }
+        $consigneeOption = $this->consignee;
+        if ($consigneeOption->isDefined()) {
+            $consignee = $consigneeOption->get();
+            $value_1 = $consignee->toArray();
+            $dataArray['consignee'] = $value_1;
+        }
+        $detailsOption = $this->details;
+        if ($detailsOption->isDefined()) {
+            $details = $detailsOption->get();
+            $dataArray['details'] = $details->toArray();
+        }
+        $servicesOption = $this->services;
+        if ($servicesOption->isDefined()) {
+            $services = $servicesOption->get();
+            $dataArray['services'] = $services->toArray();
+        }
+        $customsOption = $this->customs;
+        if ($customsOption->isDefined()) {
+            $customs = $customsOption->get();
+            $dataArray['customs'] = $customs->toArray();
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

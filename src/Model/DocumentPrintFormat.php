@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+enum DocumentPrintFormat: string
+{
+    case A4_PT = 'A4-PT';
+    case A4 = 'A4';
+    case _910_300_700 = '910-300-700';
+    case _910_300_700_oZ_oz = '910-300-700-oZ/oz';
+    case _910_300_300 = '910-300-300';
+    case _910_300_300_oz = '910-300-300-oz';
+    case _910_300_710 = '910-300-710';
+    case _910_300_600_610 = '910-300-600/610';
+    case _910_300_400_410 = '910-300-400/410';
+    case _100x70mm = '100x70mm';
+}

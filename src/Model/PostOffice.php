@@ -1,0 +1,253 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class PostOffice implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $postNumber
+     * @param Option<string>           $email
+     * @param Option<Country>          $country
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $name, private int $retailID, private string $city, private string $postalCode, private Option $postNumber, private Option $email, private Option $country, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $name, int $retailID, string $city, string $postalCode, array $additionalProperties = []): self
+    {
+        return new self($name, $retailID, $city, $postalCode, None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function withName(string $name): self
+    {
+        return new self($name, $this->retailID, $this->city, $this->postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * Id or Number of Post office / Filiale / outlet / parcel shop.
+     */
+    public function getRetailID(): int
+    {
+        return $this->retailID;
+    }
+
+    public function withRetailID(int $retailID): self
+    {
+        return new self($this->name, $retailID, $this->city, $this->postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * postNumber (Postnummer) is the official account number a private DHL Customer gets upon registration. To address a post office or retail outlet directly, either the post number or e-mail address of the consignee is needed.
+     *
+     * @return Option<string>
+     */
+    public function getPostNumber(): Option
+    {
+        return $this->postNumber;
+    }
+
+    public function withPostNumber(string $postNumber): self
+    {
+        return new self($this->name, $this->retailID, $this->city, $this->postalCode, Some::create($postNumber), $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * Email address of the consignee. To address a post office or retail outlet directly, either the post number or e-mail address of the consignee is needed.
+     *
+     * @return Option<string>
+     */
+    public function getEmail(): Option
+    {
+        return $this->email;
+    }
+
+    public function withEmail(string $email): self
+    {
+        return new self($this->name, $this->retailID, $this->city, $this->postalCode, $this->postNumber, Some::create($email), $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * City where the retail location is.
+     */
+    public function getCity(): string
+    {
+        return $this->city;
+    }
+
+    public function withCity(string $city): self
+    {
+        return new self($this->name, $this->retailID, $city, $this->postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * A valid country code consisting of three characters according to ISO 3166-1 alpha-3.
+     *
+     * @return Option<Country>
+     */
+    public function getCountry(): Option
+    {
+        return $this->country;
+    }
+
+    public function withCountry(Country $country): self
+    {
+        return new self($this->name, $this->retailID, $this->city, $this->postalCode, $this->postNumber, $this->email, Some::create($country), $this->additionalProperties);
+    }
+
+    public function getPostalCode(): string
+    {
+        return $this->postalCode;
+    }
+
+    public function withPostalCode(string $postalCode): self
+    {
+        return new self($this->name, $this->retailID, $this->city, $postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $name = null;
+        $retailID = null;
+        $postNumber = None::create();
+        $email = None::create();
+        $city = null;
+        $country = None::create();
+        $postalCode = null;
+        if (array_key_exists('name', $data)) {
+            $nameRaw = $data['name'];
+            if (!is_string($nameRaw)) {
+                throw new MalformedDataException(sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)));
+            }
+            $name = $nameRaw;
+            unset($data['name']);
+        }
+        if (array_key_exists('retailID', $data)) {
+            $retailIDRaw = $data['retailID'];
+            if (!is_int($retailIDRaw)) {
+                throw new MalformedDataException(sprintf('Property "retailID" must be int, got %s.', get_debug_type($retailIDRaw)));
+            }
+            $retailID = $retailIDRaw;
+            unset($data['retailID']);
+        }
+        if (array_key_exists('postNumber', $data)) {
+            $postNumberRaw = $data['postNumber'];
+            if (!is_string($postNumberRaw)) {
+                throw new MalformedDataException(sprintf('Property "postNumber" must be string, got %s.', get_debug_type($postNumberRaw)));
+            }
+            $postNumber = Some::create($postNumberRaw);
+            unset($data['postNumber']);
+        }
+        if (array_key_exists('email', $data)) {
+            $emailRaw = $data['email'];
+            if (!is_string($emailRaw)) {
+                throw new MalformedDataException(sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)));
+            }
+            $email = Some::create($emailRaw);
+            unset($data['email']);
+        }
+        if (array_key_exists('city', $data)) {
+            $cityRaw = $data['city'];
+            if (!is_string($cityRaw)) {
+                throw new MalformedDataException(sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)));
+            }
+            $city = $cityRaw;
+            unset($data['city']);
+        }
+        if (array_key_exists('country', $data)) {
+            $countryRaw = $data['country'];
+            if (!is_string($countryRaw)) {
+                throw new MalformedDataException(sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)));
+            }
+            $country = Some::create(Country::tryFrom($countryRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)));
+            unset($data['country']);
+        }
+        if (array_key_exists('postalCode', $data)) {
+            $postalCodeRaw = $data['postalCode'];
+            if (!is_string($postalCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)));
+            }
+            $postalCode = $postalCodeRaw;
+            unset($data['postalCode']);
+        }
+        $additionalProperties = $data;
+        if ($name === null) {
+            throw new MalformedDataException('Required property "name" is missing from the document.');
+        }
+        if ($retailID === null) {
+            throw new MalformedDataException('Required property "retailID" is missing from the document.');
+        }
+        if ($city === null) {
+            throw new MalformedDataException('Required property "city" is missing from the document.');
+        }
+        if ($postalCode === null) {
+            throw new MalformedDataException('Required property "postalCode" is missing from the document.');
+        }
+
+        return new self($name, $retailID, $city, $postalCode, $postNumber, $email, $country, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['name'] = $this->name;
+        $dataArray['retailID'] = $this->retailID;
+        $postNumberOption = $this->postNumber;
+        if ($postNumberOption->isDefined()) {
+            $postNumber = $postNumberOption->get();
+            $dataArray['postNumber'] = $postNumber;
+        }
+        $emailOption = $this->email;
+        if ($emailOption->isDefined()) {
+            $email = $emailOption->get();
+            $dataArray['email'] = $email;
+        }
+        $dataArray['city'] = $this->city;
+        $countryOption = $this->country;
+        if ($countryOption->isDefined()) {
+            $country = $countryOption->get();
+            $dataArray['country'] = $country->value;
+        }
+        $dataArray['postalCode'] = $this->postalCode;
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

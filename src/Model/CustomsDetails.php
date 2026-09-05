@@ -1,0 +1,460 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_is_list;
+use function array_key_exists;
+use function array_map;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_bool;
+use function is_string;
+use function sprintf;
+
+final readonly class CustomsDetails implements SelfNormalizingModel
+{
+    /**
+     * @param list<Commodity>                          $items
+     * @param Option<string>                           $invoiceNo
+     * @param Option<string>                           $exportDescription
+     * @param Option<CustomsDetailsShippingConditions> $shippingConditions
+     * @param Option<string>                           $permitNo
+     * @param Option<string>                           $attestationNo
+     * @param Option<bool>                             $hasElectronicExportNotification
+     * @param Option<string>                           $mRN
+     * @param Option<string>                           $officeOfOrigin
+     * @param Option<string>                           $shipperCustomsRef
+     * @param Option<string>                           $consigneeCustomsRef
+     * @param array<int|string, mixed>                 $additionalProperties
+     */
+    public function __construct(private CustomsDetailsExportType $exportType, private Value $postalCharges, private array $items, private Option $invoiceNo, private Option $exportDescription, private Option $shippingConditions, private Option $permitNo, private Option $attestationNo, private Option $hasElectronicExportNotification, private Option $mRN, private Option $officeOfOrigin, private Option $shipperCustomsRef, private Option $consigneeCustomsRef, private array $additionalProperties)
+    {
+    }
+
+    /**
+     * @param list<Commodity>          $items
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public static function create(CustomsDetailsExportType $exportType, Value $postalCharges, array $items, array $additionalProperties = []): self
+    {
+        return new self($exportType, $postalCharges, $items, None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Invoice number.
+     *
+     * @return Option<string>
+     */
+    public function getInvoiceNo(): Option
+    {
+        return $this->invoiceNo;
+    }
+
+    public function withInvoiceNo(string $invoiceNo): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, Some::create($invoiceNo), $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * This contains the category of goods contained in parcel.
+     */
+    public function getExportType(): CustomsDetailsExportType
+    {
+        return $this->exportType;
+    }
+
+    public function withExportType(CustomsDetailsExportType $exportType): self
+    {
+        return new self($exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Mandatory if exporttype is 'OTHER'.
+     *
+     * @return Option<string>
+     */
+    public function getExportDescription(): Option
+    {
+        return $this->exportDescription;
+    }
+
+    public function withExportDescription(string $exportDescription): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, Some::create($exportDescription), $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Aka 'Terms of Trade' aka 'Frankatur'. The attribute is exclusively used for the product Europaket (V54EPAK). DDU is deprecated (use DAP instead).
+     *
+     * @return Option<CustomsDetailsShippingConditions>
+     */
+    public function getShippingConditions(): Option
+    {
+        return $this->shippingConditions;
+    }
+
+    public function withShippingConditions(CustomsDetailsShippingConditions $shippingConditions): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, Some::create($shippingConditions), $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Permit number. Very rarely needed. Mostly relevant for higher value goods. An example use case would be an item made from crocodile leather which requires dedicated license / permit identified by that number.
+     *
+     * @return Option<string>
+     */
+    public function getPermitNo(): Option
+    {
+        return $this->permitNo;
+    }
+
+    public function withPermitNo(string $permitNo): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, Some::create($permitNo), $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Attest or certification identified by this number. Very rarely needed. An example use case would be a medical shipment referring to an attestation that a certain amount of medicine may be imported within e.g. the current quarter of the year.
+     *
+     * @return Option<string>
+     */
+    public function getAttestationNo(): Option
+    {
+        return $this->attestationNo;
+    }
+
+    public function withAttestationNo(string $attestationNo): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, Some::create($attestationNo), $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * flag confirming whether electronic record for export was made.
+     *
+     * @return Option<bool>
+     */
+    public function getHasElectronicExportNotification(): Option
+    {
+        return $this->hasElectronicExportNotification;
+    }
+
+    public function withHasElectronicExportNotification(bool $hasElectronicExportNotification): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, Some::create($hasElectronicExportNotification), $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getMRN(): Option
+    {
+        return $this->mRN;
+    }
+
+    public function withMRN(string $mRN): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, Some::create($mRN), $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Postal charges that have been charged to the recipient. The information must match the information on the invoice. Postal charges are added to the customs value which is the basis for the calculation of import duties. Since 1.1.2021 this information is mandatory according to requirements of the Universal Postal Union. The currency of the postal charges is used throughout the customs declaration form. The currency details of the individual goods items and the currency of the postal charges must match. Otherwise no shipping label will be created.
+     */
+    public function getPostalCharges(): Value
+    {
+        return $this->postalCharges;
+    }
+
+    public function withPostalCharges(Value $postalCharges): self
+    {
+        return new self($this->exportType, $postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Deprecated (do not use anymore). Will appear on CN23.
+     *
+     * @return Option<string>
+     */
+    public function getOfficeOfOrigin(): Option
+    {
+        return $this->officeOfOrigin;
+    }
+
+    public function withOfficeOfOrigin(string $officeOfOrigin): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, Some::create($officeOfOrigin), $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Optional. The customs reference is used by customs authorities to identify economics operators an/or other persons involved. With the given reference, granted authorizations and/or relevant processes in customs clearance an/or taxation can be taken into account. Aka Zoll-Nummer or EORI-Number but dependent on destination.
+     *
+     * @return Option<string>
+     */
+    public function getShipperCustomsRef(): Option
+    {
+        return $this->shipperCustomsRef;
+    }
+
+    public function withShipperCustomsRef(string $shipperCustomsRef): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, Some::create($shipperCustomsRef), $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /**
+     * Optional. The customs reference is used by customs authorities to identify economics operators an/or other persons involved. With the given reference, granted authorizations and/or relevant processes in customs clearance an/or taxation can be taken into account. Aka Zoll-Nummer or EORI-Number but dependent on destination.
+     *
+     * @return Option<string>
+     */
+    public function getConsigneeCustomsRef(): Option
+    {
+        return $this->consigneeCustomsRef;
+    }
+
+    public function withConsigneeCustomsRef(string $consigneeCustomsRef): self
+    {
+        return new self($this->exportType, $this->postalCharges, $this->items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, Some::create($consigneeCustomsRef), $this->additionalProperties);
+    }
+
+    /**
+     * Commodity types in that package.
+     *
+     * @return list<Commodity>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /** @param list<Commodity> $items */
+    public function withItems(array $items): self
+    {
+        return new self($this->exportType, $this->postalCharges, $items, $this->invoiceNo, $this->exportDescription, $this->shippingConditions, $this->permitNo, $this->attestationNo, $this->hasElectronicExportNotification, $this->mRN, $this->officeOfOrigin, $this->shipperCustomsRef, $this->consigneeCustomsRef, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $invoiceNo = None::create();
+        $exportType = null;
+        $exportDescription = None::create();
+        $shippingConditions = None::create();
+        $permitNo = None::create();
+        $attestationNo = None::create();
+        $hasElectronicExportNotification = None::create();
+        $mRN = None::create();
+        $postalCharges = null;
+        $officeOfOrigin = None::create();
+        $shipperCustomsRef = None::create();
+        $consigneeCustomsRef = None::create();
+        $items = null;
+        if (array_key_exists('invoiceNo', $data)) {
+            $invoiceNoRaw = $data['invoiceNo'];
+            if (!is_string($invoiceNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "invoiceNo" must be string, got %s.', get_debug_type($invoiceNoRaw)));
+            }
+            $invoiceNo = Some::create($invoiceNoRaw);
+            unset($data['invoiceNo']);
+        }
+        if (array_key_exists('exportType', $data)) {
+            $exportTypeRaw = $data['exportType'];
+            if (!is_string($exportTypeRaw)) {
+                throw new MalformedDataException(sprintf('Property "exportType" must be string, got %s.', get_debug_type($exportTypeRaw)));
+            }
+            $exportType = CustomsDetailsExportType::tryFrom($exportTypeRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid CustomsDetailsExportType.', $exportTypeRaw));
+            unset($data['exportType']);
+        }
+        if (array_key_exists('exportDescription', $data)) {
+            $exportDescriptionRaw = $data['exportDescription'];
+            if (!is_string($exportDescriptionRaw)) {
+                throw new MalformedDataException(sprintf('Property "exportDescription" must be string, got %s.', get_debug_type($exportDescriptionRaw)));
+            }
+            $exportDescription = Some::create($exportDescriptionRaw);
+            unset($data['exportDescription']);
+        }
+        if (array_key_exists('shippingConditions', $data)) {
+            $shippingConditionsRaw = $data['shippingConditions'];
+            if (!is_string($shippingConditionsRaw)) {
+                throw new MalformedDataException(sprintf('Property "shippingConditions" must be string, got %s.', get_debug_type($shippingConditionsRaw)));
+            }
+            $shippingConditions = Some::create(CustomsDetailsShippingConditions::tryFrom($shippingConditionsRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid CustomsDetailsShippingConditions.', $shippingConditionsRaw)));
+            unset($data['shippingConditions']);
+        }
+        if (array_key_exists('permitNo', $data)) {
+            $permitNoRaw = $data['permitNo'];
+            if (!is_string($permitNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "permitNo" must be string, got %s.', get_debug_type($permitNoRaw)));
+            }
+            $permitNo = Some::create($permitNoRaw);
+            unset($data['permitNo']);
+        }
+        if (array_key_exists('attestationNo', $data)) {
+            $attestationNoRaw = $data['attestationNo'];
+            if (!is_string($attestationNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "attestationNo" must be string, got %s.', get_debug_type($attestationNoRaw)));
+            }
+            $attestationNo = Some::create($attestationNoRaw);
+            unset($data['attestationNo']);
+        }
+        if (array_key_exists('hasElectronicExportNotification', $data)) {
+            $hasElectronicExportNotificationRaw = $data['hasElectronicExportNotification'];
+            if (!is_bool($hasElectronicExportNotificationRaw)) {
+                throw new MalformedDataException(sprintf('Property "hasElectronicExportNotification" must be bool, got %s.', get_debug_type($hasElectronicExportNotificationRaw)));
+            }
+            $hasElectronicExportNotification = Some::create($hasElectronicExportNotificationRaw);
+            unset($data['hasElectronicExportNotification']);
+        }
+        if (array_key_exists('MRN', $data)) {
+            $mRNRaw = $data['MRN'];
+            if (!is_string($mRNRaw)) {
+                throw new MalformedDataException(sprintf('Property "MRN" must be string, got %s.', get_debug_type($mRNRaw)));
+            }
+            $mRN = Some::create($mRNRaw);
+            unset($data['MRN']);
+        }
+        if (array_key_exists('postalCharges', $data)) {
+            $postalChargesRaw = $data['postalCharges'];
+            if (!is_array($postalChargesRaw)) {
+                throw new MalformedDataException(sprintf('Property "postalCharges" must be object, got %s.', get_debug_type($postalChargesRaw)));
+            }
+            /** @var array<string, mixed> $postalChargesRawTyped */
+            $postalChargesRawTyped = $postalChargesRaw;
+            $postalCharges = Value::fromArray($postalChargesRawTyped);
+            unset($data['postalCharges']);
+        }
+        if (array_key_exists('officeOfOrigin', $data)) {
+            $officeOfOriginRaw = $data['officeOfOrigin'];
+            if (!is_string($officeOfOriginRaw)) {
+                throw new MalformedDataException(sprintf('Property "officeOfOrigin" must be string, got %s.', get_debug_type($officeOfOriginRaw)));
+            }
+            $officeOfOrigin = Some::create($officeOfOriginRaw);
+            unset($data['officeOfOrigin']);
+        }
+        if (array_key_exists('shipperCustomsRef', $data)) {
+            $shipperCustomsRefRaw = $data['shipperCustomsRef'];
+            if (!is_string($shipperCustomsRefRaw)) {
+                throw new MalformedDataException(sprintf('Property "shipperCustomsRef" must be string, got %s.', get_debug_type($shipperCustomsRefRaw)));
+            }
+            $shipperCustomsRef = Some::create($shipperCustomsRefRaw);
+            unset($data['shipperCustomsRef']);
+        }
+        if (array_key_exists('consigneeCustomsRef', $data)) {
+            $consigneeCustomsRefRaw = $data['consigneeCustomsRef'];
+            if (!is_string($consigneeCustomsRefRaw)) {
+                throw new MalformedDataException(sprintf('Property "consigneeCustomsRef" must be string, got %s.', get_debug_type($consigneeCustomsRefRaw)));
+            }
+            $consigneeCustomsRef = Some::create($consigneeCustomsRefRaw);
+            unset($data['consigneeCustomsRef']);
+        }
+        if (array_key_exists('items', $data)) {
+            $itemsRaw = $data['items'];
+            if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
+                throw new MalformedDataException(sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)));
+            }
+            $items = array_map(static function (mixed $value): Commodity {
+                if (!is_array($value)) {
+                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                }
+                /** @var array<string, mixed> $valueTyped */
+                $valueTyped = $value;
+
+                return Commodity::fromArray($valueTyped);
+            }, $itemsRaw);
+            unset($data['items']);
+        }
+        $additionalProperties = $data;
+        if ($exportType === null) {
+            throw new MalformedDataException('Required property "exportType" is missing from the document.');
+        }
+        if ($postalCharges === null) {
+            throw new MalformedDataException('Required property "postalCharges" is missing from the document.');
+        }
+        if ($items === null) {
+            throw new MalformedDataException('Required property "items" is missing from the document.');
+        }
+
+        return new self($exportType, $postalCharges, $items, $invoiceNo, $exportDescription, $shippingConditions, $permitNo, $attestationNo, $hasElectronicExportNotification, $mRN, $officeOfOrigin, $shipperCustomsRef, $consigneeCustomsRef, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $invoiceNoOption = $this->invoiceNo;
+        if ($invoiceNoOption->isDefined()) {
+            $invoiceNo = $invoiceNoOption->get();
+            $dataArray['invoiceNo'] = $invoiceNo;
+        }
+        $dataArray['exportType'] = $this->exportType->value;
+        $exportDescriptionOption = $this->exportDescription;
+        if ($exportDescriptionOption->isDefined()) {
+            $exportDescription = $exportDescriptionOption->get();
+            $dataArray['exportDescription'] = $exportDescription;
+        }
+        $shippingConditionsOption = $this->shippingConditions;
+        if ($shippingConditionsOption->isDefined()) {
+            $shippingConditions = $shippingConditionsOption->get();
+            $dataArray['shippingConditions'] = $shippingConditions->value;
+        }
+        $permitNoOption = $this->permitNo;
+        if ($permitNoOption->isDefined()) {
+            $permitNo = $permitNoOption->get();
+            $dataArray['permitNo'] = $permitNo;
+        }
+        $attestationNoOption = $this->attestationNo;
+        if ($attestationNoOption->isDefined()) {
+            $attestationNo = $attestationNoOption->get();
+            $dataArray['attestationNo'] = $attestationNo;
+        }
+        $hasElectronicExportNotificationOption = $this->hasElectronicExportNotification;
+        if ($hasElectronicExportNotificationOption->isDefined()) {
+            $hasElectronicExportNotification = $hasElectronicExportNotificationOption->get();
+            $dataArray['hasElectronicExportNotification'] = $hasElectronicExportNotification;
+        }
+        $mRNOption = $this->mRN;
+        if ($mRNOption->isDefined()) {
+            $mRN = $mRNOption->get();
+            $dataArray['MRN'] = $mRN;
+        }
+        $dataArray['postalCharges'] = $this->postalCharges->toArray();
+        $officeOfOriginOption = $this->officeOfOrigin;
+        if ($officeOfOriginOption->isDefined()) {
+            $officeOfOrigin = $officeOfOriginOption->get();
+            $dataArray['officeOfOrigin'] = $officeOfOrigin;
+        }
+        $shipperCustomsRefOption = $this->shipperCustomsRef;
+        if ($shipperCustomsRefOption->isDefined()) {
+            $shipperCustomsRef = $shipperCustomsRefOption->get();
+            $dataArray['shipperCustomsRef'] = $shipperCustomsRef;
+        }
+        $consigneeCustomsRefOption = $this->consigneeCustomsRef;
+        if ($consigneeCustomsRefOption->isDefined()) {
+            $consigneeCustomsRef = $consigneeCustomsRefOption->get();
+            $dataArray['consigneeCustomsRef'] = $consigneeCustomsRef;
+        }
+        $values = [];
+        foreach ($this->items as $value) {
+            $values[] = $value->toArray();
+        }
+        $dataArray['items'] = $values;
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

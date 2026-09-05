@@ -1,0 +1,159 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class BankAccount implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $bankName
+     * @param Option<string>           $bic
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $accountHolder, private string $iban, private Option $bankName, private Option $bic, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $accountHolder, string $iban, array $additionalProperties = []): self
+    {
+        return new self($accountHolder, $iban, None::create(), None::create(), $additionalProperties);
+    }
+
+    public function getAccountHolder(): string
+    {
+        return $this->accountHolder;
+    }
+
+    public function withAccountHolder(string $accountHolder): self
+    {
+        return new self($accountHolder, $this->iban, $this->bankName, $this->bic, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getBankName(): Option
+    {
+        return $this->bankName;
+    }
+
+    public function withBankName(string $bankName): self
+    {
+        return new self($this->accountHolder, $this->iban, Some::create($bankName), $this->bic, $this->additionalProperties);
+    }
+
+    public function getIban(): string
+    {
+        return $this->iban;
+    }
+
+    public function withIban(string $iban): self
+    {
+        return new self($this->accountHolder, $iban, $this->bankName, $this->bic, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getBic(): Option
+    {
+        return $this->bic;
+    }
+
+    public function withBic(string $bic): self
+    {
+        return new self($this->accountHolder, $this->iban, $this->bankName, Some::create($bic), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $accountHolder = null;
+        $bankName = None::create();
+        $iban = null;
+        $bic = None::create();
+        if (array_key_exists('accountHolder', $data)) {
+            $accountHolderRaw = $data['accountHolder'];
+            if (!is_string($accountHolderRaw)) {
+                throw new MalformedDataException(sprintf('Property "accountHolder" must be string, got %s.', get_debug_type($accountHolderRaw)));
+            }
+            $accountHolder = $accountHolderRaw;
+            unset($data['accountHolder']);
+        }
+        if (array_key_exists('bankName', $data)) {
+            $bankNameRaw = $data['bankName'];
+            if (!is_string($bankNameRaw)) {
+                throw new MalformedDataException(sprintf('Property "bankName" must be string, got %s.', get_debug_type($bankNameRaw)));
+            }
+            $bankName = Some::create($bankNameRaw);
+            unset($data['bankName']);
+        }
+        if (array_key_exists('iban', $data)) {
+            $ibanRaw = $data['iban'];
+            if (!is_string($ibanRaw)) {
+                throw new MalformedDataException(sprintf('Property "iban" must be string, got %s.', get_debug_type($ibanRaw)));
+            }
+            $iban = $ibanRaw;
+            unset($data['iban']);
+        }
+        if (array_key_exists('bic', $data)) {
+            $bicRaw = $data['bic'];
+            if (!is_string($bicRaw)) {
+                throw new MalformedDataException(sprintf('Property "bic" must be string, got %s.', get_debug_type($bicRaw)));
+            }
+            $bic = Some::create($bicRaw);
+            unset($data['bic']);
+        }
+        $additionalProperties = $data;
+        if ($accountHolder === null) {
+            throw new MalformedDataException('Required property "accountHolder" is missing from the document.');
+        }
+        if ($iban === null) {
+            throw new MalformedDataException('Required property "iban" is missing from the document.');
+        }
+
+        return new self($accountHolder, $iban, $bankName, $bic, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['accountHolder'] = $this->accountHolder;
+        $bankNameOption = $this->bankName;
+        if ($bankNameOption->isDefined()) {
+            $bankName = $bankNameOption->get();
+            $dataArray['bankName'] = $bankName;
+        }
+        $dataArray['iban'] = $this->iban;
+        $bicOption = $this->bic;
+        if ($bicOption->isDefined()) {
+            $bic = $bicOption->get();
+            $dataArray['bic'] = $bic;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

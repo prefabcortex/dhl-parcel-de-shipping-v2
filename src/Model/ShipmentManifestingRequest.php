@@ -1,0 +1,158 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_is_list;
+use function array_key_exists;
+use function array_map;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_string;
+use function sprintf;
+
+final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
+{
+    /**
+     * @param Option<list<string>>     $shipmentNumbers
+     * @param Option<string>           $billingNumber
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $profile, private Option $shipmentNumbers, private Option $billingNumber, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $profile, array $additionalProperties = []): self
+    {
+        return new self($profile, None::create(), None::create(), $additionalProperties);
+    }
+
+    public function getProfile(): string
+    {
+        return $this->profile;
+    }
+
+    public function withProfile(string $profile): self
+    {
+        return new self($profile, $this->shipmentNumbers, $this->billingNumber, $this->additionalProperties);
+    }
+
+    /**
+     * List of shipment IDs for manifesting.
+     *
+     * @return Option<list<string>>
+     */
+    public function getShipmentNumbers(): Option
+    {
+        return $this->shipmentNumbers;
+    }
+
+    /** @param list<string> $shipmentNumbers */
+    public function withShipmentNumbers(array $shipmentNumbers): self
+    {
+        return new self($this->profile, Some::create($shipmentNumbers), $this->billingNumber, $this->additionalProperties);
+    }
+
+    /**
+     * Customer billingNumber number.
+     *
+     * @return Option<string>
+     */
+    public function getBillingNumber(): Option
+    {
+        return $this->billingNumber;
+    }
+
+    public function withBillingNumber(string $billingNumber): self
+    {
+        return new self($this->profile, $this->shipmentNumbers, Some::create($billingNumber), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $profile = null;
+        $shipmentNumbers = None::create();
+        $billingNumber = None::create();
+        if (array_key_exists('profile', $data)) {
+            $profileRaw = $data['profile'];
+            if (!is_string($profileRaw)) {
+                throw new MalformedDataException(sprintf('Property "profile" must be string, got %s.', get_debug_type($profileRaw)));
+            }
+            $profile = $profileRaw;
+            unset($data['profile']);
+        }
+        if (array_key_exists('shipmentNumbers', $data)) {
+            $shipmentNumbersRaw = $data['shipmentNumbers'];
+            if (!(is_array($shipmentNumbersRaw) && array_is_list($shipmentNumbersRaw))) {
+                throw new MalformedDataException(sprintf('Property "shipmentNumbers" must be array, got %s.', get_debug_type($shipmentNumbersRaw)));
+            }
+            $shipmentNumbers = Some::create(array_map(static function (mixed $value): string {
+                if (!is_string($value)) {
+                    throw new MalformedDataException(sprintf('Array item must be string, got %s.', get_debug_type($value)));
+                }
+
+                return $value;
+            }, $shipmentNumbersRaw));
+            unset($data['shipmentNumbers']);
+        }
+        if (array_key_exists('billingNumber', $data)) {
+            $billingNumberRaw = $data['billingNumber'];
+            if (!is_string($billingNumberRaw)) {
+                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+            }
+            $billingNumber = Some::create($billingNumberRaw);
+            unset($data['billingNumber']);
+        }
+        $additionalProperties = $data;
+        if ($profile === null) {
+            throw new MalformedDataException('Required property "profile" is missing from the document.');
+        }
+
+        return new self($profile, $shipmentNumbers, $billingNumber, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['profile'] = $this->profile;
+        $shipmentNumbersOption = $this->shipmentNumbers;
+        if ($shipmentNumbersOption->isDefined()) {
+            $shipmentNumbers = $shipmentNumbersOption->get();
+            $values = [];
+            foreach ($shipmentNumbers as $value) {
+                $values[] = $value;
+            }
+            $dataArray['shipmentNumbers'] = $values;
+        }
+        $billingNumberOption = $this->billingNumber;
+        if ($billingNumberOption->isDefined()) {
+            $billingNumber = $billingNumberOption->get();
+            $dataArray['billingNumber'] = $billingNumber;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

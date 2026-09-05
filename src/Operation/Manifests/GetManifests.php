@@ -1,0 +1,180 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Operation\Manifests;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsBadRequestException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsInternalServerErrorException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsNotFoundException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsTooManyRequestsException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
+use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
+use Prefabcortex\DhlParcelDeShippingV2\Http\HeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\JsonBody;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
+use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Model\GetManifestsAccept;
+use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
+use Prefabcortex\DhlParcelDeShippingV2\Model\SingleManifestResponse;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\GetManifestsHeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\GetManifestsQueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidatorTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\LabelDataResponseConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\RequestStatusConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\SingleManifestResponseConstraint;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+use function array_map;
+
+/**
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ *
+ * @implements Operation<SingleManifestResponse>
+ */
+final class GetManifests implements Operation
+{
+    use BaseOperationTrait;
+    use OperationTrait;
+    use ValidatorTrait;
+    /** @var list<GetManifestsAccept> */
+    protected array $accept;
+    private readonly GetManifestsQueryParameters $queryParameters;
+    private readonly GetManifestsHeaderParameters $headerParameters;
+
+    /**
+     * Return the manifest document for the specific date (abbreviated ISO8601 format YYYY-MM-DD). If no date is provided, the manifest for today will be returned. The manifest PDF document will list the shipments for your EKP, separated by billing numbers. Potentially, the document is large and response time will reflect this. <br />Additionally, the response contains a mapping of billing numbers to sheet numbers of the manifest and a mapping of shipment numbers to sheet numbers.<br />The call can be repeated as often as needed. Should a date be provided which is too old or lies within the future, HTTP 400 is returned.
+     *
+     * @param list<GetManifestsAccept> $accept Accept content header application/json|application/problem+json
+     */
+    public function __construct(GetManifestsQueryParameters $queryParameters, GetManifestsHeaderParameters $headerParameters, array $accept)
+    {
+        $this->queryParameters = $queryParameters;
+        $this->headerParameters = $headerParameters;
+        $this->accept = $accept;
+    }
+
+    #[Override]
+    public function getMethod(): string
+    {
+        return 'GET';
+    }
+
+    #[Override]
+    public function getUri(): string
+    {
+        return '/manifests';
+    }
+
+    #[Override]
+    public function getPayload(StreamFactoryInterface $streamFactory): Payload
+    {
+        return new Payload([], '');
+    }
+
+    /** @return array<string, list<string>> */
+    public function getExtraHeaders(): array
+    {
+        if ($this->accept === []) {
+            return ['Accept' => ['application/json', 'application/problem+json']];
+        }
+
+        return ['Accept' => array_map(static fn (GetManifestsAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+    }
+
+    protected function getQueryParameters(): QueryParameters
+    {
+        return $this->queryParameters->toQueryParameters();
+    }
+
+    protected function getHeaderParameters(): HeaderParameters
+    {
+        return $this->headerParameters->toHeaderParameters();
+    }
+
+    /**
+     * {@inheritdoc}.
+     *
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws GetManifestsBadRequestException
+     * @throws GetManifestsUnauthorizedException
+     * @throws GetManifestsNotFoundException
+     * @throws GetManifestsTooManyRequestsException
+     * @throws GetManifestsInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): SingleManifestResponse
+    {
+        $status = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        if (200 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, SingleManifestResponseConstraint::constraints());
+
+            return SingleManifestResponse::fromArray($typedData);
+        }
+        if (400 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            throw new GetManifestsBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
+        }
+        if (401 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetManifestsUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (404 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetManifestsNotFoundException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (429 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetManifestsTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (500 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetManifestsInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        throw new UnexpectedStatusCodeException($response, $body);
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws GetManifestsBadRequestException
+     * @throws GetManifestsUnauthorizedException
+     * @throws GetManifestsNotFoundException
+     * @throws GetManifestsTooManyRequestsException
+     * @throws GetManifestsInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    public function parseResponse(ResponseInterface $response): SingleManifestResponse
+    {
+        $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
+
+        return $this->transformResponseBody($response, $contentType);
+    }
+
+    /** @return list<list<string>> */
+    #[Override]
+    public function getSecurityRequirements(): array
+    {
+        return [['ApiKey'], ['BasicAuth'], ['OAuth2']];
+    }
+}

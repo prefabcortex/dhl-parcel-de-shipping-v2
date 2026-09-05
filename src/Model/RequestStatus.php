@@ -1,0 +1,197 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class RequestStatus implements SelfNormalizingModel
+{
+    /**
+     * @param Option<int>              $status
+     * @param Option<string>           $instance
+     * @param Option<string>           $detail
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $title, private int $statusCode, private Option $status, private Option $instance, private Option $detail, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $title, int $statusCode, array $additionalProperties = []): self
+    {
+        return new self($title, $statusCode, None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function withTitle(string $title): self
+    {
+        return new self($title, $this->statusCode, $this->status, $this->instance, $this->detail, $this->additionalProperties);
+    }
+
+    /**
+     * The status code of the response. Usually, but not necessarliy the HTTP status code. Same as attribut "status" but deprecated. Do not use. Will be removed in the next major version.
+     */
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
+
+    public function withStatusCode(int $statusCode): self
+    {
+        return new self($this->title, $statusCode, $this->status, $this->instance, $this->detail, $this->additionalProperties);
+    }
+
+    /**
+     * The status code of the response. Usually, but not necessarliy the HTTP status code.
+     *
+     * @return Option<int>
+     */
+    public function getStatus(): Option
+    {
+        return $this->status;
+    }
+
+    public function withStatus(int $status): self
+    {
+        return new self($this->title, $this->statusCode, Some::create($status), $this->instance, $this->detail, $this->additionalProperties);
+    }
+
+    /**
+     * A URI reference that identifies the specific occurrence of the problem.
+     *
+     * @return Option<string>
+     */
+    public function getInstance(): Option
+    {
+        return $this->instance;
+    }
+
+    public function withInstance(string $instance): self
+    {
+        return new self($this->title, $this->statusCode, $this->status, Some::create($instance), $this->detail, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getDetail(): Option
+    {
+        return $this->detail;
+    }
+
+    public function withDetail(string $detail): self
+    {
+        return new self($this->title, $this->statusCode, $this->status, $this->instance, Some::create($detail), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $title = null;
+        $statusCode = null;
+        $status = None::create();
+        $instance = None::create();
+        $detail = None::create();
+        if (array_key_exists('title', $data)) {
+            $titleRaw = $data['title'];
+            if (!is_string($titleRaw)) {
+                throw new MalformedDataException(sprintf('Property "title" must be string, got %s.', get_debug_type($titleRaw)));
+            }
+            $title = $titleRaw;
+            unset($data['title']);
+        }
+        if (array_key_exists('statusCode', $data)) {
+            $statusCodeRaw = $data['statusCode'];
+            if (!is_int($statusCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "statusCode" must be int, got %s.', get_debug_type($statusCodeRaw)));
+            }
+            $statusCode = $statusCodeRaw;
+            unset($data['statusCode']);
+        }
+        if (array_key_exists('status', $data)) {
+            $statusRaw = $data['status'];
+            if (!is_int($statusRaw)) {
+                throw new MalformedDataException(sprintf('Property "status" must be int, got %s.', get_debug_type($statusRaw)));
+            }
+            $status = Some::create($statusRaw);
+            unset($data['status']);
+        }
+        if (array_key_exists('instance', $data)) {
+            $instanceRaw = $data['instance'];
+            if (!is_string($instanceRaw)) {
+                throw new MalformedDataException(sprintf('Property "instance" must be string, got %s.', get_debug_type($instanceRaw)));
+            }
+            $instance = Some::create($instanceRaw);
+            unset($data['instance']);
+        }
+        if (array_key_exists('detail', $data)) {
+            $detailRaw = $data['detail'];
+            if (!is_string($detailRaw)) {
+                throw new MalformedDataException(sprintf('Property "detail" must be string, got %s.', get_debug_type($detailRaw)));
+            }
+            $detail = Some::create($detailRaw);
+            unset($data['detail']);
+        }
+        $additionalProperties = $data;
+        if ($title === null) {
+            throw new MalformedDataException('Required property "title" is missing from the document.');
+        }
+        if ($statusCode === null) {
+            throw new MalformedDataException('Required property "statusCode" is missing from the document.');
+        }
+
+        return new self($title, $statusCode, $status, $instance, $detail, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['title'] = $this->title;
+        $dataArray['statusCode'] = $this->statusCode;
+        $statusOption = $this->status;
+        if ($statusOption->isDefined()) {
+            $status = $statusOption->get();
+            $dataArray['status'] = $status;
+        }
+        $instanceOption = $this->instance;
+        if ($instanceOption->isDefined()) {
+            $instance = $instanceOption->get();
+            $dataArray['instance'] = $instance;
+        }
+        $detailOption = $this->detail;
+        if ($detailOption->isDefined()) {
+            $detail = $detailOption->get();
+            $dataArray['detail'] = $detail;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

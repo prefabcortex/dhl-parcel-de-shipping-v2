@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class ShipperReference implements SelfNormalizingModel
+{
+    /** @param array<int|string, mixed> $additionalProperties */
+    public function __construct(private string $shipperRef, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $shipperRef, array $additionalProperties = []): self
+    {
+        return new self($shipperRef, $additionalProperties);
+    }
+
+    /**
+     * Reference string to the shipper data configured in GKP(GeschÃ¤ftskundenportal - Business Costumer Portal).
+     */
+    public function getShipperRef(): string
+    {
+        return $this->shipperRef;
+    }
+
+    public function withShipperRef(string $shipperRef): self
+    {
+        return new self($shipperRef, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $shipperRef = null;
+        if (array_key_exists('shipperRef', $data)) {
+            $shipperRefRaw = $data['shipperRef'];
+            if (!is_string($shipperRefRaw)) {
+                throw new MalformedDataException(sprintf('Property "shipperRef" must be string, got %s.', get_debug_type($shipperRefRaw)));
+            }
+            $shipperRef = $shipperRefRaw;
+            unset($data['shipperRef']);
+        }
+        $additionalProperties = $data;
+        if ($shipperRef === null) {
+            throw new MalformedDataException('Required property "shipperRef" is missing from the document.');
+        }
+
+        return new self($shipperRef, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['shipperRef'] = $this->shipperRef;
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

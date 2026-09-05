@@ -1,0 +1,186 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Operation\ShipmentsAndLabels;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderBadRequestException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderInternalServerErrorException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderNotFoundException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderTooManyRequestsException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
+use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
+use Prefabcortex\DhlParcelDeShippingV2\Http\HeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\JsonBody;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
+use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Model\GetOrderAccept;
+use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\GetOrderHeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\GetOrderQueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidatorTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\LabelDataResponseConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\RequestStatusConstraint;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+use function array_map;
+
+/**
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ *
+ * @implements Operation<LabelDataResponse>
+ */
+final class GetOrder implements Operation
+{
+    use BaseOperationTrait;
+    use OperationTrait;
+    use ValidatorTrait;
+    /** @var list<GetOrderAccept> */
+    protected array $accept;
+    private readonly GetOrderQueryParameters $queryParameters;
+    private readonly GetOrderHeaderParameters $headerParameters;
+
+    /**
+     * Returns documents for existing shipment(s). The call accepts multiple shipment numbers and will provide sets of documents for those. The **format (PDF,ZPL)** and **method of delivery (URL, encoded, data)** can be selected for **all** shipments and labels in that call. You cannot chose one format and delivery method for one label and different for another label within the same call. You can also specify if you want regular labels, return labels, cod labels, or customsDoc. Any combination is possible.
+     *
+     * The call returns for each shipment number the status indicator and the selected labels and documents. If a label type (for example a cod label) does not exist for a shipment, it will not be returned. This is not an error. If you were sending multiple shipments, you will get an HTTP 207 response (multistatus) with detailed status for each shipment. Other standard HTTP response codes (200, 400, 401, 429, 500) are possible as well. Labels can be either provided as part of the response (base64 encoded for PDF, text for ZPL) or via URL link for view and download (PDF). Note that the format settings per query parameters apply to the shipping label. Retoure label paper type can be specified separately since a different printer may be used here. If requesting labels to be returned as URL for separate download, the URLs provided can be shared.
+     *
+     * @param list<GetOrderAccept> $accept Accept content header application/json|application/problem+json
+     */
+    public function __construct(GetOrderQueryParameters $queryParameters, GetOrderHeaderParameters $headerParameters, array $accept)
+    {
+        $this->queryParameters = $queryParameters;
+        $this->headerParameters = $headerParameters;
+        $this->accept = $accept;
+    }
+
+    #[Override]
+    public function getMethod(): string
+    {
+        return 'GET';
+    }
+
+    #[Override]
+    public function getUri(): string
+    {
+        return '/orders';
+    }
+
+    #[Override]
+    public function getPayload(StreamFactoryInterface $streamFactory): Payload
+    {
+        return new Payload([], '');
+    }
+
+    /** @return array<string, list<string>> */
+    public function getExtraHeaders(): array
+    {
+        if ($this->accept === []) {
+            return ['Accept' => ['application/json', 'application/problem+json']];
+        }
+
+        return ['Accept' => array_map(static fn (GetOrderAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+    }
+
+    protected function getQueryParameters(): QueryParameters
+    {
+        return $this->queryParameters->toQueryParameters();
+    }
+
+    protected function getHeaderParameters(): HeaderParameters
+    {
+        return $this->headerParameters->toHeaderParameters();
+    }
+
+    /**
+     * {@inheritdoc}.
+     *
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws GetOrderBadRequestException
+     * @throws GetOrderUnauthorizedException
+     * @throws GetOrderNotFoundException
+     * @throws GetOrderTooManyRequestsException
+     * @throws GetOrderInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): LabelDataResponse
+    {
+        $status = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        if (200 === $status && $contentType->is('application/json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+
+            return LabelDataResponse::fromArray($typedData);
+        }
+        if (207 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+
+            return LabelDataResponse::fromArray($typedData);
+        }
+        if (400 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            throw new GetOrderBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
+        }
+        if (401 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetOrderUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (404 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetOrderNotFoundException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (429 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetOrderTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (500 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new GetOrderInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        throw new UnexpectedStatusCodeException($response, $body);
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws GetOrderBadRequestException
+     * @throws GetOrderUnauthorizedException
+     * @throws GetOrderNotFoundException
+     * @throws GetOrderTooManyRequestsException
+     * @throws GetOrderInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    public function parseResponse(ResponseInterface $response): LabelDataResponse
+    {
+        $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
+
+        return $this->transformResponseBody($response, $contentType);
+    }
+
+    /** @return list<list<string>> */
+    #[Override]
+    public function getSecurityRequirements(): array
+    {
+        return [['ApiKey'], ['BasicAuth'], ['OAuth2']];
+    }
+}

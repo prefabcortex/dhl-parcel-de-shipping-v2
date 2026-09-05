@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ResponseItem;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints\Uuid;
+
+/**
+ * @see ResponseItem
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class ResponseItemConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'shipmentNo' => new Optional([new Length(null, null, 50), new Type(['string']), new NotNull()]),
+                'routingCode' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'returnRoutingCode' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'returnShipmentNo' => new Optional([new Length(null, null, 50), new Type(['string']), new NotNull()]),
+                'sstatus' => new Required([new NotNull(), ...RequestStatusConstraint::constraints()]),
+                'shipmentRefNo' => new Optional([new Length(null, 6), new NotBlank(null, null, null), new Length(null, null, 50), new Type(['string']), new NotNull()]),
+                'label' => new Optional([new NotNull(), ...DocumentConstraint::constraints()]),
+                'returnLabel' => new Optional([new NotNull(), ...DocumentConstraint::constraints()]),
+                'customsDoc' => new Optional([new NotNull(), ...DocumentConstraint::constraints()]),
+                'codLabel' => new Optional([new NotNull(), ...DocumentConstraint::constraints()]),
+                'validationMessages' => new Optional([new All([...ValidationMessageItemConstraint::constraints()]), new Type(['array']), new NotNull()]),
+                'uuid' => new Optional([new Uuid(), new Type(['string']), new NotNull()]),
+            ], null, null, true),
+        ];
+    }
+}

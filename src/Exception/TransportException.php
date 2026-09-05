@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Exception;
+
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\RequestInterface;
+
+/**
+ * An {@see ApiException} raised because the request never came back — no response exists to read.
+ *
+ * The PSR-18 client reports these, and for a long time they reached the caller as
+ * `ClientExceptionInterface` and nothing else. That interface is not ours and cannot be made to
+ * implement our marker, so the single `catch (ApiException $e)` every generated README documents
+ * went straight past a timeout — the most likely way a call fails in production. A caller who
+ * wanted the failures actually covered had to write three catch blocks, which is a contract nobody
+ * follows.
+ *
+ * So the client's exception is caught at the one place it can be raised and re-thrown as one of
+ * these. What that costs is stated plainly: a `catch` written against the concrete class of a
+ * particular client — `GuzzleHttp\Exception\ConnectException`, say — no longer matches, because
+ * this is not that class. The original is kept as `getPrevious()`, and every *PSR-level* catch
+ * keeps matching, which is the level the generated `@throws` has always named.
+ *
+ * The classification the client made is preserved rather than flattened: a client that reported a
+ * network failure produces {@see NetworkException}, one that reported a bad request produces
+ * {@see RequestException}, and one that classified neither produces
+ * {@see TransportFailedException}. Retry logic keys on exactly that distinction, so losing it to
+ * save two files would have replaced one silent breakage with another.
+ *
+ * `getRequest()` is declared here for the same reason `ResponseException` declares its accessors:
+ * a caller who catches this type can always ask what was being sent. The PSR sub-interfaces
+ * declare the identical method on two of the three, and the third would otherwise be the one case
+ * where the question has no answer — even though the request is in hand at every throw site.
+ */
+interface TransportException extends ApiException, ClientExceptionInterface
+{
+    /**
+     * The request that did not complete.
+     *
+     * Taken from the client's own exception where it reported one — a middleware may have rewritten
+     * the request on the way out, and its copy is the one that actually went to the wire — and
+     * otherwise the request this package handed over.
+     */
+    public function getRequest(): RequestInterface;
+}

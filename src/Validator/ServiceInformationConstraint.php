@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ServiceInformation;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+
+/**
+ * @see ServiceInformation
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class ServiceInformationConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'amp' => new Optional([new NotNull(), ...ServiceInformationAmpConstraint::constraints()]),
+                'backend' => new Optional([new NotNull(), ...ServiceInformationBackendConstraint::constraints()]),
+            ], null, null, true),
+        ];
+    }
+}

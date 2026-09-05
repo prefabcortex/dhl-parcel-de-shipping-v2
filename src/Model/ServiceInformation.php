@@ -1,0 +1,117 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function sprintf;
+
+final readonly class ServiceInformation implements SelfNormalizingModel
+{
+    /**
+     * @param Option<ServiceInformationAmp>     $amp
+     * @param Option<ServiceInformationBackend> $backend
+     * @param array<int|string, mixed>          $additionalProperties
+     */
+    public function __construct(private Option $amp, private Option $backend, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), $additionalProperties);
+    }
+
+    /** @return Option<ServiceInformationAmp> */
+    public function getAmp(): Option
+    {
+        return $this->amp;
+    }
+
+    public function withAmp(ServiceInformationAmp $amp): self
+    {
+        return new self(Some::create($amp), $this->backend, $this->additionalProperties);
+    }
+
+    /** @return Option<ServiceInformationBackend> */
+    public function getBackend(): Option
+    {
+        return $this->backend;
+    }
+
+    public function withBackend(ServiceInformationBackend $backend): self
+    {
+        return new self($this->amp, Some::create($backend), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $amp = None::create();
+        $backend = None::create();
+        if (array_key_exists('amp', $data)) {
+            $ampRaw = $data['amp'];
+            if (!is_array($ampRaw)) {
+                throw new MalformedDataException(sprintf('Property "amp" must be object, got %s.', get_debug_type($ampRaw)));
+            }
+            /** @var array<string, mixed> $ampRawTyped */
+            $ampRawTyped = $ampRaw;
+            $amp = Some::create(ServiceInformationAmp::fromArray($ampRawTyped));
+            unset($data['amp']);
+        }
+        if (array_key_exists('backend', $data)) {
+            $backendRaw = $data['backend'];
+            if (!is_array($backendRaw)) {
+                throw new MalformedDataException(sprintf('Property "backend" must be object, got %s.', get_debug_type($backendRaw)));
+            }
+            /** @var array<string, mixed> $backendRawTyped */
+            $backendRawTyped = $backendRaw;
+            $backend = Some::create(ServiceInformationBackend::fromArray($backendRawTyped));
+            unset($data['backend']);
+        }
+        $additionalProperties = $data;
+
+        return new self($amp, $backend, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $ampOption = $this->amp;
+        if ($ampOption->isDefined()) {
+            $amp = $ampOption->get();
+            $dataArray['amp'] = $amp->toArray();
+        }
+        $backendOption = $this->backend;
+        if ($backendOption->isDefined()) {
+            $backend = $backendOption->get();
+            $dataArray['backend'] = $backend->toArray();
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

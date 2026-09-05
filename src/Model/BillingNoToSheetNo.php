@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class BillingNoToSheetNo implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $billingNumber
+     * @param Option<string>           $sheetNo
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private Option $billingNumber, private Option $sheetNo, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), $additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getBillingNumber(): Option
+    {
+        return $this->billingNumber;
+    }
+
+    public function withBillingNumber(string $billingNumber): self
+    {
+        return new self(Some::create($billingNumber), $this->sheetNo, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getSheetNo(): Option
+    {
+        return $this->sheetNo;
+    }
+
+    public function withSheetNo(string $sheetNo): self
+    {
+        return new self($this->billingNumber, Some::create($sheetNo), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $billingNumber = None::create();
+        $sheetNo = None::create();
+        if (array_key_exists('billingNumber', $data)) {
+            $billingNumberRaw = $data['billingNumber'];
+            if (!is_string($billingNumberRaw)) {
+                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+            }
+            $billingNumber = Some::create($billingNumberRaw);
+            unset($data['billingNumber']);
+        }
+        if (array_key_exists('sheetNo', $data)) {
+            $sheetNoRaw = $data['sheetNo'];
+            if (!is_string($sheetNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "sheetNo" must be string, got %s.', get_debug_type($sheetNoRaw)));
+            }
+            $sheetNo = Some::create($sheetNoRaw);
+            unset($data['sheetNo']);
+        }
+        $additionalProperties = $data;
+
+        return new self($billingNumber, $sheetNo, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $billingNumberOption = $this->billingNumber;
+        if ($billingNumberOption->isDefined()) {
+            $billingNumber = $billingNumberOption->get();
+            $dataArray['billingNumber'] = $billingNumber;
+        }
+        $sheetNoOption = $this->sheetNo;
+        if ($sheetNoOption->isDefined()) {
+            $sheetNo = $sheetNoOption->get();
+            $dataArray['sheetNo'] = $sheetNo;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

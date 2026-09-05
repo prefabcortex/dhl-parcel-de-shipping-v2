@@ -1,0 +1,231 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class Commodity implements SelfNormalizingModel
+{
+    /**
+     * @param Option<Country>          $countryOfOrigin
+     * @param Option<string>           $hsCode
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $itemDescription, private int $packagedQuantity, private Value $itemValue, private Weight $itemWeight, private Option $countryOfOrigin, private Option $hsCode, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $itemDescription, int $packagedQuantity, Value $itemValue, Weight $itemWeight, array $additionalProperties = []): self
+    {
+        return new self($itemDescription, $packagedQuantity, $itemValue, $itemWeight, None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * A text that describes the commodity item. Only the first 50 characters of the description text is printed on the customs declaration form CN23.
+     */
+    public function getItemDescription(): string
+    {
+        return $this->itemDescription;
+    }
+
+    public function withItemDescription(string $itemDescription): self
+    {
+        return new self($itemDescription, $this->packagedQuantity, $this->itemValue, $this->itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+    }
+
+    /**
+     * A valid country code consisting of three characters according to ISO 3166-1 alpha-3.
+     *
+     * @return Option<Country>
+     */
+    public function getCountryOfOrigin(): Option
+    {
+        return $this->countryOfOrigin;
+    }
+
+    public function withCountryOfOrigin(Country $countryOfOrigin): self
+    {
+        return new self($this->itemDescription, $this->packagedQuantity, $this->itemValue, $this->itemWeight, Some::create($countryOfOrigin), $this->hsCode, $this->additionalProperties);
+    }
+
+    /**
+     * Harmonized System Code aka Customs tariff number.
+     *
+     * @return Option<string>
+     */
+    public function getHsCode(): Option
+    {
+        return $this->hsCode;
+    }
+
+    public function withHsCode(string $hsCode): self
+    {
+        return new self($this->itemDescription, $this->packagedQuantity, $this->itemValue, $this->itemWeight, $this->countryOfOrigin, Some::create($hsCode), $this->additionalProperties);
+    }
+
+    /**
+     * How many items of that type are in the package.
+     */
+    public function getPackagedQuantity(): int
+    {
+        return $this->packagedQuantity;
+    }
+
+    public function withPackagedQuantity(int $packagedQuantity): self
+    {
+        return new self($this->itemDescription, $packagedQuantity, $this->itemValue, $this->itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+    }
+
+    /**
+     * Currency and numeric value.
+     */
+    public function getItemValue(): Value
+    {
+        return $this->itemValue;
+    }
+
+    public function withItemValue(Value $itemValue): self
+    {
+        return new self($this->itemDescription, $this->packagedQuantity, $itemValue, $this->itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+    }
+
+    /**
+     * Weight of item or shipment. Both uom and value are required.
+     */
+    public function getItemWeight(): Weight
+    {
+        return $this->itemWeight;
+    }
+
+    public function withItemWeight(Weight $itemWeight): self
+    {
+        return new self($this->itemDescription, $this->packagedQuantity, $this->itemValue, $itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $itemDescription = null;
+        $countryOfOrigin = None::create();
+        $hsCode = None::create();
+        $packagedQuantity = null;
+        $itemValue = null;
+        $itemWeight = null;
+        if (array_key_exists('itemDescription', $data)) {
+            $itemDescriptionRaw = $data['itemDescription'];
+            if (!is_string($itemDescriptionRaw)) {
+                throw new MalformedDataException(sprintf('Property "itemDescription" must be string, got %s.', get_debug_type($itemDescriptionRaw)));
+            }
+            $itemDescription = $itemDescriptionRaw;
+            unset($data['itemDescription']);
+        }
+        if (array_key_exists('countryOfOrigin', $data)) {
+            $countryOfOriginRaw = $data['countryOfOrigin'];
+            if (!is_string($countryOfOriginRaw)) {
+                throw new MalformedDataException(sprintf('Property "countryOfOrigin" must be string, got %s.', get_debug_type($countryOfOriginRaw)));
+            }
+            $countryOfOrigin = Some::create(Country::tryFrom($countryOfOriginRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryOfOriginRaw)));
+            unset($data['countryOfOrigin']);
+        }
+        if (array_key_exists('hsCode', $data)) {
+            $hsCodeRaw = $data['hsCode'];
+            if (!is_string($hsCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "hsCode" must be string, got %s.', get_debug_type($hsCodeRaw)));
+            }
+            $hsCode = Some::create($hsCodeRaw);
+            unset($data['hsCode']);
+        }
+        if (array_key_exists('packagedQuantity', $data)) {
+            $packagedQuantityRaw = $data['packagedQuantity'];
+            if (!is_int($packagedQuantityRaw)) {
+                throw new MalformedDataException(sprintf('Property "packagedQuantity" must be int, got %s.', get_debug_type($packagedQuantityRaw)));
+            }
+            $packagedQuantity = $packagedQuantityRaw;
+            unset($data['packagedQuantity']);
+        }
+        if (array_key_exists('itemValue', $data)) {
+            $itemValueRaw = $data['itemValue'];
+            if (!is_array($itemValueRaw)) {
+                throw new MalformedDataException(sprintf('Property "itemValue" must be object, got %s.', get_debug_type($itemValueRaw)));
+            }
+            /** @var array<string, mixed> $itemValueRawTyped */
+            $itemValueRawTyped = $itemValueRaw;
+            $itemValue = Value::fromArray($itemValueRawTyped);
+            unset($data['itemValue']);
+        }
+        if (array_key_exists('itemWeight', $data)) {
+            $itemWeightRaw = $data['itemWeight'];
+            if (!is_array($itemWeightRaw)) {
+                throw new MalformedDataException(sprintf('Property "itemWeight" must be object, got %s.', get_debug_type($itemWeightRaw)));
+            }
+            /** @var array<string, mixed> $itemWeightRawTyped */
+            $itemWeightRawTyped = $itemWeightRaw;
+            $itemWeight = Weight::fromArray($itemWeightRawTyped);
+            unset($data['itemWeight']);
+        }
+        $additionalProperties = $data;
+        if ($itemDescription === null) {
+            throw new MalformedDataException('Required property "itemDescription" is missing from the document.');
+        }
+        if ($packagedQuantity === null) {
+            throw new MalformedDataException('Required property "packagedQuantity" is missing from the document.');
+        }
+        if ($itemValue === null) {
+            throw new MalformedDataException('Required property "itemValue" is missing from the document.');
+        }
+        if ($itemWeight === null) {
+            throw new MalformedDataException('Required property "itemWeight" is missing from the document.');
+        }
+
+        return new self($itemDescription, $packagedQuantity, $itemValue, $itemWeight, $countryOfOrigin, $hsCode, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['itemDescription'] = $this->itemDescription;
+        $countryOfOriginOption = $this->countryOfOrigin;
+        if ($countryOfOriginOption->isDefined()) {
+            $countryOfOrigin = $countryOfOriginOption->get();
+            $dataArray['countryOfOrigin'] = $countryOfOrigin->value;
+        }
+        $hsCodeOption = $this->hsCode;
+        if ($hsCodeOption->isDefined()) {
+            $hsCode = $hsCodeOption->get();
+            $dataArray['hsCode'] = $hsCode;
+        }
+        $dataArray['packagedQuantity'] = $this->packagedQuantity;
+        $dataArray['itemValue'] = $this->itemValue->toArray();
+        $dataArray['itemWeight'] = $this->itemWeight->toArray();
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

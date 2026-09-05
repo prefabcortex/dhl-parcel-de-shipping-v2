@@ -1,0 +1,121 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function sprintf;
+
+final readonly class ShipmentDetails implements SelfNormalizingModel
+{
+    /**
+     * @param Option<Dimensions>       $dim
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private Weight $weight, private Option $dim, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(Weight $weight, array $additionalProperties = []): self
+    {
+        return new self($weight, None::create(), $additionalProperties);
+    }
+
+    /**
+     * Physical dimensions (aka 'Gurtmass') of the parcel. If you provide the dimension information, all attributes need to be provided. You cannot provide just the height, for example. If you provide length, width, and height in millimeters, they will be rounded to full cm.
+     *
+     * @return Option<Dimensions>
+     */
+    public function getDim(): Option
+    {
+        return $this->dim;
+    }
+
+    public function withDim(Dimensions $dim): self
+    {
+        return new self($this->weight, Some::create($dim), $this->additionalProperties);
+    }
+
+    /**
+     * Weight of item or shipment. Both uom and value are required.
+     */
+    public function getWeight(): Weight
+    {
+        return $this->weight;
+    }
+
+    public function withWeight(Weight $weight): self
+    {
+        return new self($weight, $this->dim, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $dim = None::create();
+        $weight = null;
+        if (array_key_exists('dim', $data)) {
+            $dimRaw = $data['dim'];
+            if (!is_array($dimRaw)) {
+                throw new MalformedDataException(sprintf('Property "dim" must be object, got %s.', get_debug_type($dimRaw)));
+            }
+            /** @var array<string, mixed> $dimRawTyped */
+            $dimRawTyped = $dimRaw;
+            $dim = Some::create(Dimensions::fromArray($dimRawTyped));
+            unset($data['dim']);
+        }
+        if (array_key_exists('weight', $data)) {
+            $weightRaw = $data['weight'];
+            if (!is_array($weightRaw)) {
+                throw new MalformedDataException(sprintf('Property "weight" must be object, got %s.', get_debug_type($weightRaw)));
+            }
+            /** @var array<string, mixed> $weightRawTyped */
+            $weightRawTyped = $weightRaw;
+            $weight = Weight::fromArray($weightRawTyped);
+            unset($data['weight']);
+        }
+        $additionalProperties = $data;
+        if ($weight === null) {
+            throw new MalformedDataException('Required property "weight" is missing from the document.');
+        }
+
+        return new self($weight, $dim, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dimOption = $this->dim;
+        if ($dimOption->isDefined()) {
+            $dim = $dimOption->get();
+            $dataArray['dim'] = $dim->toArray();
+        }
+        $dataArray['weight'] = $this->weight->toArray();
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

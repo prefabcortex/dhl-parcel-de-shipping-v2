@@ -1,0 +1,647 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use DateTime;
+use DateTimeInterface;
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_bool;
+use function is_string;
+use function sprintf;
+
+final readonly class VAS implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>              $preferredNeighbour
+     * @param Option<string>              $preferredLocation
+     * @param Option<VASVisualCheckOfAge> $visualCheckOfAge
+     * @param Option<bool>                $namedPersonOnly
+     * @param Option<VASIdentCheck>       $identCheck
+     * @param Option<bool>                $signedForByRecipient
+     * @param Option<VASEndorsement>      $endorsement
+     * @param Option<DateTimeInterface>   $preferredDay
+     * @param Option<bool>                $noNeighbourDelivery
+     * @param Option<Value>               $additionalInsurance
+     * @param Option<bool>                $bulkyGoods
+     * @param Option<VASCashOnDelivery>   $cashOnDelivery
+     * @param Option<string>              $individualSenderRequirement
+     * @param Option<bool>                $premium
+     * @param Option<bool>                $closestDropPoint
+     * @param Option<string>              $parcelOutletRouting
+     * @param Option<bool>                $goGreenPlus
+     * @param Option<VASDhlRetoure>       $dhlRetoure
+     * @param Option<bool>                $postalDeliveryDutyPaid
+     * @param array<int|string, mixed>    $additionalProperties
+     */
+    public function __construct(private Option $preferredNeighbour, private Option $preferredLocation, private Option $visualCheckOfAge, private Option $namedPersonOnly, private Option $identCheck, private Option $signedForByRecipient, private Option $endorsement, private Option $preferredDay, private Option $noNeighbourDelivery, private Option $additionalInsurance, private Option $bulkyGoods, private Option $cashOnDelivery, private Option $individualSenderRequirement, private Option $premium, private Option $closestDropPoint, private Option $parcelOutletRouting, private Option $goGreenPlus, private Option $dhlRetoure, private Option $postalDeliveryDutyPaid, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Preferred neighbour. Can be specified as text.
+     *
+     * @return Option<string>
+     */
+    public function getPreferredNeighbour(): Option
+    {
+        return $this->preferredNeighbour;
+    }
+
+    public function withPreferredNeighbour(string $preferredNeighbour): self
+    {
+        return new self(Some::create($preferredNeighbour), $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Preferred location. Can be specified as text.
+     *
+     * @return Option<string>
+     */
+    public function getPreferredLocation(): Option
+    {
+        return $this->preferredLocation;
+    }
+
+    public function withPreferredLocation(string $preferredLocation): self
+    {
+        return new self($this->preferredNeighbour, Some::create($preferredLocation), $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * if used it will trigger checking the age of recipient.
+     *
+     * @return Option<VASVisualCheckOfAge>
+     */
+    public function getVisualCheckOfAge(): Option
+    {
+        return $this->visualCheckOfAge;
+    }
+
+    public function withVisualCheckOfAge(VASVisualCheckOfAge $visualCheckOfAge): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, Some::create($visualCheckOfAge), $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Delivery can only be signed for by yourself personally.
+     *
+     * @return Option<bool>
+     */
+    public function getNamedPersonOnly(): Option
+    {
+        return $this->namedPersonOnly;
+    }
+
+    public function withNamedPersonOnly(bool $namedPersonOnly): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, Some::create($namedPersonOnly), $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Check the identity of the recipient via name (firstname, lastname), date of birth or age. This uses firstName and lastName as separate attributes since for identity check an automatic split of a one-line name is not considered reliable enough.
+     *
+     * @return Option<VASIdentCheck>
+     */
+    public function getIdentCheck(): Option
+    {
+        return $this->identCheck;
+    }
+
+    public function withIdentCheck(VASIdentCheck $identCheck): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, Some::create($identCheck), $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Delivery must be signed for by the recipient and not by DHL staff.
+     *
+     * @return Option<bool>
+     */
+    public function getSignedForByRecipient(): Option
+    {
+        return $this->signedForByRecipient;
+    }
+
+    public function withSignedForByRecipient(bool $signedForByRecipient): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, Some::create($signedForByRecipient), $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Instructions and endorsement how to treat international undeliverable shipment. By default, shipments are returned if undeliverable. There are country specific rules whether the shipment is returned immediately or after a grace period.
+     *
+     * @return Option<VASEndorsement>
+     */
+    public function getEndorsement(): Option
+    {
+        return $this->endorsement;
+    }
+
+    public function withEndorsement(VASEndorsement $endorsement): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, Some::create($endorsement), $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Preferred day of delivery in format YYYY-MM-DD. Shipper can request a preferred day of delivery. The preferred day should be between 2 and 6 working days after handover to DHL.
+     *
+     * @return Option<DateTimeInterface>
+     */
+    public function getPreferredDay(): Option
+    {
+        return $this->preferredDay;
+    }
+
+    public function withPreferredDay(DateTimeInterface $preferredDay): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, Some::create($preferredDay), $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Delivery can only be signed for by yourself personally or by members of your household.
+     *
+     * @return Option<bool>
+     */
+    public function getNoNeighbourDelivery(): Option
+    {
+        return $this->noNeighbourDelivery;
+    }
+
+    public function withNoNeighbourDelivery(bool $noNeighbourDelivery): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, Some::create($noNeighbourDelivery), $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Currency and numeric value.
+     *
+     * @return Option<Value>
+     */
+    public function getAdditionalInsurance(): Option
+    {
+        return $this->additionalInsurance;
+    }
+
+    public function withAdditionalInsurance(Value $additionalInsurance): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, Some::create($additionalInsurance), $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Leaving this out is same as setting to false. Sperrgut.
+     *
+     * @return Option<bool>
+     */
+    public function getBulkyGoods(): Option
+    {
+        return $this->bulkyGoods;
+    }
+
+    public function withBulkyGoods(bool $bulkyGoods): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, Some::create($bulkyGoods), $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Cash on delivery (Nachnahme). Currency must be Euro. Either bank account information or account reference (from customer profile) must be provided. Transfernote1 + 2 are references transmitted during bank transfer. Providing account information explicitly requires elevated privileges.
+     *
+     * @return Option<VASCashOnDelivery>
+     */
+    public function getCashOnDelivery(): Option
+    {
+        return $this->cashOnDelivery;
+    }
+
+    public function withCashOnDelivery(VASCashOnDelivery $cashOnDelivery): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, Some::create($cashOnDelivery), $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Special instructions for delivery. 2 character code, possible values agreed in contract.
+     *
+     * @return Option<string>
+     */
+    public function getIndividualSenderRequirement(): Option
+    {
+        return $this->individualSenderRequirement;
+    }
+
+    public function withIndividualSenderRequirement(string $individualSenderRequirement): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, Some::create($individualSenderRequirement), $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Choice of premium vs economy parcel. Availability is country dependent and may be manipulated by DHL if choice is not available. Please review the label.
+     *
+     * @return Option<bool>
+     */
+    public function getPremium(): Option
+    {
+        return $this->premium;
+    }
+
+    public function withPremium(bool $premium): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, Some::create($premium), $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Closest Droppoint Delivery to the droppoint closest to the address of the recipient of the shipment. For this kind of delivery either the phone number and/or the e-mail address of the receiver is mandatory. For shipments using DHL Paket International it is recommended that you choose one of the three delivery types: Economy, Premium, CDP. Otherwise, the current default for the receiver country will be picked.
+     *
+     * @return Option<bool>
+     */
+    public function getClosestDropPoint(): Option
+    {
+        return $this->closestDropPoint;
+    }
+
+    public function withClosestDropPoint(bool $closestDropPoint): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, Some::create($closestDropPoint), $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Undeliverable domestic shipment can be forwarded and held at retail. Notification to email (fallback: consignee email) will be used.
+     *
+     * @return Option<string>
+     */
+    public function getParcelOutletRouting(): Option
+    {
+        return $this->parcelOutletRouting;
+    }
+
+    public function withParcelOutletRouting(string $parcelOutletRouting): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, Some::create($parcelOutletRouting), $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * GoGreen Plus enables sustainable shipping by investing in measures to reduce greenhouse gas emissions at DHL.
+     *
+     * @return Option<bool>
+     */
+    public function getGoGreenPlus(): Option
+    {
+        return $this->goGreenPlus;
+    }
+
+    public function withGoGreenPlus(bool $goGreenPlus): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, Some::create($goGreenPlus), $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * Requests return label (aka 'retoure') to be provided. Also requires returnAddress and return billing number. Neither weight nor dimension need to be specified for the retoure (flat rate service).
+     *
+     * @return Option<VASDhlRetoure>
+     */
+    public function getDhlRetoure(): Option
+    {
+        return $this->dhlRetoure;
+    }
+
+    public function withDhlRetoure(VASDhlRetoure $dhlRetoure): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, Some::create($dhlRetoure), $this->postalDeliveryDutyPaid, $this->additionalProperties);
+    }
+
+    /**
+     * All import duties are paid by the shipper.
+     *
+     * @return Option<bool>
+     */
+    public function getPostalDeliveryDutyPaid(): Option
+    {
+        return $this->postalDeliveryDutyPaid;
+    }
+
+    public function withPostalDeliveryDutyPaid(bool $postalDeliveryDutyPaid): self
+    {
+        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, Some::create($postalDeliveryDutyPaid), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $preferredNeighbour = None::create();
+        $preferredLocation = None::create();
+        $visualCheckOfAge = None::create();
+        $namedPersonOnly = None::create();
+        $identCheck = None::create();
+        $signedForByRecipient = None::create();
+        $endorsement = None::create();
+        $preferredDay = None::create();
+        $noNeighbourDelivery = None::create();
+        $additionalInsurance = None::create();
+        $bulkyGoods = None::create();
+        $cashOnDelivery = None::create();
+        $individualSenderRequirement = None::create();
+        $premium = None::create();
+        $closestDropPoint = None::create();
+        $parcelOutletRouting = None::create();
+        $goGreenPlus = None::create();
+        $dhlRetoure = None::create();
+        $postalDeliveryDutyPaid = None::create();
+        if (array_key_exists('preferredNeighbour', $data)) {
+            $preferredNeighbourRaw = $data['preferredNeighbour'];
+            if (!is_string($preferredNeighbourRaw)) {
+                throw new MalformedDataException(sprintf('Property "preferredNeighbour" must be string, got %s.', get_debug_type($preferredNeighbourRaw)));
+            }
+            $preferredNeighbour = Some::create($preferredNeighbourRaw);
+            unset($data['preferredNeighbour']);
+        }
+        if (array_key_exists('preferredLocation', $data)) {
+            $preferredLocationRaw = $data['preferredLocation'];
+            if (!is_string($preferredLocationRaw)) {
+                throw new MalformedDataException(sprintf('Property "preferredLocation" must be string, got %s.', get_debug_type($preferredLocationRaw)));
+            }
+            $preferredLocation = Some::create($preferredLocationRaw);
+            unset($data['preferredLocation']);
+        }
+        if (array_key_exists('visualCheckOfAge', $data)) {
+            $visualCheckOfAgeRaw = $data['visualCheckOfAge'];
+            if (!is_string($visualCheckOfAgeRaw)) {
+                throw new MalformedDataException(sprintf('Property "visualCheckOfAge" must be string, got %s.', get_debug_type($visualCheckOfAgeRaw)));
+            }
+            $visualCheckOfAge = Some::create(VASVisualCheckOfAge::tryFrom($visualCheckOfAgeRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid VASVisualCheckOfAge.', $visualCheckOfAgeRaw)));
+            unset($data['visualCheckOfAge']);
+        }
+        if (array_key_exists('namedPersonOnly', $data)) {
+            $namedPersonOnlyRaw = $data['namedPersonOnly'];
+            if (!is_bool($namedPersonOnlyRaw)) {
+                throw new MalformedDataException(sprintf('Property "namedPersonOnly" must be bool, got %s.', get_debug_type($namedPersonOnlyRaw)));
+            }
+            $namedPersonOnly = Some::create($namedPersonOnlyRaw);
+            unset($data['namedPersonOnly']);
+        }
+        if (array_key_exists('identCheck', $data)) {
+            $identCheckRaw = $data['identCheck'];
+            if (!is_array($identCheckRaw)) {
+                throw new MalformedDataException(sprintf('Property "identCheck" must be object, got %s.', get_debug_type($identCheckRaw)));
+            }
+            /** @var array<string, mixed> $identCheckRawTyped */
+            $identCheckRawTyped = $identCheckRaw;
+            $identCheck = Some::create(VASIdentCheck::fromArray($identCheckRawTyped));
+            unset($data['identCheck']);
+        }
+        if (array_key_exists('signedForByRecipient', $data)) {
+            $signedForByRecipientRaw = $data['signedForByRecipient'];
+            if (!is_bool($signedForByRecipientRaw)) {
+                throw new MalformedDataException(sprintf('Property "signedForByRecipient" must be bool, got %s.', get_debug_type($signedForByRecipientRaw)));
+            }
+            $signedForByRecipient = Some::create($signedForByRecipientRaw);
+            unset($data['signedForByRecipient']);
+        }
+        if (array_key_exists('endorsement', $data)) {
+            $endorsementRaw = $data['endorsement'];
+            if (!is_string($endorsementRaw)) {
+                throw new MalformedDataException(sprintf('Property "endorsement" must be string, got %s.', get_debug_type($endorsementRaw)));
+            }
+            $endorsement = Some::create(VASEndorsement::tryFrom($endorsementRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid VASEndorsement.', $endorsementRaw)));
+            unset($data['endorsement']);
+        }
+        if (array_key_exists('preferredDay', $data)) {
+            $preferredDayRaw = $data['preferredDay'];
+            if (!is_string($preferredDayRaw)) {
+                throw new MalformedDataException(sprintf('Property "preferredDay" must be object, got %s.', get_debug_type($preferredDayRaw)));
+            }
+            $date = DateTime::createFromFormat('Y-m-d', $preferredDayRaw);
+            if ($date === false) {
+                throw new MalformedDataException('Invalid date format, expected: Y-m-d');
+            }
+            $preferredDay = Some::create($date->setTime(0, 0, 0));
+            unset($data['preferredDay']);
+        }
+        if (array_key_exists('noNeighbourDelivery', $data)) {
+            $noNeighbourDeliveryRaw = $data['noNeighbourDelivery'];
+            if (!is_bool($noNeighbourDeliveryRaw)) {
+                throw new MalformedDataException(sprintf('Property "noNeighbourDelivery" must be bool, got %s.', get_debug_type($noNeighbourDeliveryRaw)));
+            }
+            $noNeighbourDelivery = Some::create($noNeighbourDeliveryRaw);
+            unset($data['noNeighbourDelivery']);
+        }
+        if (array_key_exists('additionalInsurance', $data)) {
+            $additionalInsuranceRaw = $data['additionalInsurance'];
+            if (!is_array($additionalInsuranceRaw)) {
+                throw new MalformedDataException(sprintf('Property "additionalInsurance" must be object, got %s.', get_debug_type($additionalInsuranceRaw)));
+            }
+            /** @var array<string, mixed> $additionalInsuranceRawTyped */
+            $additionalInsuranceRawTyped = $additionalInsuranceRaw;
+            $additionalInsurance = Some::create(Value::fromArray($additionalInsuranceRawTyped));
+            unset($data['additionalInsurance']);
+        }
+        if (array_key_exists('bulkyGoods', $data)) {
+            $bulkyGoodsRaw = $data['bulkyGoods'];
+            if (!is_bool($bulkyGoodsRaw)) {
+                throw new MalformedDataException(sprintf('Property "bulkyGoods" must be bool, got %s.', get_debug_type($bulkyGoodsRaw)));
+            }
+            $bulkyGoods = Some::create($bulkyGoodsRaw);
+            unset($data['bulkyGoods']);
+        }
+        if (array_key_exists('cashOnDelivery', $data)) {
+            $cashOnDeliveryRaw = $data['cashOnDelivery'];
+            if (!is_array($cashOnDeliveryRaw)) {
+                throw new MalformedDataException(sprintf('Property "cashOnDelivery" must be object, got %s.', get_debug_type($cashOnDeliveryRaw)));
+            }
+            /** @var array<string, mixed> $cashOnDeliveryRawTyped */
+            $cashOnDeliveryRawTyped = $cashOnDeliveryRaw;
+            $cashOnDelivery = Some::create(VASCashOnDelivery::fromArray($cashOnDeliveryRawTyped));
+            unset($data['cashOnDelivery']);
+        }
+        if (array_key_exists('individualSenderRequirement', $data)) {
+            $individualSenderRequirementRaw = $data['individualSenderRequirement'];
+            if (!is_string($individualSenderRequirementRaw)) {
+                throw new MalformedDataException(sprintf('Property "individualSenderRequirement" must be string, got %s.', get_debug_type($individualSenderRequirementRaw)));
+            }
+            $individualSenderRequirement = Some::create($individualSenderRequirementRaw);
+            unset($data['individualSenderRequirement']);
+        }
+        if (array_key_exists('premium', $data)) {
+            $premiumRaw = $data['premium'];
+            if (!is_bool($premiumRaw)) {
+                throw new MalformedDataException(sprintf('Property "premium" must be bool, got %s.', get_debug_type($premiumRaw)));
+            }
+            $premium = Some::create($premiumRaw);
+            unset($data['premium']);
+        }
+        if (array_key_exists('closestDropPoint', $data)) {
+            $closestDropPointRaw = $data['closestDropPoint'];
+            if (!is_bool($closestDropPointRaw)) {
+                throw new MalformedDataException(sprintf('Property "closestDropPoint" must be bool, got %s.', get_debug_type($closestDropPointRaw)));
+            }
+            $closestDropPoint = Some::create($closestDropPointRaw);
+            unset($data['closestDropPoint']);
+        }
+        if (array_key_exists('parcelOutletRouting', $data)) {
+            $parcelOutletRoutingRaw = $data['parcelOutletRouting'];
+            if (!is_string($parcelOutletRoutingRaw)) {
+                throw new MalformedDataException(sprintf('Property "parcelOutletRouting" must be string, got %s.', get_debug_type($parcelOutletRoutingRaw)));
+            }
+            $parcelOutletRouting = Some::create($parcelOutletRoutingRaw);
+            unset($data['parcelOutletRouting']);
+        }
+        if (array_key_exists('goGreenPlus', $data)) {
+            $goGreenPlusRaw = $data['goGreenPlus'];
+            if (!is_bool($goGreenPlusRaw)) {
+                throw new MalformedDataException(sprintf('Property "goGreenPlus" must be bool, got %s.', get_debug_type($goGreenPlusRaw)));
+            }
+            $goGreenPlus = Some::create($goGreenPlusRaw);
+            unset($data['goGreenPlus']);
+        }
+        if (array_key_exists('dhlRetoure', $data)) {
+            $dhlRetoureRaw = $data['dhlRetoure'];
+            if (!is_array($dhlRetoureRaw)) {
+                throw new MalformedDataException(sprintf('Property "dhlRetoure" must be object, got %s.', get_debug_type($dhlRetoureRaw)));
+            }
+            /** @var array<string, mixed> $dhlRetoureRawTyped */
+            $dhlRetoureRawTyped = $dhlRetoureRaw;
+            $dhlRetoure = Some::create(VASDhlRetoure::fromArray($dhlRetoureRawTyped));
+            unset($data['dhlRetoure']);
+        }
+        if (array_key_exists('postalDeliveryDutyPaid', $data)) {
+            $postalDeliveryDutyPaidRaw = $data['postalDeliveryDutyPaid'];
+            if (!is_bool($postalDeliveryDutyPaidRaw)) {
+                throw new MalformedDataException(sprintf('Property "postalDeliveryDutyPaid" must be bool, got %s.', get_debug_type($postalDeliveryDutyPaidRaw)));
+            }
+            $postalDeliveryDutyPaid = Some::create($postalDeliveryDutyPaidRaw);
+            unset($data['postalDeliveryDutyPaid']);
+        }
+        $additionalProperties = $data;
+
+        return new self($preferredNeighbour, $preferredLocation, $visualCheckOfAge, $namedPersonOnly, $identCheck, $signedForByRecipient, $endorsement, $preferredDay, $noNeighbourDelivery, $additionalInsurance, $bulkyGoods, $cashOnDelivery, $individualSenderRequirement, $premium, $closestDropPoint, $parcelOutletRouting, $goGreenPlus, $dhlRetoure, $postalDeliveryDutyPaid, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $preferredNeighbourOption = $this->preferredNeighbour;
+        if ($preferredNeighbourOption->isDefined()) {
+            $preferredNeighbour = $preferredNeighbourOption->get();
+            $dataArray['preferredNeighbour'] = $preferredNeighbour;
+        }
+        $preferredLocationOption = $this->preferredLocation;
+        if ($preferredLocationOption->isDefined()) {
+            $preferredLocation = $preferredLocationOption->get();
+            $dataArray['preferredLocation'] = $preferredLocation;
+        }
+        $visualCheckOfAgeOption = $this->visualCheckOfAge;
+        if ($visualCheckOfAgeOption->isDefined()) {
+            $visualCheckOfAge = $visualCheckOfAgeOption->get();
+            $dataArray['visualCheckOfAge'] = $visualCheckOfAge->value;
+        }
+        $namedPersonOnlyOption = $this->namedPersonOnly;
+        if ($namedPersonOnlyOption->isDefined()) {
+            $namedPersonOnly = $namedPersonOnlyOption->get();
+            $dataArray['namedPersonOnly'] = $namedPersonOnly;
+        }
+        $identCheckOption = $this->identCheck;
+        if ($identCheckOption->isDefined()) {
+            $identCheck = $identCheckOption->get();
+            $dataArray['identCheck'] = $identCheck->toArray();
+        }
+        $signedForByRecipientOption = $this->signedForByRecipient;
+        if ($signedForByRecipientOption->isDefined()) {
+            $signedForByRecipient = $signedForByRecipientOption->get();
+            $dataArray['signedForByRecipient'] = $signedForByRecipient;
+        }
+        $endorsementOption = $this->endorsement;
+        if ($endorsementOption->isDefined()) {
+            $endorsement = $endorsementOption->get();
+            $dataArray['endorsement'] = $endorsement->value;
+        }
+        $preferredDayOption = $this->preferredDay;
+        if ($preferredDayOption->isDefined()) {
+            $preferredDay = $preferredDayOption->get();
+            $dataArray['preferredDay'] = $preferredDay->format('Y-m-d');
+        }
+        $noNeighbourDeliveryOption = $this->noNeighbourDelivery;
+        if ($noNeighbourDeliveryOption->isDefined()) {
+            $noNeighbourDelivery = $noNeighbourDeliveryOption->get();
+            $dataArray['noNeighbourDelivery'] = $noNeighbourDelivery;
+        }
+        $additionalInsuranceOption = $this->additionalInsurance;
+        if ($additionalInsuranceOption->isDefined()) {
+            $additionalInsurance = $additionalInsuranceOption->get();
+            $dataArray['additionalInsurance'] = $additionalInsurance->toArray();
+        }
+        $bulkyGoodsOption = $this->bulkyGoods;
+        if ($bulkyGoodsOption->isDefined()) {
+            $bulkyGoods = $bulkyGoodsOption->get();
+            $dataArray['bulkyGoods'] = $bulkyGoods;
+        }
+        $cashOnDeliveryOption = $this->cashOnDelivery;
+        if ($cashOnDeliveryOption->isDefined()) {
+            $cashOnDelivery = $cashOnDeliveryOption->get();
+            $dataArray['cashOnDelivery'] = $cashOnDelivery->toArray();
+        }
+        $individualSenderRequirementOption = $this->individualSenderRequirement;
+        if ($individualSenderRequirementOption->isDefined()) {
+            $individualSenderRequirement = $individualSenderRequirementOption->get();
+            $dataArray['individualSenderRequirement'] = $individualSenderRequirement;
+        }
+        $premiumOption = $this->premium;
+        if ($premiumOption->isDefined()) {
+            $premium = $premiumOption->get();
+            $dataArray['premium'] = $premium;
+        }
+        $closestDropPointOption = $this->closestDropPoint;
+        if ($closestDropPointOption->isDefined()) {
+            $closestDropPoint = $closestDropPointOption->get();
+            $dataArray['closestDropPoint'] = $closestDropPoint;
+        }
+        $parcelOutletRoutingOption = $this->parcelOutletRouting;
+        if ($parcelOutletRoutingOption->isDefined()) {
+            $parcelOutletRouting = $parcelOutletRoutingOption->get();
+            $dataArray['parcelOutletRouting'] = $parcelOutletRouting;
+        }
+        $goGreenPlusOption = $this->goGreenPlus;
+        if ($goGreenPlusOption->isDefined()) {
+            $goGreenPlus = $goGreenPlusOption->get();
+            $dataArray['goGreenPlus'] = $goGreenPlus;
+        }
+        $dhlRetoureOption = $this->dhlRetoure;
+        if ($dhlRetoureOption->isDefined()) {
+            $dhlRetoure = $dhlRetoureOption->get();
+            $dataArray['dhlRetoure'] = $dhlRetoure->toArray();
+        }
+        $postalDeliveryDutyPaidOption = $this->postalDeliveryDutyPaid;
+        if ($postalDeliveryDutyPaidOption->isDefined()) {
+            $postalDeliveryDutyPaid = $postalDeliveryDutyPaidOption->get();
+            $dataArray['postalDeliveryDutyPaid'] = $postalDeliveryDutyPaid;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

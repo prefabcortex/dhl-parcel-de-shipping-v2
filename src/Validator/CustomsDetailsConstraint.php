@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\CustomsDetails;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
+
+/**
+ * @see CustomsDetails
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class CustomsDetailsConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'invoiceNo' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'exportType' => new Required([...CustomsDetailsExportTypeConstraint::constraints()]),
+                'exportDescription' => new Optional([new Length(null, null, 80), new Type(['string']), new NotNull()]),
+                'shippingConditions' => new Optional([...CustomsDetailsShippingConditionsConstraint::constraints()]),
+                'permitNo' => new Optional([new Length(null, null, 30), new Type(['string']), new NotNull()]),
+                'attestationNo' => new Optional([new Length(null, null, 30), new Type(['string']), new NotNull()]),
+                'hasElectronicExportNotification' => new Optional([new Type(['bool']), new NotNull()]),
+                'MRN' => new Optional([new Length(null, null, 18), new Type(['string']), new NotNull()]),
+                'postalCharges' => new Required([new NotNull()]),
+                'officeOfOrigin' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'shipperCustomsRef' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'consigneeCustomsRef' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'items' => new Required([new Count(null, null, 99), new Count(null, 1), new All([...CommodityConstraint::constraints()]), new Type(['array']), new NotNull()]),
+            ], null, null, true),
+        ];
+    }
+}

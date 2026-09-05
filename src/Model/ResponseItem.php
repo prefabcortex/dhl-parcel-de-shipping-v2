@@ -1,0 +1,431 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_is_list;
+use function array_key_exists;
+use function array_map;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_string;
+use function sprintf;
+
+final readonly class ResponseItem implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>                      $shipmentNo
+     * @param Option<string>                      $routingCode
+     * @param Option<string>                      $returnRoutingCode
+     * @param Option<string>                      $returnShipmentNo
+     * @param Option<string>                      $shipmentRefNo
+     * @param Option<Document>                    $label
+     * @param Option<Document>                    $returnLabel
+     * @param Option<Document>                    $customsDoc
+     * @param Option<Document>                    $codLabel
+     * @param Option<list<ValidationMessageItem>> $validationMessages
+     * @param Option<string>                      $uuid
+     * @param array<int|string, mixed>            $additionalProperties
+     */
+    public function __construct(private RequestStatus $sstatus, private Option $shipmentNo, private Option $routingCode, private Option $returnRoutingCode, private Option $returnShipmentNo, private Option $shipmentRefNo, private Option $label, private Option $returnLabel, private Option $customsDoc, private Option $codLabel, private Option $validationMessages, private Option $uuid, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(RequestStatus $sstatus, array $additionalProperties = []): self
+    {
+        return new self($sstatus, None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getShipmentNo(): Option
+    {
+        return $this->shipmentNo;
+    }
+
+    public function withShipmentNo(string $shipmentNo): self
+    {
+        return new self($this->sstatus, Some::create($shipmentNo), $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Routing code of the consignee address.
+     *
+     * @return Option<string>
+     */
+    public function getRoutingCode(): Option
+    {
+        return $this->routingCode;
+    }
+
+    public function withRoutingCode(string $routingCode): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, Some::create($routingCode), $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Routing code of the return address.
+     *
+     * @return Option<string>
+     */
+    public function getReturnRoutingCode(): Option
+    {
+        return $this->returnRoutingCode;
+    }
+
+    public function withReturnRoutingCode(string $returnRoutingCode): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, Some::create($returnRoutingCode), $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getReturnShipmentNo(): Option
+    {
+        return $this->returnShipmentNo;
+    }
+
+    public function withReturnShipmentNo(string $returnShipmentNo): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, Some::create($returnShipmentNo), $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * General status description for the attached response or response item.
+     */
+    public function getSstatus(): RequestStatus
+    {
+        return $this->sstatus;
+    }
+
+    public function withSstatus(RequestStatus $sstatus): self
+    {
+        return new self($sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getShipmentRefNo(): Option
+    {
+        return $this->shipmentRefNo;
+    }
+
+    public function withShipmentRefNo(string $shipmentRefNo): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, Some::create($shipmentRefNo), $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Encoded document. All types of labels and documents.
+     *
+     * @return Option<Document>
+     */
+    public function getLabel(): Option
+    {
+        return $this->label;
+    }
+
+    public function withLabel(Document $label): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, Some::create($label), $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Encoded document. All types of labels and documents.
+     *
+     * @return Option<Document>
+     */
+    public function getReturnLabel(): Option
+    {
+        return $this->returnLabel;
+    }
+
+    public function withReturnLabel(Document $returnLabel): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, Some::create($returnLabel), $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Encoded document. All types of labels and documents.
+     *
+     * @return Option<Document>
+     */
+    public function getCustomsDoc(): Option
+    {
+        return $this->customsDoc;
+    }
+
+    public function withCustomsDoc(Document $customsDoc): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, Some::create($customsDoc), $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Encoded document. All types of labels and documents.
+     *
+     * @return Option<Document>
+     */
+    public function getCodLabel(): Option
+    {
+        return $this->codLabel;
+    }
+
+    public function withCodLabel(Document $codLabel): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, Some::create($codLabel), $this->validationMessages, $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * Optional validation messages attached to the shipment.
+     *
+     * @return Option<list<ValidationMessageItem>>
+     */
+    public function getValidationMessages(): Option
+    {
+        return $this->validationMessages;
+    }
+
+    /** @param list<ValidationMessageItem> $validationMessages */
+    public function withValidationMessages(array $validationMessages): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, Some::create($validationMessages), $this->uuid, $this->additionalProperties);
+    }
+
+    /**
+     * UUID identifying the shipment.
+     *
+     * @return Option<string>
+     */
+    public function getUuid(): Option
+    {
+        return $this->uuid;
+    }
+
+    public function withUuid(string $uuid): self
+    {
+        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, Some::create($uuid), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $shipmentNo = None::create();
+        $routingCode = None::create();
+        $returnRoutingCode = None::create();
+        $returnShipmentNo = None::create();
+        $sstatus = null;
+        $shipmentRefNo = None::create();
+        $label = None::create();
+        $returnLabel = None::create();
+        $customsDoc = None::create();
+        $codLabel = None::create();
+        $validationMessages = None::create();
+        $uuid = None::create();
+        if (array_key_exists('shipmentNo', $data)) {
+            $shipmentNoRaw = $data['shipmentNo'];
+            if (!is_string($shipmentNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)));
+            }
+            $shipmentNo = Some::create($shipmentNoRaw);
+            unset($data['shipmentNo']);
+        }
+        if (array_key_exists('routingCode', $data)) {
+            $routingCodeRaw = $data['routingCode'];
+            if (!is_string($routingCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "routingCode" must be string, got %s.', get_debug_type($routingCodeRaw)));
+            }
+            $routingCode = Some::create($routingCodeRaw);
+            unset($data['routingCode']);
+        }
+        if (array_key_exists('returnRoutingCode', $data)) {
+            $returnRoutingCodeRaw = $data['returnRoutingCode'];
+            if (!is_string($returnRoutingCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "returnRoutingCode" must be string, got %s.', get_debug_type($returnRoutingCodeRaw)));
+            }
+            $returnRoutingCode = Some::create($returnRoutingCodeRaw);
+            unset($data['returnRoutingCode']);
+        }
+        if (array_key_exists('returnShipmentNo', $data)) {
+            $returnShipmentNoRaw = $data['returnShipmentNo'];
+            if (!is_string($returnShipmentNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "returnShipmentNo" must be string, got %s.', get_debug_type($returnShipmentNoRaw)));
+            }
+            $returnShipmentNo = Some::create($returnShipmentNoRaw);
+            unset($data['returnShipmentNo']);
+        }
+        if (array_key_exists('sstatus', $data)) {
+            $sstatusRaw = $data['sstatus'];
+            if (!is_array($sstatusRaw)) {
+                throw new MalformedDataException(sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)));
+            }
+            /** @var array<string, mixed> $sstatusRawTyped */
+            $sstatusRawTyped = $sstatusRaw;
+            $sstatus = RequestStatus::fromArray($sstatusRawTyped);
+            unset($data['sstatus']);
+        }
+        if (array_key_exists('shipmentRefNo', $data)) {
+            $shipmentRefNoRaw = $data['shipmentRefNo'];
+            if (!is_string($shipmentRefNoRaw)) {
+                throw new MalformedDataException(sprintf('Property "shipmentRefNo" must be string, got %s.', get_debug_type($shipmentRefNoRaw)));
+            }
+            $shipmentRefNo = Some::create($shipmentRefNoRaw);
+            unset($data['shipmentRefNo']);
+        }
+        if (array_key_exists('label', $data)) {
+            $labelRaw = $data['label'];
+            if (!is_array($labelRaw)) {
+                throw new MalformedDataException(sprintf('Property "label" must be object, got %s.', get_debug_type($labelRaw)));
+            }
+            /** @var array<string, mixed> $labelRawTyped */
+            $labelRawTyped = $labelRaw;
+            $label = Some::create(Document::fromArray($labelRawTyped));
+            unset($data['label']);
+        }
+        if (array_key_exists('returnLabel', $data)) {
+            $returnLabelRaw = $data['returnLabel'];
+            if (!is_array($returnLabelRaw)) {
+                throw new MalformedDataException(sprintf('Property "returnLabel" must be object, got %s.', get_debug_type($returnLabelRaw)));
+            }
+            /** @var array<string, mixed> $returnLabelRawTyped */
+            $returnLabelRawTyped = $returnLabelRaw;
+            $returnLabel = Some::create(Document::fromArray($returnLabelRawTyped));
+            unset($data['returnLabel']);
+        }
+        if (array_key_exists('customsDoc', $data)) {
+            $customsDocRaw = $data['customsDoc'];
+            if (!is_array($customsDocRaw)) {
+                throw new MalformedDataException(sprintf('Property "customsDoc" must be object, got %s.', get_debug_type($customsDocRaw)));
+            }
+            /** @var array<string, mixed> $customsDocRawTyped */
+            $customsDocRawTyped = $customsDocRaw;
+            $customsDoc = Some::create(Document::fromArray($customsDocRawTyped));
+            unset($data['customsDoc']);
+        }
+        if (array_key_exists('codLabel', $data)) {
+            $codLabelRaw = $data['codLabel'];
+            if (!is_array($codLabelRaw)) {
+                throw new MalformedDataException(sprintf('Property "codLabel" must be object, got %s.', get_debug_type($codLabelRaw)));
+            }
+            /** @var array<string, mixed> $codLabelRawTyped */
+            $codLabelRawTyped = $codLabelRaw;
+            $codLabel = Some::create(Document::fromArray($codLabelRawTyped));
+            unset($data['codLabel']);
+        }
+        if (array_key_exists('validationMessages', $data)) {
+            $validationMessagesRaw = $data['validationMessages'];
+            if (!(is_array($validationMessagesRaw) && array_is_list($validationMessagesRaw))) {
+                throw new MalformedDataException(sprintf('Property "validationMessages" must be array, got %s.', get_debug_type($validationMessagesRaw)));
+            }
+            $validationMessages = Some::create(array_map(static function (mixed $value): ValidationMessageItem {
+                if (!is_array($value)) {
+                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                }
+                /** @var array<string, mixed> $valueTyped */
+                $valueTyped = $value;
+
+                return ValidationMessageItem::fromArray($valueTyped);
+            }, $validationMessagesRaw));
+            unset($data['validationMessages']);
+        }
+        if (array_key_exists('uuid', $data)) {
+            $uuidRaw = $data['uuid'];
+            if (!is_string($uuidRaw)) {
+                throw new MalformedDataException(sprintf('Property "uuid" must be string, got %s.', get_debug_type($uuidRaw)));
+            }
+            $uuid = Some::create($uuidRaw);
+            unset($data['uuid']);
+        }
+        $additionalProperties = $data;
+        if ($sstatus === null) {
+            throw new MalformedDataException('Required property "sstatus" is missing from the document.');
+        }
+
+        return new self($sstatus, $shipmentNo, $routingCode, $returnRoutingCode, $returnShipmentNo, $shipmentRefNo, $label, $returnLabel, $customsDoc, $codLabel, $validationMessages, $uuid, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $shipmentNoOption = $this->shipmentNo;
+        if ($shipmentNoOption->isDefined()) {
+            $shipmentNo = $shipmentNoOption->get();
+            $dataArray['shipmentNo'] = $shipmentNo;
+        }
+        $routingCodeOption = $this->routingCode;
+        if ($routingCodeOption->isDefined()) {
+            $routingCode = $routingCodeOption->get();
+            $dataArray['routingCode'] = $routingCode;
+        }
+        $returnRoutingCodeOption = $this->returnRoutingCode;
+        if ($returnRoutingCodeOption->isDefined()) {
+            $returnRoutingCode = $returnRoutingCodeOption->get();
+            $dataArray['returnRoutingCode'] = $returnRoutingCode;
+        }
+        $returnShipmentNoOption = $this->returnShipmentNo;
+        if ($returnShipmentNoOption->isDefined()) {
+            $returnShipmentNo = $returnShipmentNoOption->get();
+            $dataArray['returnShipmentNo'] = $returnShipmentNo;
+        }
+        $dataArray['sstatus'] = $this->sstatus->toArray();
+        $shipmentRefNoOption = $this->shipmentRefNo;
+        if ($shipmentRefNoOption->isDefined()) {
+            $shipmentRefNo = $shipmentRefNoOption->get();
+            $dataArray['shipmentRefNo'] = $shipmentRefNo;
+        }
+        $labelOption = $this->label;
+        if ($labelOption->isDefined()) {
+            $label = $labelOption->get();
+            $dataArray['label'] = $label->toArray();
+        }
+        $returnLabelOption = $this->returnLabel;
+        if ($returnLabelOption->isDefined()) {
+            $returnLabel = $returnLabelOption->get();
+            $dataArray['returnLabel'] = $returnLabel->toArray();
+        }
+        $customsDocOption = $this->customsDoc;
+        if ($customsDocOption->isDefined()) {
+            $customsDoc = $customsDocOption->get();
+            $dataArray['customsDoc'] = $customsDoc->toArray();
+        }
+        $codLabelOption = $this->codLabel;
+        if ($codLabelOption->isDefined()) {
+            $codLabel = $codLabelOption->get();
+            $dataArray['codLabel'] = $codLabel->toArray();
+        }
+        $validationMessagesOption = $this->validationMessages;
+        if ($validationMessagesOption->isDefined()) {
+            $validationMessages = $validationMessagesOption->get();
+            $values = [];
+            foreach ($validationMessages as $value) {
+                $values[] = $value->toArray();
+            }
+            $dataArray['validationMessages'] = $values;
+        }
+        $uuidOption = $this->uuid;
+        if ($uuidOption->isDefined()) {
+            $uuid = $uuidOption->get();
+            $dataArray['uuid'] = $uuid;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

@@ -1,0 +1,239 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_is_list;
+use function array_key_exists;
+use function array_map;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_string;
+use function sprintf;
+
+final readonly class SingleManifestResponse implements SelfNormalizingModel
+{
+    /**
+     * @param Option<RequestStatus>             $status
+     * @param Option<string>                    $manifestDate
+     * @param Option<list<Document>>            $manifest
+     * @param Option<list<BillingNoToSheetNo>>  $sheetNo
+     * @param Option<list<ShipmentNoToSheetNo>> $items
+     * @param array<int|string, mixed>          $additionalProperties
+     */
+    public function __construct(private Option $status, private Option $manifestDate, private Option $manifest, private Option $sheetNo, private Option $items, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * General status description for the attached response or response item.
+     *
+     * @return Option<RequestStatus>
+     */
+    public function getStatus(): Option
+    {
+        return $this->status;
+    }
+
+    public function withStatus(RequestStatus $status): self
+    {
+        return new self(Some::create($status), $this->manifestDate, $this->manifest, $this->sheetNo, $this->items, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getManifestDate(): Option
+    {
+        return $this->manifestDate;
+    }
+
+    public function withManifestDate(string $manifestDate): self
+    {
+        return new self($this->status, Some::create($manifestDate), $this->manifest, $this->sheetNo, $this->items, $this->additionalProperties);
+    }
+
+    /** @return Option<list<Document>> */
+    public function getManifest(): Option
+    {
+        return $this->manifest;
+    }
+
+    /** @param list<Document> $manifest */
+    public function withManifest(array $manifest): self
+    {
+        return new self($this->status, $this->manifestDate, Some::create($manifest), $this->sheetNo, $this->items, $this->additionalProperties);
+    }
+
+    /** @return Option<list<BillingNoToSheetNo>> */
+    public function getSheetNo(): Option
+    {
+        return $this->sheetNo;
+    }
+
+    /** @param list<BillingNoToSheetNo> $sheetNo */
+    public function withSheetNo(array $sheetNo): self
+    {
+        return new self($this->status, $this->manifestDate, $this->manifest, Some::create($sheetNo), $this->items, $this->additionalProperties);
+    }
+
+    /** @return Option<list<ShipmentNoToSheetNo>> */
+    public function getItems(): Option
+    {
+        return $this->items;
+    }
+
+    /** @param list<ShipmentNoToSheetNo> $items */
+    public function withItems(array $items): self
+    {
+        return new self($this->status, $this->manifestDate, $this->manifest, $this->sheetNo, Some::create($items), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $status = None::create();
+        $manifestDate = None::create();
+        $manifest = None::create();
+        $sheetNo = None::create();
+        $items = None::create();
+        if (array_key_exists('status', $data)) {
+            $statusRaw = $data['status'];
+            if (!is_array($statusRaw)) {
+                throw new MalformedDataException(sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)));
+            }
+            /** @var array<string, mixed> $statusRawTyped */
+            $statusRawTyped = $statusRaw;
+            $status = Some::create(RequestStatus::fromArray($statusRawTyped));
+            unset($data['status']);
+        }
+        if (array_key_exists('manifestDate', $data)) {
+            $manifestDateRaw = $data['manifestDate'];
+            if (!is_string($manifestDateRaw)) {
+                throw new MalformedDataException(sprintf('Property "manifestDate" must be string, got %s.', get_debug_type($manifestDateRaw)));
+            }
+            $manifestDate = Some::create($manifestDateRaw);
+            unset($data['manifestDate']);
+        }
+        if (array_key_exists('manifest', $data)) {
+            $manifestRaw = $data['manifest'];
+            if (!(is_array($manifestRaw) && array_is_list($manifestRaw))) {
+                throw new MalformedDataException(sprintf('Property "manifest" must be array, got %s.', get_debug_type($manifestRaw)));
+            }
+            $manifest = Some::create(array_map(static function (mixed $value): Document {
+                if (!is_array($value)) {
+                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                }
+                /** @var array<string, mixed> $valueTyped */
+                $valueTyped = $value;
+
+                return Document::fromArray($valueTyped);
+            }, $manifestRaw));
+            unset($data['manifest']);
+        }
+        if (array_key_exists('sheetNo', $data)) {
+            $sheetNoRaw = $data['sheetNo'];
+            if (!(is_array($sheetNoRaw) && array_is_list($sheetNoRaw))) {
+                throw new MalformedDataException(sprintf('Property "sheetNo" must be array, got %s.', get_debug_type($sheetNoRaw)));
+            }
+            $sheetNo = Some::create(array_map(static function (mixed $value_1): BillingNoToSheetNo {
+                if (!is_array($value_1)) {
+                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value_1)));
+                }
+                /** @var array<string, mixed> $value_1Typed */
+                $value_1Typed = $value_1;
+
+                return BillingNoToSheetNo::fromArray($value_1Typed);
+            }, $sheetNoRaw));
+            unset($data['sheetNo']);
+        }
+        if (array_key_exists('items', $data)) {
+            $itemsRaw = $data['items'];
+            if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
+                throw new MalformedDataException(sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)));
+            }
+            $items = Some::create(array_map(static function (mixed $value_2): ShipmentNoToSheetNo {
+                if (!is_array($value_2)) {
+                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value_2)));
+                }
+                /** @var array<string, mixed> $value_2Typed */
+                $value_2Typed = $value_2;
+
+                return ShipmentNoToSheetNo::fromArray($value_2Typed);
+            }, $itemsRaw));
+            unset($data['items']);
+        }
+        $additionalProperties = $data;
+
+        return new self($status, $manifestDate, $manifest, $sheetNo, $items, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $statusOption = $this->status;
+        if ($statusOption->isDefined()) {
+            $status = $statusOption->get();
+            $dataArray['status'] = $status->toArray();
+        }
+        $manifestDateOption = $this->manifestDate;
+        if ($manifestDateOption->isDefined()) {
+            $manifestDate = $manifestDateOption->get();
+            $dataArray['manifestDate'] = $manifestDate;
+        }
+        $manifestOption = $this->manifest;
+        if ($manifestOption->isDefined()) {
+            $manifest = $manifestOption->get();
+            $values = [];
+            foreach ($manifest as $value) {
+                $values[] = $value->toArray();
+            }
+            $dataArray['manifest'] = $values;
+        }
+        $sheetNoOption = $this->sheetNo;
+        if ($sheetNoOption->isDefined()) {
+            $sheetNo = $sheetNoOption->get();
+            $values_1 = [];
+            foreach ($sheetNo as $value_1) {
+                $values_1[] = $value_1->toArray();
+            }
+            $dataArray['sheetNo'] = $values_1;
+        }
+        $itemsOption = $this->items;
+        if ($itemsOption->isDefined()) {
+            $items = $itemsOption->get();
+            $values_2 = [];
+            foreach ($items as $value_2) {
+                $values_2[] = $value_2->toArray();
+            }
+            $dataArray['items'] = $values_2;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

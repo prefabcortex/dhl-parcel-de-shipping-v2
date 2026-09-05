@@ -1,0 +1,173 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Operation\ShipmentsAndLabels;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteBadRequestException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteInternalServerErrorException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteTooManyRequestsException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
+use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
+use Prefabcortex\DhlParcelDeShippingV2\Http\HeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\JsonBody;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
+use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
+use Prefabcortex\DhlParcelDeShippingV2\Model\OrdersAccountDeleteAccept;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\OrdersAccountDeleteHeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\OrdersAccountDeleteQueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidatorTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\LabelDataResponseConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\RequestStatusConstraint;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+use function array_map;
+use function in_array;
+
+/**
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ *
+ * @implements Operation<LabelDataResponse>
+ */
+final class OrdersAccountDelete implements Operation
+{
+    use BaseOperationTrait;
+    use OperationTrait;
+    use ValidatorTrait;
+    /** @var list<OrdersAccountDeleteAccept> */
+    protected array $accept;
+    private readonly OrdersAccountDeleteQueryParameters $queryParameters;
+    private readonly OrdersAccountDeleteHeaderParameters $headerParameters;
+
+    /**
+     * Delete one or more shipments created earlier. Deletion of shipments is only possible prior to them being manifested (closed out, 'Tagesabschluss'). The call will return HTTP 200 (single shipment) or 207 on success, with individual status elements for each shipment. Individual status elements are HTTP 200, 400. 400 will be returned when shipment does not exist (or was already deleted).
+     *
+     * @param list<OrdersAccountDeleteAccept> $accept Accept content header application/json|application/problem+json
+     */
+    public function __construct(OrdersAccountDeleteQueryParameters $queryParameters, OrdersAccountDeleteHeaderParameters $headerParameters, array $accept)
+    {
+        $this->queryParameters = $queryParameters;
+        $this->headerParameters = $headerParameters;
+        $this->accept = $accept;
+    }
+
+    #[Override]
+    public function getMethod(): string
+    {
+        return 'DELETE';
+    }
+
+    #[Override]
+    public function getUri(): string
+    {
+        return '/orders';
+    }
+
+    #[Override]
+    public function getPayload(StreamFactoryInterface $streamFactory): Payload
+    {
+        return new Payload([], '');
+    }
+
+    /** @return array<string, list<string>> */
+    public function getExtraHeaders(): array
+    {
+        if ($this->accept === []) {
+            return ['Accept' => ['application/json', 'application/problem+json']];
+        }
+
+        return ['Accept' => array_map(static fn (OrdersAccountDeleteAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+    }
+
+    protected function getQueryParameters(): QueryParameters
+    {
+        return $this->queryParameters->toQueryParameters();
+    }
+
+    protected function getHeaderParameters(): HeaderParameters
+    {
+        return $this->headerParameters->toHeaderParameters();
+    }
+
+    /**
+     * {@inheritdoc}.
+     *
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws OrdersAccountDeleteBadRequestException
+     * @throws OrdersAccountDeleteUnauthorizedException
+     * @throws OrdersAccountDeleteTooManyRequestsException
+     * @throws OrdersAccountDeleteInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): LabelDataResponse
+    {
+        $status = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        // 200: Response for requests with a single element
+        // 207: Response for requests taking multiple input elements
+        if (in_array($status, [200, 207], true) && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+
+            return LabelDataResponse::fromArray($typedData);
+        }
+        if (400 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            throw new OrdersAccountDeleteBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
+        }
+        if (401 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new OrdersAccountDeleteUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (429 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new OrdersAccountDeleteTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (500 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new OrdersAccountDeleteInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        throw new UnexpectedStatusCodeException($response, $body);
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws OrdersAccountDeleteBadRequestException
+     * @throws OrdersAccountDeleteUnauthorizedException
+     * @throws OrdersAccountDeleteTooManyRequestsException
+     * @throws OrdersAccountDeleteInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    public function parseResponse(ResponseInterface $response): LabelDataResponse
+    {
+        $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
+
+        return $this->transformResponseBody($response, $contentType);
+    }
+
+    /** @return list<list<string>> */
+    #[Override]
+    public function getSecurityRequirements(): array
+    {
+        return [['ApiKey'], ['BasicAuth'], ['OAuth2']];
+    }
+}

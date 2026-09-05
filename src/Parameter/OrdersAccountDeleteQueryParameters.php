@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Parameter;
+
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameter;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ScalarValue;
+
+final readonly class OrdersAccountDeleteQueryParameters
+{
+    public function __construct(private string $profile, private string $shipment)
+    {
+    }
+
+    public function getProfile(): string
+    {
+        return $this->profile;
+    }
+
+    public function getShipment(): string
+    {
+        return $this->shipment;
+    }
+
+    /**
+     * @internal called by the generated operation, not part of this package's public
+     *                  contract: it may change in any release
+     */
+    public function toQueryParameters(): QueryParameters
+    {
+        $parameters = [];
+        $parameters[] = new QueryParameter('profile', new ScalarValue($this->profile), false);
+        $parameters[] = new QueryParameter('shipment', new ScalarValue($this->shipment), false);
+
+        return new QueryParameters(...$parameters);
+    }
+}

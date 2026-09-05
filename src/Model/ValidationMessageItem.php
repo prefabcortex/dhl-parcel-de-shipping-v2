@@ -1,0 +1,151 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class ValidationMessageItem implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $property
+     * @param Option<string>           $validationMessage
+     * @param Option<string>           $validationState
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private Option $property, private Option $validationMessage, private Option $validationState, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * The property that is affected by the validation message.
+     *
+     * @return Option<string>
+     */
+    public function getProperty(): Option
+    {
+        return $this->property;
+    }
+
+    public function withProperty(string $property): self
+    {
+        return new self(Some::create($property), $this->validationMessage, $this->validationState, $this->additionalProperties);
+    }
+
+    /**
+     * The validation message describing the error.
+     *
+     * @return Option<string>
+     */
+    public function getValidationMessage(): Option
+    {
+        return $this->validationMessage;
+    }
+
+    public function withValidationMessage(string $validationMessage): self
+    {
+        return new self($this->property, Some::create($validationMessage), $this->validationState, $this->additionalProperties);
+    }
+
+    /**
+     * The validation state resulting from the error.
+     *
+     * @return Option<string>
+     */
+    public function getValidationState(): Option
+    {
+        return $this->validationState;
+    }
+
+    public function withValidationState(string $validationState): self
+    {
+        return new self($this->property, $this->validationMessage, Some::create($validationState), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $property = None::create();
+        $validationMessage = None::create();
+        $validationState = None::create();
+        if (array_key_exists('property', $data)) {
+            $propertyRaw = $data['property'];
+            if (!is_string($propertyRaw)) {
+                throw new MalformedDataException(sprintf('Property "property" must be string, got %s.', get_debug_type($propertyRaw)));
+            }
+            $property = Some::create($propertyRaw);
+            unset($data['property']);
+        }
+        if (array_key_exists('validationMessage', $data)) {
+            $validationMessageRaw = $data['validationMessage'];
+            if (!is_string($validationMessageRaw)) {
+                throw new MalformedDataException(sprintf('Property "validationMessage" must be string, got %s.', get_debug_type($validationMessageRaw)));
+            }
+            $validationMessage = Some::create($validationMessageRaw);
+            unset($data['validationMessage']);
+        }
+        if (array_key_exists('validationState', $data)) {
+            $validationStateRaw = $data['validationState'];
+            if (!is_string($validationStateRaw)) {
+                throw new MalformedDataException(sprintf('Property "validationState" must be string, got %s.', get_debug_type($validationStateRaw)));
+            }
+            $validationState = Some::create($validationStateRaw);
+            unset($data['validationState']);
+        }
+        $additionalProperties = $data;
+
+        return new self($property, $validationMessage, $validationState, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $propertyOption = $this->property;
+        if ($propertyOption->isDefined()) {
+            $property = $propertyOption->get();
+            $dataArray['property'] = $property;
+        }
+        $validationMessageOption = $this->validationMessage;
+        if ($validationMessageOption->isDefined()) {
+            $validationMessage = $validationMessageOption->get();
+            $dataArray['validationMessage'] = $validationMessage;
+        }
+        $validationStateOption = $this->validationState;
+        if ($validationStateOption->isDefined()) {
+            $validationState = $validationStateOption->get();
+            $dataArray['validationState'] = $validationState;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

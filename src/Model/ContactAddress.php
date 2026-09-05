@@ -1,0 +1,495 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_string;
+use function sprintf;
+
+final readonly class ContactAddress implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $name2
+     * @param Option<string>           $name3
+     * @param Option<string>           $dispatchingInformation
+     * @param Option<string>           $addressHouse
+     * @param Option<string>           $additionalAddressInformation1
+     * @param Option<string>           $additionalAddressInformation2
+     * @param Option<string>           $postalCode
+     * @param Option<string>           $state
+     * @param Option<string>           $contactName
+     * @param Option<string>           $phone
+     * @param Option<string>           $email
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $name1, private string $addressStreet, private string $city, private Country $country, private Option $name2, private Option $name3, private Option $dispatchingInformation, private Option $addressHouse, private Option $additionalAddressInformation1, private Option $additionalAddressInformation2, private Option $postalCode, private Option $state, private Option $contactName, private Option $phone, private Option $email, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $name1, string $addressStreet, string $city, Country $country, array $additionalProperties = []): self
+    {
+        return new self($name1, $addressStreet, $city, $country, None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Name1. Line 1 of name information.
+     */
+    public function getName1(): string
+    {
+        return $this->name1;
+    }
+
+    public function withName1(string $name1): self
+    {
+        return new self($name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * An optional, additional line of name information.
+     *
+     * @return Option<string>
+     */
+    public function getName2(): Option
+    {
+        return $this->name2;
+    }
+
+    public function withName2(string $name2): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, Some::create($name2), $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * An optional, additional line of name information.
+     *
+     * @return Option<string>
+     */
+    public function getName3(): Option
+    {
+        return $this->name3;
+    }
+
+    public function withName3(string $name3): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, Some::create($name3), $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * An optional, additional line of address. It is printed on the shipping label for international shipments to the following countries only BEL, CZE, NLD. It is positioned below name3 on the label.
+     *
+     * @return Option<string>
+     */
+    public function getDispatchingInformation(): Option
+    {
+        return $this->dispatchingInformation;
+    }
+
+    public function withDispatchingInformation(string $dispatchingInformation): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, Some::create($dispatchingInformation), $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Line 1 of the street address. This is just the street name. Can also include house number. If the house number is included Street and house number must be separated by a space to avoid validation errors.
+     */
+    public function getAddressStreet(): string
+    {
+        return $this->addressStreet;
+    }
+
+    public function withAddressStreet(string $addressStreet): self
+    {
+        return new self($this->name1, $addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Line 1 of the street address. This is just the house number. Can be added to street name instead.
+     *
+     * @return Option<string>
+     */
+    public function getAddressHouse(): Option
+    {
+        return $this->addressHouse;
+    }
+
+    public function withAddressHouse(string $addressHouse): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, Some::create($addressHouse), $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Additional information that is positioned either behind or below addressStreet on international shipment labels. Where exactly it is printed on the label depends on the country.
+     *
+     * @return Option<string>
+     */
+    public function getAdditionalAddressInformation1(): Option
+    {
+        return $this->additionalAddressInformation1;
+    }
+
+    public function withAdditionalAddressInformation1(string $additionalAddressInformation1): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, Some::create($additionalAddressInformation1), $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Additional information that is positioned either behind or below addressStreet on international shipment labels. It is printed on shipping labels to the following countries only AUT, CHN, DNK, GBR, HRV, LTU, PRT, ROU, RUS. Where exactly it is printed on the label depends on the country.
+     *
+     * @return Option<string>
+     */
+    public function getAdditionalAddressInformation2(): Option
+    {
+        return $this->additionalAddressInformation2;
+    }
+
+    public function withAdditionalAddressInformation2(string $additionalAddressInformation2): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, Some::create($additionalAddressInformation2), $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Mandatory for all countries that use a postal code system.
+     *
+     * @return Option<string>
+     */
+    public function getPostalCode(): Option
+    {
+        return $this->postalCode;
+    }
+
+    public function withPostalCode(string $postalCode): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, Some::create($postalCode), $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * city.
+     */
+    public function getCity(): string
+    {
+        return $this->city;
+    }
+
+    public function withCity(string $city): self
+    {
+        return new self($this->name1, $this->addressStreet, $city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * State, province or territory. For the USA please use the official regional ISO-Codes, e.g. US-AL.
+     *
+     * @return Option<string>
+     */
+    public function getState(): Option
+    {
+        return $this->state;
+    }
+
+    public function withState(string $state): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, Some::create($state), $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * A valid country code consisting of three characters according to ISO 3166-1 alpha-3.
+     */
+    public function getCountry(): Country
+    {
+        return $this->country;
+    }
+
+    public function withCountry(Country $country): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * optional contact name. (this is not the primary name printed on label).
+     *
+     * @return Option<string>
+     */
+    public function getContactName(): Option
+    {
+        return $this->contactName;
+    }
+
+    public function withContactName(string $contactName): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, Some::create($contactName), $this->phone, $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Please note that, in accordance with Art. 4 No. 11 GDPR, you must obtain the recipient's consent to forward their phone number to Deutsche Post DHL Group. For shipments within Germany, the phone number cannot be transmitted. In some countries the provision of a telephone number and/or e-mail address is mandatory for a delivery to a droppoint. If your recipient has objected to the disclosure of their telephone number and/or e-mail address, the shipment can only be delivered in these countries using the service Premium.
+     *
+     * @return Option<string>
+     */
+    public function getPhone(): Option
+    {
+        return $this->phone;
+    }
+
+    public function withPhone(string $phone): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, Some::create($phone), $this->email, $this->additionalProperties);
+    }
+
+    /**
+     * Please note that, in accordance with Art. 4 No. 11 GDPR, you must obtain the recipient's consent to forward their e-mail address to Deutsche Post DHL Group. For shipments within Germany, the e-mail address is used to send a DHL Parcel Notification to the recipient. The e-mail address is not mandatory for shipments within Germany. In some countries the provision of a telephone number and/or e-mail address is mandatory for a delivery to a droppoint. If your recipient has objected to the disclosure of their telephone number and/or e-mail address, the shipment can only be delivered in these countries using the service Premium.
+     *
+     * @return Option<string>
+     */
+    public function getEmail(): Option
+    {
+        return $this->email;
+    }
+
+    public function withEmail(string $email): self
+    {
+        return new self($this->name1, $this->addressStreet, $this->city, $this->country, $this->name2, $this->name3, $this->dispatchingInformation, $this->addressHouse, $this->additionalAddressInformation1, $this->additionalAddressInformation2, $this->postalCode, $this->state, $this->contactName, $this->phone, Some::create($email), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $name1 = null;
+        $name2 = None::create();
+        $name3 = None::create();
+        $dispatchingInformation = None::create();
+        $addressStreet = null;
+        $addressHouse = None::create();
+        $additionalAddressInformation1 = None::create();
+        $additionalAddressInformation2 = None::create();
+        $postalCode = None::create();
+        $city = null;
+        $state = None::create();
+        $country = null;
+        $contactName = None::create();
+        $phone = None::create();
+        $email = None::create();
+        if (array_key_exists('name1', $data)) {
+            $name1Raw = $data['name1'];
+            if (!is_string($name1Raw)) {
+                throw new MalformedDataException(sprintf('Property "name1" must be string, got %s.', get_debug_type($name1Raw)));
+            }
+            $name1 = $name1Raw;
+            unset($data['name1']);
+        }
+        if (array_key_exists('name2', $data)) {
+            $name2Raw = $data['name2'];
+            if (!is_string($name2Raw)) {
+                throw new MalformedDataException(sprintf('Property "name2" must be string, got %s.', get_debug_type($name2Raw)));
+            }
+            $name2 = Some::create($name2Raw);
+            unset($data['name2']);
+        }
+        if (array_key_exists('name3', $data)) {
+            $name3Raw = $data['name3'];
+            if (!is_string($name3Raw)) {
+                throw new MalformedDataException(sprintf('Property "name3" must be string, got %s.', get_debug_type($name3Raw)));
+            }
+            $name3 = Some::create($name3Raw);
+            unset($data['name3']);
+        }
+        if (array_key_exists('dispatchingInformation', $data)) {
+            $dispatchingInformationRaw = $data['dispatchingInformation'];
+            if (!is_string($dispatchingInformationRaw)) {
+                throw new MalformedDataException(sprintf('Property "dispatchingInformation" must be string, got %s.', get_debug_type($dispatchingInformationRaw)));
+            }
+            $dispatchingInformation = Some::create($dispatchingInformationRaw);
+            unset($data['dispatchingInformation']);
+        }
+        if (array_key_exists('addressStreet', $data)) {
+            $addressStreetRaw = $data['addressStreet'];
+            if (!is_string($addressStreetRaw)) {
+                throw new MalformedDataException(sprintf('Property "addressStreet" must be string, got %s.', get_debug_type($addressStreetRaw)));
+            }
+            $addressStreet = $addressStreetRaw;
+            unset($data['addressStreet']);
+        }
+        if (array_key_exists('addressHouse', $data)) {
+            $addressHouseRaw = $data['addressHouse'];
+            if (!is_string($addressHouseRaw)) {
+                throw new MalformedDataException(sprintf('Property "addressHouse" must be string, got %s.', get_debug_type($addressHouseRaw)));
+            }
+            $addressHouse = Some::create($addressHouseRaw);
+            unset($data['addressHouse']);
+        }
+        if (array_key_exists('additionalAddressInformation1', $data)) {
+            $additionalAddressInformation1Raw = $data['additionalAddressInformation1'];
+            if (!is_string($additionalAddressInformation1Raw)) {
+                throw new MalformedDataException(sprintf('Property "additionalAddressInformation1" must be string, got %s.', get_debug_type($additionalAddressInformation1Raw)));
+            }
+            $additionalAddressInformation1 = Some::create($additionalAddressInformation1Raw);
+            unset($data['additionalAddressInformation1']);
+        }
+        if (array_key_exists('additionalAddressInformation2', $data)) {
+            $additionalAddressInformation2Raw = $data['additionalAddressInformation2'];
+            if (!is_string($additionalAddressInformation2Raw)) {
+                throw new MalformedDataException(sprintf('Property "additionalAddressInformation2" must be string, got %s.', get_debug_type($additionalAddressInformation2Raw)));
+            }
+            $additionalAddressInformation2 = Some::create($additionalAddressInformation2Raw);
+            unset($data['additionalAddressInformation2']);
+        }
+        if (array_key_exists('postalCode', $data)) {
+            $postalCodeRaw = $data['postalCode'];
+            if (!is_string($postalCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)));
+            }
+            $postalCode = Some::create($postalCodeRaw);
+            unset($data['postalCode']);
+        }
+        if (array_key_exists('city', $data)) {
+            $cityRaw = $data['city'];
+            if (!is_string($cityRaw)) {
+                throw new MalformedDataException(sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)));
+            }
+            $city = $cityRaw;
+            unset($data['city']);
+        }
+        if (array_key_exists('state', $data)) {
+            $stateRaw = $data['state'];
+            if (!is_string($stateRaw)) {
+                throw new MalformedDataException(sprintf('Property "state" must be string, got %s.', get_debug_type($stateRaw)));
+            }
+            $state = Some::create($stateRaw);
+            unset($data['state']);
+        }
+        if (array_key_exists('country', $data)) {
+            $countryRaw = $data['country'];
+            if (!is_string($countryRaw)) {
+                throw new MalformedDataException(sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)));
+            }
+            $country = Country::tryFrom($countryRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw));
+            unset($data['country']);
+        }
+        if (array_key_exists('contactName', $data)) {
+            $contactNameRaw = $data['contactName'];
+            if (!is_string($contactNameRaw)) {
+                throw new MalformedDataException(sprintf('Property "contactName" must be string, got %s.', get_debug_type($contactNameRaw)));
+            }
+            $contactName = Some::create($contactNameRaw);
+            unset($data['contactName']);
+        }
+        if (array_key_exists('phone', $data)) {
+            $phoneRaw = $data['phone'];
+            if (!is_string($phoneRaw)) {
+                throw new MalformedDataException(sprintf('Property "phone" must be string, got %s.', get_debug_type($phoneRaw)));
+            }
+            $phone = Some::create($phoneRaw);
+            unset($data['phone']);
+        }
+        if (array_key_exists('email', $data)) {
+            $emailRaw = $data['email'];
+            if (!is_string($emailRaw)) {
+                throw new MalformedDataException(sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)));
+            }
+            $email = Some::create($emailRaw);
+            unset($data['email']);
+        }
+        $additionalProperties = $data;
+        if ($name1 === null) {
+            throw new MalformedDataException('Required property "name1" is missing from the document.');
+        }
+        if ($addressStreet === null) {
+            throw new MalformedDataException('Required property "addressStreet" is missing from the document.');
+        }
+        if ($city === null) {
+            throw new MalformedDataException('Required property "city" is missing from the document.');
+        }
+        if ($country === null) {
+            throw new MalformedDataException('Required property "country" is missing from the document.');
+        }
+
+        return new self($name1, $addressStreet, $city, $country, $name2, $name3, $dispatchingInformation, $addressHouse, $additionalAddressInformation1, $additionalAddressInformation2, $postalCode, $state, $contactName, $phone, $email, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['name1'] = $this->name1;
+        $name2Option = $this->name2;
+        if ($name2Option->isDefined()) {
+            $name2 = $name2Option->get();
+            $dataArray['name2'] = $name2;
+        }
+        $name3Option = $this->name3;
+        if ($name3Option->isDefined()) {
+            $name3 = $name3Option->get();
+            $dataArray['name3'] = $name3;
+        }
+        $dispatchingInformationOption = $this->dispatchingInformation;
+        if ($dispatchingInformationOption->isDefined()) {
+            $dispatchingInformation = $dispatchingInformationOption->get();
+            $dataArray['dispatchingInformation'] = $dispatchingInformation;
+        }
+        $dataArray['addressStreet'] = $this->addressStreet;
+        $addressHouseOption = $this->addressHouse;
+        if ($addressHouseOption->isDefined()) {
+            $addressHouse = $addressHouseOption->get();
+            $dataArray['addressHouse'] = $addressHouse;
+        }
+        $additionalAddressInformation1Option = $this->additionalAddressInformation1;
+        if ($additionalAddressInformation1Option->isDefined()) {
+            $additionalAddressInformation1 = $additionalAddressInformation1Option->get();
+            $dataArray['additionalAddressInformation1'] = $additionalAddressInformation1;
+        }
+        $additionalAddressInformation2Option = $this->additionalAddressInformation2;
+        if ($additionalAddressInformation2Option->isDefined()) {
+            $additionalAddressInformation2 = $additionalAddressInformation2Option->get();
+            $dataArray['additionalAddressInformation2'] = $additionalAddressInformation2;
+        }
+        $postalCodeOption = $this->postalCode;
+        if ($postalCodeOption->isDefined()) {
+            $postalCode = $postalCodeOption->get();
+            $dataArray['postalCode'] = $postalCode;
+        }
+        $dataArray['city'] = $this->city;
+        $stateOption = $this->state;
+        if ($stateOption->isDefined()) {
+            $state = $stateOption->get();
+            $dataArray['state'] = $state;
+        }
+        $dataArray['country'] = $this->country->value;
+        $contactNameOption = $this->contactName;
+        if ($contactNameOption->isDefined()) {
+            $contactName = $contactNameOption->get();
+            $dataArray['contactName'] = $contactName;
+        }
+        $phoneOption = $this->phone;
+        if ($phoneOption->isDefined()) {
+            $phone = $phoneOption->get();
+            $dataArray['phone'] = $phone;
+        }
+        $emailOption = $this->email;
+        if ($emailOption->isDefined()) {
+            $email = $emailOption->get();
+            $dataArray['email'] = $email;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

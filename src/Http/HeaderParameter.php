@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Http;
+
+/**
+ * One header parameter: its wire name and its value.
+ *
+ * Unlike {@see QueryParameter} there is no `allowReserved` — percent-encoding is a URL concern,
+ * and header values are not URL-encoded.
+ *
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ */
+final readonly class HeaderParameter
+{
+    public function __construct(public string $name, public ParameterValue $value)
+    {
+    }
+}

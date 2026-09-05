@@ -1,0 +1,194 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Operation\ShipmentsAndLabels;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersBadRequestException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersInternalServerErrorException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersTooManyRequestsException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
+use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
+use Prefabcortex\DhlParcelDeShippingV2\Http\HeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\JsonBody;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
+use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Model\CreateOrdersAccept;
+use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ShipmentOrderRequest;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\CreateOrdersHeaderParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Parameter\CreateOrdersQueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidatorTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\LabelDataResponseConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\RequestStatusConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\ShipmentOrderRequestConstraint;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+use function array_map;
+use function in_array;
+
+/**
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ *
+ * @implements Operation<LabelDataResponse>
+ */
+final class CreateOrders implements Operation
+{
+    use BaseOperationTrait;
+    use OperationTrait;
+    use ValidatorTrait;
+    private readonly ShipmentOrderRequest $body;
+    /** @var list<CreateOrdersAccept> */
+    protected array $accept;
+    private readonly CreateOrdersQueryParameters $queryParameters;
+    private readonly CreateOrdersHeaderParameters $headerParameters;
+
+    /**
+     * This request is used to create one or more shipments and return corresponding shipment tracking numbers, labels, and documentation. Up to 30 shipments can be created in a single call.
+     * #### Request
+     * The selected products and corresponding billing numbers, as well as the desired services and package details are required to create a shipment. Each shipment can have a dedicated shipper address. The example request body contains sample values for most services.
+     * #### Response
+     * The request will return shipment tracking numbers and the applicable labels for each shipment. If multiple shipments have been included, an HTTP 207 response (multistatus) is returned and holds detailed status for each shipment. Other standard HTTP response codes (401, 500, 400, 200, 429) are possible, too. Labels can be either provided as part of the response (base64 encoded for PDF, text for ZPL) or via URL link for view and download. Note that the format settings per query parameters apply to the shipping label. It may also apply to other labels included, depending on the configuration of your account. Label paper for return shipments can be specified separately since a different printer may be used here. If requesting labels to be provided as URL for separate download, the URLs can be shared.
+     * #### Validation
+     * It is recommended to validate the request first prior to shipment creation by setting the `validate` query parameter to `true`. Especially, during development and test, it is recommended to perform this validation. This functionality supports both
+     * * JSON schema validation (against this API description). During development and test, it is recommended to do this validation. JSON schema is available for local validation
+     * * Dry run against the DHL backend.
+     *
+     * If this succeeds, actual shipment creation will also succeed.
+     *
+     * @param list<CreateOrdersAccept> $accept Accept content header application/json|application/problem+json
+     */
+    public function __construct(ShipmentOrderRequest $requestBody, CreateOrdersQueryParameters $queryParameters, CreateOrdersHeaderParameters $headerParameters, array $accept)
+    {
+        $this->body = $requestBody;
+        $this->queryParameters = $queryParameters;
+        $this->headerParameters = $headerParameters;
+        $this->accept = $accept;
+    }
+
+    #[Override]
+    public function getMethod(): string
+    {
+        return 'POST';
+    }
+
+    #[Override]
+    public function getUri(): string
+    {
+        return '/orders';
+    }
+
+    /**
+     * @throws MalformedDataException
+     * @throws ValidationException
+     */
+    #[Override]
+    public function getPayload(StreamFactoryInterface $streamFactory): Payload
+    {
+        $data = $this->body->toArray();
+        $this->validate($data, ShipmentOrderRequestConstraint::constraints());
+
+        return new Payload(['Content-Type' => ['application/json']], JsonBody::encode($data));
+    }
+
+    /** @return array<string, list<string>> */
+    public function getExtraHeaders(): array
+    {
+        if ($this->accept === []) {
+            return ['Accept' => ['application/json', 'application/problem+json']];
+        }
+
+        return ['Accept' => array_map(static fn (CreateOrdersAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+    }
+
+    protected function getQueryParameters(): QueryParameters
+    {
+        return $this->queryParameters->toQueryParameters();
+    }
+
+    protected function getHeaderParameters(): HeaderParameters
+    {
+        return $this->headerParameters->toHeaderParameters();
+    }
+
+    /**
+     * {@inheritdoc}.
+     *
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws CreateOrdersBadRequestException
+     * @throws CreateOrdersUnauthorizedException
+     * @throws CreateOrdersTooManyRequestsException
+     * @throws CreateOrdersInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): LabelDataResponse
+    {
+        $status = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        // 200: Success response for requests with a single shipment.
+        // 207: Response for requests taking multiple input elements
+        if (in_array($status, [200, 207], true) && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+
+            return LabelDataResponse::fromArray($typedData);
+        }
+        if (400 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            throw new CreateOrdersBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
+        }
+        if (401 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new CreateOrdersUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (429 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new CreateOrdersTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (500 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new CreateOrdersInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        throw new UnexpectedStatusCodeException($response, $body);
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws CreateOrdersBadRequestException
+     * @throws CreateOrdersUnauthorizedException
+     * @throws CreateOrdersTooManyRequestsException
+     * @throws CreateOrdersInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    public function parseResponse(ResponseInterface $response): LabelDataResponse
+    {
+        $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
+
+        return $this->transformResponseBody($response, $contentType);
+    }
+
+    /** @return list<list<string>> */
+    #[Override]
+    public function getSecurityRequirements(): array
+    {
+        return [['ApiKey'], ['BasicAuth'], ['OAuth2']];
+    }
+}

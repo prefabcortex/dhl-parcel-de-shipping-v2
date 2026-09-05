@@ -1,0 +1,134 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_is_list;
+use function array_key_exists;
+use function array_map;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function sprintf;
+
+final readonly class MultipleManifestResponse implements SelfNormalizingModel
+{
+    /**
+     * @param Option<RequestStatus>           $status
+     * @param Option<list<ShortResponseItem>> $items
+     * @param array<int|string, mixed>        $additionalProperties
+     */
+    public function __construct(private Option $status, private Option $items, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(array $additionalProperties = []): self
+    {
+        return new self(None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * General status description for the attached response or response item.
+     *
+     * @return Option<RequestStatus>
+     */
+    public function getStatus(): Option
+    {
+        return $this->status;
+    }
+
+    public function withStatus(RequestStatus $status): self
+    {
+        return new self(Some::create($status), $this->items, $this->additionalProperties);
+    }
+
+    /** @return Option<list<ShortResponseItem>> */
+    public function getItems(): Option
+    {
+        return $this->items;
+    }
+
+    /** @param list<ShortResponseItem> $items */
+    public function withItems(array $items): self
+    {
+        return new self($this->status, Some::create($items), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $status = None::create();
+        $items = None::create();
+        if (array_key_exists('status', $data)) {
+            $statusRaw = $data['status'];
+            if (!is_array($statusRaw)) {
+                throw new MalformedDataException(sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)));
+            }
+            /** @var array<string, mixed> $statusRawTyped */
+            $statusRawTyped = $statusRaw;
+            $status = Some::create(RequestStatus::fromArray($statusRawTyped));
+            unset($data['status']);
+        }
+        if (array_key_exists('items', $data)) {
+            $itemsRaw = $data['items'];
+            if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
+                throw new MalformedDataException(sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)));
+            }
+            $items = Some::create(array_map(static function (mixed $value): ShortResponseItem {
+                if (!is_array($value)) {
+                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                }
+                /** @var array<string, mixed> $valueTyped */
+                $valueTyped = $value;
+
+                return ShortResponseItem::fromArray($valueTyped);
+            }, $itemsRaw));
+            unset($data['items']);
+        }
+        $additionalProperties = $data;
+
+        return new self($status, $items, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $statusOption = $this->status;
+        if ($statusOption->isDefined()) {
+            $status = $statusOption->get();
+            $dataArray['status'] = $status->toArray();
+        }
+        $itemsOption = $this->items;
+        if ($itemsOption->isDefined()) {
+            $items = $itemsOption->get();
+            $values = [];
+            foreach ($items as $value) {
+                $values[] = $value->toArray();
+            }
+            $dataArray['items'] = $values;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

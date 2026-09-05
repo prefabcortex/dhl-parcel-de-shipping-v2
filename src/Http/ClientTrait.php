@@ -1,0 +1,158 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Http;
+
+use InvalidArgumentException;
+use Prefabcortex\DhlParcelDeShippingV2\Authentication\AuthenticatorRegistry;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ApiException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\NetworkException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RequestException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\TransportException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\TransportFailedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnsupportedValueException;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\StreamInterface;
+
+use function array_key_exists;
+use function is_array;
+use function parse_url;
+use function rtrim;
+use function sprintf;
+use function str_contains;
+
+/**
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ */
+trait ClientTrait
+{
+    /**
+     * Scheme, authority and base path every operation path hangs off, without a trailing slash.
+     */
+    protected string $baseUri;
+    protected ClientInterface $httpClient;
+    protected RequestFactoryInterface $requestFactory;
+    protected StreamFactoryInterface $streamFactory;
+    protected AuthenticatorRegistry $authenticatorRegistry;
+
+    /**
+     * @param string $baseUri where the described API lives, e.g.
+     *                        `https://api-eu.dhl.com/parcel/de/shipping/v2`
+     *
+     * @throws UnsupportedValueException when the base URI carries no scheme and host, and could
+     *                                   therefore never address a server
+     */
+    protected function __construct(string $baseUri, ClientInterface $httpClient, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, AuthenticatorRegistry $authenticatorRegistry)
+    {
+        // Checked once here rather than per request: a base URI that names no host produces a
+        // relative request URI, and a PSR-18 client answers that with an exception naming the
+        // request instead of the configuration that caused it.
+        $parsed = parse_url($baseUri);
+        if (!is_array($parsed) || !array_key_exists('scheme', $parsed) || !array_key_exists('host', $parsed)) {
+            throw new UnsupportedValueException(sprintf('Base URI must carry a scheme and a host, got "%s".', $baseUri));
+        }
+        $this->baseUri = rtrim($baseUri, '/');
+        $this->httpClient = $httpClient;
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
+        $this->authenticatorRegistry = $authenticatorRegistry;
+    }
+
+    /**
+     * Public because the generated tag facades call it from another namespace, and PHP has no
+     * package-private visibility to say otherwise. The annotation has to be repeated here rather
+     * than left on the trait: reflection copies a trait method's own docblock into the using class,
+     * never the trait's, so this is the only place a tool reading `Client::executeOperation()`
+     * looks.
+     *
+     * @internal plumbing of the generated package, not part of its public contract: only the
+     *                    generated operations and client touch this, and it may change in any release
+     *
+     * @template TReturn
+     *
+     * @param Operation<TReturn> $operation
+     *
+     * @return TReturn
+     *
+     * @throws ApiException
+     * @throws TransportException
+     * @throws UnsupportedValueException
+     */
+    final public function executeOperation(Operation $operation): mixed
+    {
+        return $operation->parseResponse($this->processOperation($operation));
+    }
+
+    /**
+     * @internal plumbing of the generated package, not part of its public contract: only the
+     *                    generated operations and client touch this, and it may change in any release
+     *
+     * @param Operation<mixed> $operation
+     *
+     * @throws ApiException
+     * @throws TransportException
+     * @throws UnsupportedValueException
+     */
+    final public function executeRawOperation(Operation $operation): ResponseInterface
+    {
+        return $this->processOperation($operation);
+    }
+
+    /**
+     * @param Operation<mixed> $operation
+     *
+     * @throws ApiException
+     * @throws TransportException
+     * @throws UnsupportedValueException
+     */
+    private function processOperation(Operation $operation): ResponseInterface
+    {
+        $payload = $operation->getPayload($this->streamFactory);
+        $queryString = $operation->getQueryString();
+        $uriGlue = !str_contains($operation->getUri(), '?') ? '?' : '&';
+        $uri = $queryString !== '' ? $operation->getUri() . $uriGlue . $queryString : $operation->getUri();
+        // Assembling the message is the one stretch that raises PSR-7's bare
+        // `InvalidArgumentException` — `withHeader()` with a value the implementation will not take
+        // is the case that actually happens. PSR-7 declares no interface for it, so it can only be
+        // recognised by where it is caught, and that is what makes this span the right one: it holds
+        // no throw site of ours, so everything caught here came from the PSR implementation.
+        // `UnsupportedValueException` is listed first regardless — it extends the same SPL class,
+        // and a third-party `Authenticator` raising one would otherwise be re-wrapped in itself.
+        try {
+            // Concatenation, not RFC 3986 resolution. OpenAPI defines a request URL as the Server
+            // Object's URL followed by the Path Item's key, and `Operation::getUri()` answers with
+            // such a key — always rooted at `/`. Resolving the two the way RFC 3986 resolves a
+            // reference would replace the base path instead of extending it: `/pets` against
+            // `https://host/v2` would address `https://host/pets`, a path the server does not serve.
+            $request = $this->requestFactory->createRequest($operation->getMethod(), $this->baseUri . $uri);
+            $request = $payload->content instanceof StreamInterface ? $request->withBody($payload->content) : $request->withBody($this->streamFactory->createStream($payload->content));
+            foreach ($operation->getHeaders($payload->headers) as $name => $value) {
+                $request = $request->withHeader($name, $value);
+            }
+            $request = $this->authenticatorRegistry->authenticate($request, $operation->getSecurityRequirements());
+        } catch (UnsupportedValueException $exception) {
+            throw $exception;
+        } catch (InvalidArgumentException $exception) {
+            throw new UnsupportedValueException(sprintf('The request could not be assembled: %s', $exception->getMessage()), 0, $exception);
+        }
+        // The order is load-bearing: both finer interfaces extend `ClientExceptionInterface`, so a
+        // catch of the general one first would swallow the classification the client just made.
+        try {
+            return $this->httpClient->sendRequest($request);
+        } catch (NetworkExceptionInterface $exception) {
+            throw new NetworkException($exception->getRequest(), $exception);
+        } catch (RequestExceptionInterface $exception) {
+            throw new RequestException($exception->getRequest(), $exception);
+        } catch (ClientExceptionInterface $exception) {
+            throw new TransportFailedException($request, $exception);
+        }
+    }
+}

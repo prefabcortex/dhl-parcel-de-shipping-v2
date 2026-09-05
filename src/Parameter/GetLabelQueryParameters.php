@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Parameter;
+
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameter;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ScalarValue;
+
+final readonly class GetLabelQueryParameters
+{
+    public function __construct(private string $token)
+    {
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
+    /**
+     * @internal called by the generated operation, not part of this package's public
+     *                  contract: it may change in any release
+     */
+    public function toQueryParameters(): QueryParameters
+    {
+        $parameters = [];
+        $parameters[] = new QueryParameter('token', new ScalarValue($this->token), false);
+
+        return new QueryParameters(...$parameters);
+    }
+}

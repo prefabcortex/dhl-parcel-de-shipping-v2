@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Exception;
+
+use UnexpectedValueException;
+
+/**
+ * Data that cannot cross the boundary between a JSON document and a typed model.
+ *
+ * Every place the two meet raises this. Reading: the JSON reader, when a response body is not
+ * valid JSON or decodes to the wrong shape, and every generated `fromArray()`, when a property
+ * arrives with a type the description does not allow. Writing: the encoder, when a request body
+ * holds something JSON cannot represent — a string field carrying bytes that are not valid UTF-8
+ * is the case that actually happens. Different directions, one question — is this data what the
+ * description says it is — so one type to catch.
+ *
+ * Extends `UnexpectedValueException` rather than replacing it. That was the type these throw sites
+ * used before, it is the type every `@throws` in a published package named, and it is what
+ * existing `catch` blocks in consumer code are written against; a subclass keeps all three
+ * correct. What it adds is the marker: without it a malformed response — the single likeliest way
+ * a call goes wrong — was the one failure `catch (ApiException $e)` did not cover, which is
+ * exactly the failure a consumer writes that catch for.
+ *
+ * The generator's own parsing keeps throwing the SPL type directly. A broken specification
+ * document is not a package's error surface, and nothing catches it as one.
+ */
+final class MalformedDataException extends UnexpectedValueException implements ApiException
+{
+}

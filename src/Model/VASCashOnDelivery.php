@@ -1,0 +1,205 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_array;
+use function is_string;
+use function sprintf;
+
+final readonly class VASCashOnDelivery implements SelfNormalizingModel
+{
+    /**
+     * @param Option<Value>            $amount
+     * @param Option<BankAccount>      $bankAccount
+     * @param Option<string>           $accountReference
+     * @param Option<string>           $transferNote2
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $transferNote1, private Option $amount, private Option $bankAccount, private Option $accountReference, private Option $transferNote2, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $transferNote1, array $additionalProperties = []): self
+    {
+        return new self($transferNote1, None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Currency and numeric value.
+     *
+     * @return Option<Value>
+     */
+    public function getAmount(): Option
+    {
+        return $this->amount;
+    }
+
+    public function withAmount(Value $amount): self
+    {
+        return new self($this->transferNote1, Some::create($amount), $this->bankAccount, $this->accountReference, $this->transferNote2, $this->additionalProperties);
+    }
+
+    /**
+     * Bank account data used for CoD (Cash on Delivery).
+     *
+     * @return Option<BankAccount>
+     */
+    public function getBankAccount(): Option
+    {
+        return $this->bankAccount;
+    }
+
+    public function withBankAccount(BankAccount $bankAccount): self
+    {
+        return new self($this->transferNote1, $this->amount, Some::create($bankAccount), $this->accountReference, $this->transferNote2, $this->additionalProperties);
+    }
+
+    /**
+     * Reference to bank account details. Account references are maintained in customer settings in Post & DHL business customer portal under Ship -> Settings -> Cash on delivery. Please note, that the default account reference is used if the provided account reference does not exist in your customer settings!
+     *
+     * @return Option<string>
+     */
+    public function getAccountReference(): Option
+    {
+        return $this->accountReference;
+    }
+
+    public function withAccountReference(string $accountReference): self
+    {
+        return new self($this->transferNote1, $this->amount, $this->bankAccount, Some::create($accountReference), $this->transferNote2, $this->additionalProperties);
+    }
+
+    public function getTransferNote1(): string
+    {
+        return $this->transferNote1;
+    }
+
+    public function withTransferNote1(string $transferNote1): self
+    {
+        return new self($transferNote1, $this->amount, $this->bankAccount, $this->accountReference, $this->transferNote2, $this->additionalProperties);
+    }
+
+    /** @return Option<string> */
+    public function getTransferNote2(): Option
+    {
+        return $this->transferNote2;
+    }
+
+    public function withTransferNote2(string $transferNote2): self
+    {
+        return new self($this->transferNote1, $this->amount, $this->bankAccount, $this->accountReference, Some::create($transferNote2), $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $amount = None::create();
+        $bankAccount = None::create();
+        $accountReference = None::create();
+        $transferNote1 = null;
+        $transferNote2 = None::create();
+        if (array_key_exists('amount', $data)) {
+            $amountRaw = $data['amount'];
+            if (!is_array($amountRaw)) {
+                throw new MalformedDataException(sprintf('Property "amount" must be object, got %s.', get_debug_type($amountRaw)));
+            }
+            /** @var array<string, mixed> $amountRawTyped */
+            $amountRawTyped = $amountRaw;
+            $amount = Some::create(Value::fromArray($amountRawTyped));
+            unset($data['amount']);
+        }
+        if (array_key_exists('bankAccount', $data)) {
+            $bankAccountRaw = $data['bankAccount'];
+            if (!is_array($bankAccountRaw)) {
+                throw new MalformedDataException(sprintf('Property "bankAccount" must be object, got %s.', get_debug_type($bankAccountRaw)));
+            }
+            /** @var array<string, mixed> $bankAccountRawTyped */
+            $bankAccountRawTyped = $bankAccountRaw;
+            $bankAccount = Some::create(BankAccount::fromArray($bankAccountRawTyped));
+            unset($data['bankAccount']);
+        }
+        if (array_key_exists('accountReference', $data)) {
+            $accountReferenceRaw = $data['accountReference'];
+            if (!is_string($accountReferenceRaw)) {
+                throw new MalformedDataException(sprintf('Property "accountReference" must be string, got %s.', get_debug_type($accountReferenceRaw)));
+            }
+            $accountReference = Some::create($accountReferenceRaw);
+            unset($data['accountReference']);
+        }
+        if (array_key_exists('transferNote1', $data)) {
+            $transferNote1Raw = $data['transferNote1'];
+            if (!is_string($transferNote1Raw)) {
+                throw new MalformedDataException(sprintf('Property "transferNote1" must be string, got %s.', get_debug_type($transferNote1Raw)));
+            }
+            $transferNote1 = $transferNote1Raw;
+            unset($data['transferNote1']);
+        }
+        if (array_key_exists('transferNote2', $data)) {
+            $transferNote2Raw = $data['transferNote2'];
+            if (!is_string($transferNote2Raw)) {
+                throw new MalformedDataException(sprintf('Property "transferNote2" must be string, got %s.', get_debug_type($transferNote2Raw)));
+            }
+            $transferNote2 = Some::create($transferNote2Raw);
+            unset($data['transferNote2']);
+        }
+        $additionalProperties = $data;
+        if ($transferNote1 === null) {
+            throw new MalformedDataException('Required property "transferNote1" is missing from the document.');
+        }
+
+        return new self($transferNote1, $amount, $bankAccount, $accountReference, $transferNote2, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $amountOption = $this->amount;
+        if ($amountOption->isDefined()) {
+            $amount = $amountOption->get();
+            $dataArray['amount'] = $amount->toArray();
+        }
+        $bankAccountOption = $this->bankAccount;
+        if ($bankAccountOption->isDefined()) {
+            $bankAccount = $bankAccountOption->get();
+            $dataArray['bankAccount'] = $bankAccount->toArray();
+        }
+        $accountReferenceOption = $this->accountReference;
+        if ($accountReferenceOption->isDefined()) {
+            $accountReference = $accountReferenceOption->get();
+            $dataArray['accountReference'] = $accountReference;
+        }
+        $dataArray['transferNote1'] = $this->transferNote1;
+        $transferNote2Option = $this->transferNote2;
+        if ($transferNote2Option->isDefined()) {
+            $transferNote2 = $transferNote2Option->get();
+            $dataArray['transferNote2'] = $transferNote2;
+        }
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

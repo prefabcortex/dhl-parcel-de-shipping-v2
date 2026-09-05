@@ -1,0 +1,90 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Parameter;
+
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameter;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ScalarValue;
+use Prefabcortex\DhlParcelDeShippingV2\Model\GetManifestsIncludeDocs;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+final class GetManifestsQueryParameters
+{
+    /**
+     * Legacy name **labelResponseType**. Shipping labels and further shipment documents can be: * __include__: included as base64 encoded data in the response (default) * __URL__: provided as URL reference. Default is include the base64 encoded labels.
+     */
+    private GetManifestsIncludeDocs $includeDocs = GetManifestsIncludeDocs::include;
+    /**
+     * @var Option<string>
+     *                     Customer billingNumber number
+     */
+    private Option $billingNumber;
+    /** @var Option<string> */
+    private Option $date;
+
+    public function __construct()
+    {
+        $this->billingNumber = None::create();
+        $this->date = None::create();
+    }
+
+    public function getIncludeDocs(): GetManifestsIncludeDocs
+    {
+        return $this->includeDocs;
+    }
+
+    public function setIncludeDocs(GetManifestsIncludeDocs $includeDocs): self
+    {
+        $this->includeDocs = $includeDocs;
+
+        return $this;
+    }
+
+    /** @return Option<string> */
+    public function getBillingNumber(): Option
+    {
+        return $this->billingNumber;
+    }
+
+    public function setBillingNumber(string $billingNumber): self
+    {
+        $this->billingNumber = Some::create($billingNumber);
+
+        return $this;
+    }
+
+    /** @return Option<string> */
+    public function getDate(): Option
+    {
+        return $this->date;
+    }
+
+    public function setDate(string $date): self
+    {
+        $this->date = Some::create($date);
+
+        return $this;
+    }
+
+    /**
+     * @internal called by the generated operation, not part of this package's public
+     *                  contract: it may change in any release
+     */
+    public function toQueryParameters(): QueryParameters
+    {
+        $parameters = [];
+        $parameters[] = new QueryParameter('includeDocs', new ScalarValue($this->includeDocs->value), false);
+        if ($this->billingNumber->isDefined()) {
+            $parameters[] = new QueryParameter('billingNumber', new ScalarValue($this->billingNumber->get()), false);
+        }
+        if ($this->date->isDefined()) {
+            $parameters[] = new QueryParameter('date', new ScalarValue($this->date->get()), false);
+        }
+
+        return new QueryParameters(...$parameters);
+    }
+}

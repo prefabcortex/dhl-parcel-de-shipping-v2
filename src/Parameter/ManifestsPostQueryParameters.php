@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Parameter;
+
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameter;
+use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ScalarValue;
+
+final class ManifestsPostQueryParameters
+{
+    /**
+     * Specify if all applicable shipments shall be marked as being ready for shipping.
+     */
+    private bool $all = false;
+
+    public function getAll(): bool
+    {
+        return $this->all;
+    }
+
+    public function setAll(bool $all): self
+    {
+        $this->all = $all;
+
+        return $this;
+    }
+
+    /**
+     * @internal called by the generated operation, not part of this package's public
+     *                  contract: it may change in any release
+     */
+    public function toQueryParameters(): QueryParameters
+    {
+        $parameters = [];
+        $parameters[] = new QueryParameter('all', new ScalarValue($this->all), false);
+
+        return new QueryParameters(...$parameters);
+    }
+}

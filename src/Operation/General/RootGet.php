@@ -1,0 +1,144 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Operation\General;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetInternalServerErrorException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetTooManyRequestsException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
+use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
+use Prefabcortex\DhlParcelDeShippingV2\Http\JsonBody;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
+use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RootGetAccept;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ServiceInformation;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidatorTrait;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\RequestStatusConstraint;
+use Prefabcortex\DhlParcelDeShippingV2\Validator\ServiceInformationConstraint;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+use function array_map;
+
+/**
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ *
+ * @implements Operation<ServiceInformation>
+ */
+final class RootGet implements Operation
+{
+    use BaseOperationTrait;
+    use OperationTrait;
+    use ValidatorTrait;
+    /** @var list<RootGetAccept> */
+    protected array $accept;
+
+    /**
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     *
+     * @param list<RootGetAccept> $accept Accept content header application/json|application/problem+json
+     */
+    public function __construct(array $accept)
+    {
+        $this->accept = $accept;
+    }
+
+    #[Override]
+    public function getMethod(): string
+    {
+        return 'GET';
+    }
+
+    #[Override]
+    public function getUri(): string
+    {
+        return '/';
+    }
+
+    #[Override]
+    public function getPayload(StreamFactoryInterface $streamFactory): Payload
+    {
+        return new Payload([], '');
+    }
+
+    /** @return array<string, list<string>> */
+    public function getExtraHeaders(): array
+    {
+        if ($this->accept === []) {
+            return ['Accept' => ['application/json', 'application/problem+json']];
+        }
+
+        return ['Accept' => array_map(static fn (RootGetAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+    }
+
+    /**
+     * {@inheritdoc}.
+     *
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws RootGetUnauthorizedException
+     * @throws RootGetTooManyRequestsException
+     * @throws RootGetInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): ServiceInformation
+    {
+        $status = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        if (200 === $status && $contentType->is('application/json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, ServiceInformationConstraint::constraints());
+
+            return ServiceInformation::fromArray($typedData);
+        }
+        if (401 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new RootGetUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (429 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new RootGetTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        if (500 === $status && $contentType->is('application/problem+json')) {
+            $typedData = JsonBody::toArray($body);
+            $this->validate($typedData, RequestStatusConstraint::constraints());
+            throw new RootGetInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
+        }
+        throw new UnexpectedStatusCodeException($response, $body);
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws RootGetUnauthorizedException
+     * @throws RootGetTooManyRequestsException
+     * @throws RootGetInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    #[Override]
+    public function parseResponse(ResponseInterface $response): ServiceInformation
+    {
+        $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
+
+        return $this->transformResponseBody($response, $contentType);
+    }
+
+    /** @return list<list<string>> */
+    #[Override]
+    public function getSecurityRequirements(): array
+    {
+        return [];
+    }
+}

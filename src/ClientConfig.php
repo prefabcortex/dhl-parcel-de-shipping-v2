@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2;
+
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+use Psr\Http\Client\ClientInterface;
+
+final readonly class ClientConfig
+{
+    public string $baseUrl;
+    /** @var Option<ClientInterface> */
+    public Option $httpClient;
+
+    /** @param Option<ClientInterface> $httpClient */
+    private function __construct(string $baseUrl, Option $httpClient)
+    {
+        $this->baseUrl = $baseUrl;
+        $this->httpClient = $httpClient;
+    }
+
+    /**
+     * A configuration for this API at an address of your own — a staging deployment, a
+     * mock server, a recorded fixture.
+     *
+     * For the address the description names, see `production()`.
+     */
+    public static function forBaseUrl(string $baseUrl): self
+    {
+        return new self($baseUrl, None::create());
+    }
+
+    public static function production(): self
+    {
+        return new self('https://api-eu.dhl.com/parcel/de/shipping/v2', None::create());
+    }
+
+    public static function sandbox(): self
+    {
+        return new self('https://api-sandbox.dhl.com/parcel/de/shipping/v2', None::create());
+    }
+
+    public function withBaseUrl(string $baseUrl): self
+    {
+        return new self($baseUrl, $this->httpClient);
+    }
+
+    public function withHttpClient(ClientInterface $httpClient): self
+    {
+        return new self($this->baseUrl, Some::create($httpClient));
+    }
+}

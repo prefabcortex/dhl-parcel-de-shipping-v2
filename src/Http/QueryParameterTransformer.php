@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Http;
+
+/**
+ * Rewrites a query parameter's value before it is serialized, configured per parameter via
+ * `custom-query-resolver`.
+ *
+ * Takes and returns a {@see ParameterValue} rather than a raw scalar-or-array union, so an
+ * implementation states the shape it produces instead of leaving it to be re-derived: returning
+ * `new ScalarValue('true')` or `ListValue::ofScalars([...])` is checked at the boundary.
+ *
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ */
+interface QueryParameterTransformer
+{
+    public function transform(ParameterValue $value): ParameterValue;
+}

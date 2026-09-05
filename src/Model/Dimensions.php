@@ -1,0 +1,152 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class Dimensions implements SelfNormalizingModel
+{
+    /** @param array<int|string, mixed> $additionalProperties */
+    public function __construct(private DimensionsUom $uom, private int $height, private int $length, private int $width, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(DimensionsUom $uom, int $height, int $length, int $width, array $additionalProperties = []): self
+    {
+        return new self($uom, $height, $length, $width, $additionalProperties);
+    }
+
+    /**
+     * Unit of metric, applies to all dimensions contained.
+     */
+    public function getUom(): DimensionsUom
+    {
+        return $this->uom;
+    }
+
+    public function withUom(DimensionsUom $uom): self
+    {
+        return new self($uom, $this->height, $this->length, $this->width, $this->additionalProperties);
+    }
+
+    public function getHeight(): int
+    {
+        return $this->height;
+    }
+
+    public function withHeight(int $height): self
+    {
+        return new self($this->uom, $height, $this->length, $this->width, $this->additionalProperties);
+    }
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
+
+    public function withLength(int $length): self
+    {
+        return new self($this->uom, $this->height, $length, $this->width, $this->additionalProperties);
+    }
+
+    public function getWidth(): int
+    {
+        return $this->width;
+    }
+
+    public function withWidth(int $width): self
+    {
+        return new self($this->uom, $this->height, $this->length, $width, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $uom = null;
+        $height = null;
+        $length = null;
+        $width = null;
+        if (array_key_exists('uom', $data)) {
+            $uomRaw = $data['uom'];
+            if (!is_string($uomRaw)) {
+                throw new MalformedDataException(sprintf('Property "uom" must be string, got %s.', get_debug_type($uomRaw)));
+            }
+            $uom = DimensionsUom::tryFrom($uomRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid DimensionsUom.', $uomRaw));
+            unset($data['uom']);
+        }
+        if (array_key_exists('height', $data)) {
+            $heightRaw = $data['height'];
+            if (!is_int($heightRaw)) {
+                throw new MalformedDataException(sprintf('Property "height" must be int, got %s.', get_debug_type($heightRaw)));
+            }
+            $height = $heightRaw;
+            unset($data['height']);
+        }
+        if (array_key_exists('length', $data)) {
+            $lengthRaw = $data['length'];
+            if (!is_int($lengthRaw)) {
+                throw new MalformedDataException(sprintf('Property "length" must be int, got %s.', get_debug_type($lengthRaw)));
+            }
+            $length = $lengthRaw;
+            unset($data['length']);
+        }
+        if (array_key_exists('width', $data)) {
+            $widthRaw = $data['width'];
+            if (!is_int($widthRaw)) {
+                throw new MalformedDataException(sprintf('Property "width" must be int, got %s.', get_debug_type($widthRaw)));
+            }
+            $width = $widthRaw;
+            unset($data['width']);
+        }
+        $additionalProperties = $data;
+        if ($uom === null) {
+            throw new MalformedDataException('Required property "uom" is missing from the document.');
+        }
+        if ($height === null) {
+            throw new MalformedDataException('Required property "height" is missing from the document.');
+        }
+        if ($length === null) {
+            throw new MalformedDataException('Required property "length" is missing from the document.');
+        }
+        if ($width === null) {
+            throw new MalformedDataException('Required property "width" is missing from the document.');
+        }
+
+        return new self($uom, $height, $length, $width, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['uom'] = $this->uom->value;
+        $dataArray['height'] = $this->height;
+        $dataArray['length'] = $this->length;
+        $dataArray['width'] = $this->width;
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

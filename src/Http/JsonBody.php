@@ -1,0 +1,284 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Http;
+
+use JsonException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+
+use function array_is_list;
+use function get_debug_type;
+use function is_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_string;
+use function json_decode;
+use function json_encode;
+use function sprintf;
+use function strlen;
+use function substr;
+
+use const JSON_THROW_ON_ERROR;
+
+/**
+ * The one place where a JSON response body crosses from untyped into typed territory.
+ *
+ * `json_decode()` returns `mixed`, so every call site used to carry the same four lines to get
+ * back to a usable type: decode, check it is an array, re-assign through a `@var` docblock, use.
+ * Emitting that into every operation spread the widest type in the language across the whole
+ * package, once per status code and media type — and static analysis rightly complained at each
+ * of them.
+ *
+ * Narrowing happens here instead, so callers receive a typed array and the `mixed` never leaves
+ * this file.
+ *
+ * Every check throws {@see MalformedDataException}, which is the `UnexpectedValueException` each
+ * generated `parseResponse()` and `transformResponseBody()` has always declared plus the marker
+ * that puts it under the package's own `ApiException` — a body that is not the JSON the
+ * description promised is the likeliest way a call fails, and as a bare SPL type it was the one
+ * failure the documented single catch went past. Writing these checks as `assert()` looked
+ * equivalent and was not: `php.ini-production` ships `zend.assertions=-1`, which drops the calls at
+ * compile time,
+ * so a published SDK ran with none of them and a truncated or mistyped response reached a typed
+ * constructor and raised a bare `TypeError` no `@throws` names. This is the boundary — it has to
+ * hold in the configuration the package is actually deployed under.
+ *
+ * @internal plumbing of the generated package, not part of its public contract: only the
+ *                    generated operations and client touch this, and it may change in any release
+ */
+final class JsonBody
+{
+    /**
+     * How much of an unreadable body the exception carries.
+     *
+     * Enough to recognise an HTML error page, a proxy notice or a truncated document at a glance,
+     * short enough that the message stays a message. The body itself is not lost either way — the
+     * generated exceptions hand it back through `getRawResponse()`.
+     */
+    private const int EXCERPT_LENGTH = 120;
+
+    /**
+     * Reads a JSON object body into the shape every generated `fromArray()` expects.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toArray(string $json): array
+    {
+        $decoded = self::decode($json, 'a JSON object');
+        if (!is_array($decoded)) {
+            throw self::mismatch('a JSON object', $decoded, $json);
+        }
+        // A JSON array arrives here as a PHP array too, and this reader lets it through on purpose:
+        // `{"0":"a","1":"b"}` is a legal object that decodes to a list, so rejecting lists would
+        // reject it as well. The mismatch is not lost — the model's `fromArray()` reads the keys it
+        // was told to expect and reports what is missing. `toArrayList()` below has no such
+        // ambiguity to protect and does reject a non-list.
+        //
+        // The key type is the one thing no runtime check can establish for an empty or huge
+        // array without walking it; a JSON object always decodes to string keys.
+        /** @var array<string, mixed> $typed */
+        $typed = $decoded;
+
+        return $typed;
+    }
+
+    /**
+     * Reads a JSON array body — a response whose top level is a list of objects.
+     *
+     * @return list<array<string, mixed>>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toArrayList(string $json): array
+    {
+        $decoded = self::decode($json, 'a JSON array');
+        if (!is_array($decoded) || !array_is_list($decoded)) {
+            throw self::mismatch('a JSON array', $decoded, $json);
+        }
+        /** @var list<array<string, mixed>> $typed */
+        $typed = $decoded;
+
+        return $typed;
+    }
+
+    /**
+     * Reads a JSON array body whose elements are not objects — `type: array` over scalars, or over
+     * a schema no model was built for.
+     *
+     * @return list<mixed>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toList(string $json): array
+    {
+        $decoded = self::decode($json, 'a JSON array');
+        if (!is_array($decoded) || !array_is_list($decoded)) {
+            throw self::mismatch('a JSON array', $decoded, $json);
+        }
+        /** @var list<mixed> $typed */
+        $typed = $decoded;
+
+        return $typed;
+    }
+
+    /**
+     * Reads a `type: string` body: JSON's own quoting, undone.
+     *
+     * @throws MalformedDataException
+     */
+    public static function toString(string $json): string
+    {
+        $decoded = self::decode($json, 'a JSON string');
+        if (!is_string($decoded)) {
+            throw self::mismatch('a JSON string', $decoded, $json);
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Reads a `type: integer` body.
+     *
+     * @throws MalformedDataException
+     */
+    public static function toInt(string $json): int
+    {
+        $decoded = self::decode($json, 'a JSON integer');
+        if (!is_int($decoded)) {
+            throw self::mismatch('a JSON integer', $decoded, $json);
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Reads a `type: number` body.
+     *
+     * JSON does not distinguish integers from floats, and `json_decode()` follows the text: `1.0`
+     * arrives as a float, `1` as an int. A schema that says `number` accepts both spellings of the
+     * same value, so both are read and the result is widened rather than rejected.
+     *
+     * @throws MalformedDataException
+     */
+    public static function toFloat(string $json): float
+    {
+        $decoded = self::decode($json, 'a JSON number');
+        if (!is_float($decoded) && !is_int($decoded)) {
+            throw self::mismatch('a JSON number', $decoded, $json);
+        }
+
+        return (float) $decoded;
+    }
+
+    /**
+     * Reads a `type: boolean` body.
+     *
+     * @throws MalformedDataException
+     */
+    public static function toBool(string $json): bool
+    {
+        $decoded = self::decode($json, 'a JSON boolean');
+        if (!is_bool($decoded)) {
+            throw self::mismatch('a JSON boolean', $decoded, $json);
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Reads a body whose schema states no type at all — the whole JSON value domain.
+     *
+     * `null` is not part of it, for the same reason the generator leaves it out of the type it
+     * guesses for an untyped schema: a response body of the four bytes `null` is a document saying
+     * "no value", and the operations that have one say so in their schema instead. Ruling it out is
+     * what {@see self::decode()} does for every reader, so there is nothing left to check here.
+     *
+     * @return string|int|float|bool|array<int|string, mixed>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toJsonValue(string $json): string|int|float|bool|array
+    {
+        return self::decode($json, 'a JSON value');
+    }
+
+    /**
+     * Writes the value an operation assembled for its request body back out as JSON.
+     *
+     * The other direction, and here for the same reason: the operations used to call
+     * `json_encode($data, JSON_THROW_ON_ERROR)` themselves, which put a `JsonException` on the
+     * request path. `getPayload()` declared it, and nothing above did — not
+     * `ClientTrait::executeOperation()`, not the API methods — so it escaped the whole chain
+     * undeclared. The trigger is ordinary rather than theoretical: one string field holding bytes
+     * that are not valid UTF-8, a recipient name read out of a Latin-1 source, is enough.
+     *
+     * It comes back out as {@see MalformedDataException} because that is what it is — data that
+     * cannot cross the boundary — and because a `JsonException` answers to nothing a consumer was
+     * told to catch.
+     *
+     * @param string|int|float|bool|array<int|string, mixed> $value
+     *
+     * @throws MalformedDataException
+     */
+    public static function encode(string|int|float|bool|array $value): string
+    {
+        try {
+            // Positional, as everywhere else here: named arguments are out project-wide.
+            return json_encode($value, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new MalformedDataException(sprintf('The request body cannot be written as JSON: %s.', $exception->getMessage()), 0, $exception);
+        }
+    }
+
+    /**
+     * Parses the body into the JSON value domain, minus `null`.
+     *
+     * Rejecting a syntax error here rather than at each reader's type check is what makes the two
+     * failures tell themselves apart: unreadable bytes used to decode to `null` and be reported as
+     * "expected an object, got null", which points at the schema when the document is the problem.
+     *
+     * @return string|int|float|bool|array<int|string, mixed>
+     *
+     * @throws MalformedDataException
+     */
+    private static function decode(string $json, string $expected): string|int|float|bool|array
+    {
+        try {
+            /** @var string|int|float|bool|array<int|string, mixed>|null $decoded */
+            // Positional, not `flags:` — named arguments are out project-wide, and the generated
+            // packages inherit that rule with the file. 512 is json_decode()'s own default depth.
+            $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new MalformedDataException(sprintf('Expected %s in the response body, but it is not valid JSON (%s): %s', $expected, $exception->getMessage(), self::excerpt($json)), 0, $exception);
+        }
+        if (null === $decoded) {
+            throw self::mismatch($expected, null, $json);
+        }
+
+        return $decoded;
+    }
+
+    /**
+     *  Says what was expected, what arrived, and enough of the body to tell which is at fault.
+     */
+    private static function mismatch(string $expected, mixed $decoded, string $json): MalformedDataException
+    {
+        return new MalformedDataException(sprintf('Expected %s in the response body, got %s: %s', $expected, get_debug_type($decoded), self::excerpt($json)));
+    }
+
+    /**
+     * The opening bytes of the body, cut to length.
+     *
+     * Deliberately byte-based: `mb_substr()` would add an `ext-mbstring` requirement to every
+     * generated package for a diagnostic string, and a body this call is looking at is by
+     * definition one whose encoding cannot be trusted anyway.
+     */
+    private static function excerpt(string $json): string
+    {
+        return strlen($json) > self::EXCERPT_LENGTH ? substr($json, 0, self::EXCERPT_LENGTH) . '…' : $json;
+    }
+}

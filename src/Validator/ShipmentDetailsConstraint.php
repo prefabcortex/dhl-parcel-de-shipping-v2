@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ShipmentDetails;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+
+/**
+ * @see ShipmentDetails
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class ShipmentDetailsConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'dim' => new Optional([new NotNull(), ...DimensionsConstraint::constraints()]),
+                'weight' => new Required([new NotNull(), ...WeightConstraint::constraints()]),
+            ], null, null, true),
+        ];
+    }
+}

@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_float;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class Value implements SelfNormalizingModel
+{
+    /** @param array<int|string, mixed> $additionalProperties */
+    public function __construct(private ValueCurrency $currency, private float $value, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(ValueCurrency $currency, float $value, array $additionalProperties = []): self
+    {
+        return new self($currency, $value, $additionalProperties);
+    }
+
+    /**
+     * iso 4217 3 character currency code accepted. Recommended to use EUR where possible.
+     */
+    public function getCurrency(): ValueCurrency
+    {
+        return $this->currency;
+    }
+
+    public function withCurrency(ValueCurrency $currency): self
+    {
+        return new self($currency, $this->value, $this->additionalProperties);
+    }
+
+    /**
+     * Numeric value.
+     */
+    public function getValue(): float
+    {
+        return $this->value;
+    }
+
+    public function withValue(float $value): self
+    {
+        return new self($this->currency, $value, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $currency = null;
+        $value = null;
+        if (array_key_exists('value', $data) && is_int($data['value'])) {
+            $data['value'] = (float) $data['value'];
+        }
+        if (array_key_exists('currency', $data)) {
+            $currencyRaw = $data['currency'];
+            if (!is_string($currencyRaw)) {
+                throw new MalformedDataException(sprintf('Property "currency" must be string, got %s.', get_debug_type($currencyRaw)));
+            }
+            $currency = ValueCurrency::tryFrom($currencyRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid ValueCurrency.', $currencyRaw));
+            unset($data['currency']);
+        }
+        if (array_key_exists('value', $data)) {
+            $valueRaw = $data['value'];
+            if (!is_float($valueRaw)) {
+                throw new MalformedDataException(sprintf('Property "value" must be float, got %s.', get_debug_type($valueRaw)));
+            }
+            $value = $valueRaw;
+            unset($data['value']);
+        }
+        $additionalProperties = $data;
+        if ($currency === null) {
+            throw new MalformedDataException('Required property "currency" is missing from the document.');
+        }
+        if ($value === null) {
+            throw new MalformedDataException('Required property "value" is missing from the document.');
+        }
+
+        return new self($currency, $value, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['currency'] = $this->currency->value;
+        $dataArray['value'] = $this->value;
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

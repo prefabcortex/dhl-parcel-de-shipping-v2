@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ShipmentManifestingRequest;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Type;
+
+/**
+ * @see ShipmentManifestingRequest
+ *
+ * @internal validation rules for the model above, not part of this package's public
+ *                      contract: they may change in any release
+ */
+final class ShipmentManifestingRequestConstraint implements ConstraintProviderInterface
+{
+    #[Override]
+    public static function constraints(): array
+    {
+        return [
+            new NotNull(),
+            new Collection([
+                'profile' => new Required([new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'shipmentNumbers' => new Optional([new Count(null, null, 30), new Count(null, 1), new All([new Type(['string'])]), new Type(['array']), new NotNull()]),
+                'billingNumber' => new Optional([new Type(['string']), new NotNull()]),
+            ], null, null, true),
+        ];
+    }
+}

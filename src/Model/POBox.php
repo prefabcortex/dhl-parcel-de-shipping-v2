@@ -1,0 +1,286 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+use Override;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
+use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
+
+use function array_key_exists;
+use function array_replace;
+use function get_debug_type;
+use function is_int;
+use function is_string;
+use function sprintf;
+
+final readonly class POBox implements SelfNormalizingModel
+{
+    /**
+     * @param Option<string>           $name2
+     * @param Option<string>           $name3
+     * @param Option<string>           $email
+     * @param Option<Country>          $country
+     * @param array<int|string, mixed> $additionalProperties
+     */
+    public function __construct(private string $name1, private int $poBoxID, private string $city, private string $postalCode, private Option $name2, private Option $name3, private Option $email, private Option $country, private array $additionalProperties)
+    {
+    }
+
+    /** @param array<int|string, mixed> $additionalProperties */
+    public static function create(string $name1, int $poBoxID, string $city, string $postalCode, array $additionalProperties = []): self
+    {
+        return new self($name1, $poBoxID, $city, $postalCode, None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    }
+
+    /**
+     * Name1. Line 1 of name information.
+     */
+    public function getName1(): string
+    {
+        return $this->name1;
+    }
+
+    public function withName1(string $name1): self
+    {
+        return new self($name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * An optional, additional line of name information.
+     *
+     * @return Option<string>
+     */
+    public function getName2(): Option
+    {
+        return $this->name2;
+    }
+
+    public function withName2(string $name2): self
+    {
+        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, Some::create($name2), $this->name3, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * An optional, additional line of name information.
+     *
+     * @return Option<string>
+     */
+    public function getName3(): Option
+    {
+        return $this->name3;
+    }
+
+    public function withName3(string $name3): self
+    {
+        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, Some::create($name3), $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * Number of P.O. Box (Postfach).
+     */
+    public function getPoBoxID(): int
+    {
+        return $this->poBoxID;
+    }
+
+    public function withPoBoxID(int $poBoxID): self
+    {
+        return new self($this->name1, $poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * Email address of the consignee.
+     *
+     * @return Option<string>
+     */
+    public function getEmail(): Option
+    {
+        return $this->email;
+    }
+
+    public function withEmail(string $email): self
+    {
+        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, Some::create($email), $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * City of the P.O. Box (Postfach) location.
+     */
+    public function getCity(): string
+    {
+        return $this->city;
+    }
+
+    public function withCity(string $city): self
+    {
+        return new self($this->name1, $this->poBoxID, $city, $this->postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /**
+     * A valid country code consisting of three characters according to ISO 3166-1 alpha-3.
+     *
+     * @return Option<Country>
+     */
+    public function getCountry(): Option
+    {
+        return $this->country;
+    }
+
+    public function withCountry(Country $country): self
+    {
+        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, $this->email, Some::create($country), $this->additionalProperties);
+    }
+
+    /**
+     * Postal code of the P.O. Box (Postfach) location.
+     */
+    public function getPostalCode(): string
+    {
+        return $this->postalCode;
+    }
+
+    public function withPostalCode(string $postalCode): self
+    {
+        return new self($this->name1, $this->poBoxID, $this->city, $postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    /**
+     * @param array<int|string, mixed> $data
+     *
+     * @throws MalformedDataException
+     */
+    public static function fromArray(array $data): self
+    {
+        $name1 = null;
+        $name2 = None::create();
+        $name3 = None::create();
+        $poBoxID = null;
+        $email = None::create();
+        $city = null;
+        $country = None::create();
+        $postalCode = null;
+        if (array_key_exists('name1', $data)) {
+            $name1Raw = $data['name1'];
+            if (!is_string($name1Raw)) {
+                throw new MalformedDataException(sprintf('Property "name1" must be string, got %s.', get_debug_type($name1Raw)));
+            }
+            $name1 = $name1Raw;
+            unset($data['name1']);
+        }
+        if (array_key_exists('name2', $data)) {
+            $name2Raw = $data['name2'];
+            if (!is_string($name2Raw)) {
+                throw new MalformedDataException(sprintf('Property "name2" must be string, got %s.', get_debug_type($name2Raw)));
+            }
+            $name2 = Some::create($name2Raw);
+            unset($data['name2']);
+        }
+        if (array_key_exists('name3', $data)) {
+            $name3Raw = $data['name3'];
+            if (!is_string($name3Raw)) {
+                throw new MalformedDataException(sprintf('Property "name3" must be string, got %s.', get_debug_type($name3Raw)));
+            }
+            $name3 = Some::create($name3Raw);
+            unset($data['name3']);
+        }
+        if (array_key_exists('poBoxID', $data)) {
+            $poBoxIDRaw = $data['poBoxID'];
+            if (!is_int($poBoxIDRaw)) {
+                throw new MalformedDataException(sprintf('Property "poBoxID" must be int, got %s.', get_debug_type($poBoxIDRaw)));
+            }
+            $poBoxID = $poBoxIDRaw;
+            unset($data['poBoxID']);
+        }
+        if (array_key_exists('email', $data)) {
+            $emailRaw = $data['email'];
+            if (!is_string($emailRaw)) {
+                throw new MalformedDataException(sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)));
+            }
+            $email = Some::create($emailRaw);
+            unset($data['email']);
+        }
+        if (array_key_exists('city', $data)) {
+            $cityRaw = $data['city'];
+            if (!is_string($cityRaw)) {
+                throw new MalformedDataException(sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)));
+            }
+            $city = $cityRaw;
+            unset($data['city']);
+        }
+        if (array_key_exists('country', $data)) {
+            $countryRaw = $data['country'];
+            if (!is_string($countryRaw)) {
+                throw new MalformedDataException(sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)));
+            }
+            $country = Some::create(Country::tryFrom($countryRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)));
+            unset($data['country']);
+        }
+        if (array_key_exists('postalCode', $data)) {
+            $postalCodeRaw = $data['postalCode'];
+            if (!is_string($postalCodeRaw)) {
+                throw new MalformedDataException(sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)));
+            }
+            $postalCode = $postalCodeRaw;
+            unset($data['postalCode']);
+        }
+        $additionalProperties = $data;
+        if ($name1 === null) {
+            throw new MalformedDataException('Required property "name1" is missing from the document.');
+        }
+        if ($poBoxID === null) {
+            throw new MalformedDataException('Required property "poBoxID" is missing from the document.');
+        }
+        if ($city === null) {
+            throw new MalformedDataException('Required property "city" is missing from the document.');
+        }
+        if ($postalCode === null) {
+            throw new MalformedDataException('Required property "postalCode" is missing from the document.');
+        }
+
+        return new self($name1, $poBoxID, $city, $postalCode, $name2, $name3, $email, $country, $additionalProperties);
+    }
+
+    /** @return array<int|string, mixed> */
+    #[Override]
+    public function toArray(): array
+    {
+        $dataArray = [];
+        $dataArray['name1'] = $this->name1;
+        $name2Option = $this->name2;
+        if ($name2Option->isDefined()) {
+            $name2 = $name2Option->get();
+            $dataArray['name2'] = $name2;
+        }
+        $name3Option = $this->name3;
+        if ($name3Option->isDefined()) {
+            $name3 = $name3Option->get();
+            $dataArray['name3'] = $name3;
+        }
+        $dataArray['poBoxID'] = $this->poBoxID;
+        $emailOption = $this->email;
+        if ($emailOption->isDefined()) {
+            $email = $emailOption->get();
+            $dataArray['email'] = $email;
+        }
+        $dataArray['city'] = $this->city;
+        $countryOption = $this->country;
+        if ($countryOption->isDefined()) {
+            $country = $countryOption->get();
+            $dataArray['country'] = $country->value;
+        }
+        $dataArray['postalCode'] = $this->postalCode;
+        $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
+
+        return $dataArray;
+    }
+}

@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Model;
+
+/**
+ * A model that carries its own JSON representation instead of delegating it to an external
+ * normalizer.
+ *
+ * Only the outbound direction is a contract. The inbound one — `fromArray()` — is a static factory,
+ * which PHP cannot dispatch polymorphically anyway, and its shape genuinely differs by generation
+ * mode: models parsing documents that may contain `$ref` take the origin of the document as a
+ * second argument and may answer with a reference in place of an instance, while a generated API
+ * client's models take the data alone. Declaring either one here would make the interface a lie
+ * about the other.
+ */
+interface SelfNormalizingModel
+{
+    /**
+     * The document this model came from, as a plain array.
+     *
+     * The keys say `int|string` because PHP says so: an extensions bucket keyed by a pattern that
+     * matches digits — OpenAPI's `responses` are the everyday case — holds `200`, not `"200"`.
+     * `json_encode()` writes both as object keys either way.
+     *
+     * @return array<int|string, mixed>
+     */
+    public function toArray(): array;
+}

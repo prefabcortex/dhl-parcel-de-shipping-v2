@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Authentication;
+
+use InvalidArgumentException;
+use Override;
+use Psr\Http\Message\RequestInterface;
+use SensitiveParameter;
+
+use function sprintf;
+
+final readonly class OAuth2Authentication implements Authenticator
+{
+    public function __construct(
+        #[SensitiveParameter]
+        private string $token
+    ) {
+    }
+
+    /** @throws InvalidArgumentException */
+    #[Override]
+    public function authenticate(RequestInterface $request): RequestInterface
+    {
+        $header = sprintf('Bearer %s', $this->token);
+        $request = $request->withHeader('Authorization', $header);
+
+        return $request;
+    }
+
+    #[Override]
+    public function getSecuritySchemeName(): string
+    {
+        return 'OAuth2';
+    }
+}

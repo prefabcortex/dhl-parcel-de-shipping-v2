@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Prefabcortex\DhlParcelDeShippingV2\Api;
+
+use Prefabcortex\DhlParcelDeShippingV2\Client;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ApiException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetInternalServerErrorException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetTooManyRequestsException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\TransportException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\UnsupportedValueException;
+use Prefabcortex\DhlParcelDeShippingV2\Model\RootGetAccept;
+use Prefabcortex\DhlParcelDeShippingV2\Model\ServiceInformation;
+use Prefabcortex\DhlParcelDeShippingV2\Operation\General\RootGet;
+use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
+use Psr\Http\Message\ResponseInterface;
+
+/**
+ * Get API version info.
+ */
+final readonly class GeneralApi
+{
+    public function __construct(private Client $client)
+    {
+    }
+
+    /**
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     *
+     * @param list<RootGetAccept> $accept Accept content header application/json|application/problem+json
+     *
+     * @throws ApiException
+     * @throws UnsupportedValueException
+     * @throws TransportException
+     * @throws ValidationException
+     * @throws MalformedDataException
+     * @throws RootGetUnauthorizedException
+     * @throws RootGetTooManyRequestsException
+     * @throws RootGetInternalServerErrorException
+     * @throws UnexpectedStatusCodeException
+     */
+    public function rootGet(array $accept = []): ServiceInformation
+    {
+        return $this->client->executeOperation(new RootGet($accept));
+    }
+
+    /**
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     *
+     * @param list<RootGetAccept> $accept Accept content header application/json|application/problem+json
+     *
+     * @throws ApiException
+     * @throws UnsupportedValueException
+     * @throws TransportException
+     */
+    public function rootGetRaw(array $accept = []): ResponseInterface
+    {
+        return $this->client->executeRawOperation(new RootGet($accept));
+    }
+}

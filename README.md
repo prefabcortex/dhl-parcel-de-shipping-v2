@@ -4,7 +4,7 @@
 
 - **Title:** Parcel DE Shipping API (Post & Parcel Germany)
 - **Version:** 2.1.14
-- **Source Spec SHA-256:** 0eeb4d9ea2227966a9b4d04de6f4064d3ec2ce52c8bdbaf9bb9c310cf0975948 (`EtXwGcbOqDqx4k8MDNth61loYT20IHSJL3Z9hCZq.txt`)
+- **Source Spec SHA-256:** 0eeb4d9ea2227966a9b4d04de6f4064d3ec2ce52c8bdbaf9bb9c310cf0975948
 
 Note: This is the specification of the DPDHL Group Parcel DE Shipping API for Post & Parcel Germany. This REST web service allows business customers to create shipping labels on demand.
 
@@ -141,13 +141,22 @@ release. Everything else is the contract.
 In CI, check out with `fetch-depth: 0`. Without the tags the tool has nothing to
 compare against.
 
+## Trademarks
+
+Product and company names mentioned here — including in the name of this package —
+are the trademarks of their respective owners. They appear only to say which API
+this client addresses, which is what trademark law calls nominative use.
+
+This is an unofficial client, generated from the published API description. It IS
+NOT affiliated with, endorsed by, or connected to whoever operates that API.
+
 ## License
 
 The generated code is 0BSD — see [LICENSE](LICENSE). Documentation text carried over
-from the API description belongs to whoever wrote that description.
-
-This is an unofficial client. It was generated from the published API description and
-is neither affiliated with nor endorsed by whoever operates the API.
+from the API description is quoted from that description and remains its author's;
+it is reproduced here to document the interface, not relicensed. Whoever publishes
+this package is responsible for holding the rights to the description it was
+generated from.
 
 ## About This Package
 

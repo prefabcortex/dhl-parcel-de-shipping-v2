@@ -6,3 +6,5 @@
 /phpstan.neon.dist      export-ignore
 /phpunit.xml.dist       export-ignore
 /tests                  export-ignore
+
+/src                    linguist-generated=true

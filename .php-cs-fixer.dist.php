@@ -19,9 +19,9 @@ declare(strict_types=1);
 // The path is a placeholder, and deliberately a simple one. At generation time the generator
 // passes the output directory explicitly, so this finder is not what decides what gets fixed;
 // when the file is copied into the package, ComposerPackageGenerator rewrites this exact call
-// to the package's own `src/` and `examples/`. It refuses any `->in([__DIR__ . '/src', __DIR__ . '/examples', __DIR__ . '/tests'])` holding nested
+// to the package's own `src/` and `examples/`. It refuses any `->in(…)` holding nested
 // parentheses, so keep the argument a plain expression.
-$finder = PhpCsFixer\Finder::create()->in(__DIR__);
+$finder = PhpCsFixer\Finder::create()->in([__DIR__ . '/src', __DIR__ . '/examples', __DIR__ . '/tests']);
 
 return new PhpCsFixer\Config()
     ->setRules([

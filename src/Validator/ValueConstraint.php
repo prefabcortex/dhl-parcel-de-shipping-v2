@@ -34,7 +34,12 @@ final class ValueConstraint implements ConstraintProviderInterface
             new NotNull(),
             new Collection([
                 'currency' => new Required([...ValueCurrencyConstraint::constraints()]),
-                'value' => new Required([new LessThanOrEqual(100000.0), new GreaterThanOrEqual(0.0), new Type(['number']), new NotNull()]),
+                'value' => new Required([
+                    new LessThanOrEqual(100000.0),
+                    new GreaterThanOrEqual(0.0),
+                    new Type(['number']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

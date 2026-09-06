@@ -56,14 +56,21 @@ trait ClientTrait
      * @throws UnsupportedValueException when the base URI carries no scheme and host, and could
      *                                   therefore never address a server
      */
-    protected function __construct(string $baseUri, ClientInterface $httpClient, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, AuthenticatorRegistry $authenticatorRegistry)
-    {
+    protected function __construct(
+        string $baseUri,
+        ClientInterface $httpClient,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
+        AuthenticatorRegistry $authenticatorRegistry,
+    ) {
         // Checked once here rather than per request: a base URI that names no host produces a
         // relative request URI, and a PSR-18 client answers that with an exception naming the
         // request instead of the configuration that caused it.
         $parsed = parse_url($baseUri);
         if (!is_array($parsed) || !array_key_exists('scheme', $parsed) || !array_key_exists('host', $parsed)) {
-            throw new UnsupportedValueException(sprintf('Base URI must carry a scheme and a host, got "%s".', $baseUri));
+            throw new UnsupportedValueException(
+                sprintf('Base URI must carry a scheme and a host, got "%s".', $baseUri),
+            );
         }
         $this->baseUri = rtrim($baseUri, '/');
         $this->httpClient = $httpClient;
@@ -139,7 +146,9 @@ trait ClientTrait
             // reference would replace the base path instead of extending it: `/pets` against
             // `https://host/v2` would address `https://host/pets`, a path the server does not serve.
             $request = $this->requestFactory->createRequest($operation->getMethod(), $this->baseUri . $uri);
-            $request = $payload->content instanceof StreamInterface ? $request->withBody($payload->content) : $request->withBody($this->streamFactory->createStream($payload->content));
+            $content = $payload->content;
+            $body = $content instanceof StreamInterface ? $content : $this->streamFactory->createStream($content);
+            $request = $request->withBody($body);
             foreach ($operation->getHeaders($payload->headers) as $name => $value) {
                 $request = $request->withHeader($name, $value);
             }
@@ -147,7 +156,11 @@ trait ClientTrait
         } catch (UnsupportedValueException $exception) {
             throw $exception;
         } catch (InvalidArgumentException $exception) {
-            throw new UnsupportedValueException(sprintf('The request could not be assembled: %s', $exception->getMessage()), 0, $exception);
+            throw new UnsupportedValueException(
+                sprintf('The request could not be assembled: %s', $exception->getMessage()),
+                0,
+                $exception,
+            );
         }
         // The order is load-bearing: both finer interfaces extend `ClientExceptionInterface`, so a
         // catch of the general one first would swallow the classification the client just made.

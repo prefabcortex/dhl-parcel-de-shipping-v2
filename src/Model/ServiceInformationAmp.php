@@ -31,8 +31,13 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
      * @param Option<string>           $rev
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private Option $name, private Option $env, private Option $version, private Option $rev, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $name,
+        private Option $env,
+        private Option $version,
+        private Option $rev,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -121,7 +126,9 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
         if (array_key_exists('name', $data)) {
             $nameRaw = $data['name'];
             if (!is_string($nameRaw)) {
-                throw new MalformedDataException(sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)),
+                );
             }
             $name = Some::create($nameRaw);
             unset($data['name']);
@@ -129,7 +136,9 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
         if (array_key_exists('env', $data)) {
             $envRaw = $data['env'];
             if (!is_string($envRaw)) {
-                throw new MalformedDataException(sprintf('Property "env" must be string, got %s.', get_debug_type($envRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "env" must be string, got %s.', get_debug_type($envRaw)),
+                );
             }
             $env = Some::create($envRaw);
             unset($data['env']);
@@ -137,7 +146,9 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
         if (array_key_exists('version', $data)) {
             $versionRaw = $data['version'];
             if (!is_string($versionRaw)) {
-                throw new MalformedDataException(sprintf('Property "version" must be string, got %s.', get_debug_type($versionRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "version" must be string, got %s.', get_debug_type($versionRaw)),
+                );
             }
             $version = Some::create($versionRaw);
             unset($data['version']);
@@ -145,7 +156,9 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
         if (array_key_exists('rev', $data)) {
             $revRaw = $data['rev'];
             if (!is_string($revRaw)) {
-                throw new MalformedDataException(sprintf('Property "rev" must be string, got %s.', get_debug_type($revRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "rev" must be string, got %s.', get_debug_type($revRaw)),
+                );
             }
             $rev = Some::create($revRaw);
             unset($data['rev']);

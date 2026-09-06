@@ -31,8 +31,13 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
      * @param Option<VASIdentCheckMinimumAge> $minimumAge
      * @param array<int|string, mixed>        $additionalProperties
      */
-    public function __construct(private string $firstName, private string $lastName, private Option $dateOfBirth, private Option $minimumAge, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $firstName,
+        private string $lastName,
+        private Option $dateOfBirth,
+        private Option $minimumAge,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -48,7 +53,13 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
 
     public function withFirstName(string $firstName): self
     {
-        return new self($firstName, $this->lastName, $this->dateOfBirth, $this->minimumAge, $this->additionalProperties);
+        return new self(
+            $firstName,
+            $this->lastName,
+            $this->dateOfBirth,
+            $this->minimumAge,
+            $this->additionalProperties,
+        );
     }
 
     public function getLastName(): string
@@ -58,11 +69,18 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
 
     public function withLastName(string $lastName): self
     {
-        return new self($this->firstName, $lastName, $this->dateOfBirth, $this->minimumAge, $this->additionalProperties);
+        return new self(
+            $this->firstName,
+            $lastName,
+            $this->dateOfBirth,
+            $this->minimumAge,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * date of birth, used in conjunction with minimumAge and shipping date. Format yyyy-mm-dd is used.
+     * date of birth, used in conjunction with minimumAge and shipping date. Format yyyy-mm-dd is
+     * used.
      *
      * @return Option<DateTimeInterface>
      */
@@ -73,7 +91,13 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
 
     public function withDateOfBirth(DateTimeInterface $dateOfBirth): self
     {
-        return new self($this->firstName, $this->lastName, Some::create($dateOfBirth), $this->minimumAge, $this->additionalProperties);
+        return new self(
+            $this->firstName,
+            $this->lastName,
+            Some::create($dateOfBirth),
+            $this->minimumAge,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -88,7 +112,13 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
 
     public function withMinimumAge(VASIdentCheckMinimumAge $minimumAge): self
     {
-        return new self($this->firstName, $this->lastName, $this->dateOfBirth, Some::create($minimumAge), $this->additionalProperties);
+        return new self(
+            $this->firstName,
+            $this->lastName,
+            $this->dateOfBirth,
+            Some::create($minimumAge),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -111,7 +141,9 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
         if (array_key_exists('firstName', $data)) {
             $firstNameRaw = $data['firstName'];
             if (!is_string($firstNameRaw)) {
-                throw new MalformedDataException(sprintf('Property "firstName" must be string, got %s.', get_debug_type($firstNameRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "firstName" must be string, got %s.', get_debug_type($firstNameRaw)),
+                );
             }
             $firstName = $firstNameRaw;
             unset($data['firstName']);
@@ -119,7 +151,9 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
         if (array_key_exists('lastName', $data)) {
             $lastNameRaw = $data['lastName'];
             if (!is_string($lastNameRaw)) {
-                throw new MalformedDataException(sprintf('Property "lastName" must be string, got %s.', get_debug_type($lastNameRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "lastName" must be string, got %s.', get_debug_type($lastNameRaw)),
+                );
             }
             $lastName = $lastNameRaw;
             unset($data['lastName']);
@@ -127,7 +161,9 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
         if (array_key_exists('dateOfBirth', $data)) {
             $dateOfBirthRaw = $data['dateOfBirth'];
             if (!is_string($dateOfBirthRaw)) {
-                throw new MalformedDataException(sprintf('Property "dateOfBirth" must be object, got %s.', get_debug_type($dateOfBirthRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "dateOfBirth" must be object, got %s.', get_debug_type($dateOfBirthRaw)),
+                );
             }
             $date = DateTime::createFromFormat('Y-m-d', $dateOfBirthRaw);
             if ($date === false) {
@@ -139,9 +175,16 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
         if (array_key_exists('minimumAge', $data)) {
             $minimumAgeRaw = $data['minimumAge'];
             if (!is_string($minimumAgeRaw)) {
-                throw new MalformedDataException(sprintf('Property "minimumAge" must be string, got %s.', get_debug_type($minimumAgeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "minimumAge" must be string, got %s.', get_debug_type($minimumAgeRaw)),
+                );
             }
-            $minimumAge = Some::create(VASIdentCheckMinimumAge::tryFrom($minimumAgeRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid VASIdentCheckMinimumAge.', $minimumAgeRaw)));
+            $minimumAge = Some::create(
+                VASIdentCheckMinimumAge::tryFrom($minimumAgeRaw)
+                    ?? throw new MalformedDataException(
+                        sprintf('"%s" is not a valid VASIdentCheckMinimumAge.', $minimumAgeRaw),
+                    ),
+            );
             unset($data['minimumAge']);
         }
         $additionalProperties = $data;

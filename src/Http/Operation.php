@@ -33,9 +33,9 @@ interface Operation
      *
      * The widest type the implementations share, and since every exception a generated package
      * raises answers to it, also a complete one. A concrete operation names the exact classes on
-     * its own `getPayload()`; here there is nothing narrower to say, and saying nothing is what
-     * let a `JsonException` out of the request path without a single docblock on the way up
-     * mentioning it.
+     * its own `getPayload()`; here there is nothing narrower to say, and saying nothing is what let
+     * a `JsonException` out of the request path without a single docblock on the way up mentioning
+     * it.
      *
      * @throws ApiException
      */

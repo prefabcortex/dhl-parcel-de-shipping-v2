@@ -60,6 +60,37 @@ For a scheme this package generates no authenticator for, or a signature the des
 - [`getOrder`](examples/Operations/ShipmentsAndLabels/GetOrderExample.php)
 - [`ordersAccountDelete`](examples/Operations/ShipmentsAndLabels/OrdersAccountDeleteExample.php)
 
+## Optional values
+
+A property the description marks required is a plain type on the model. A property it
+leaves optional is an `Option`, because there are three states to tell apart and not
+two: the field was absent, the field was `null`, or the field had a value. A `?string`
+can hold the last two and loses the first, and losing it matters — `toArray()` sends
+back only what was actually set, so a field the server never mentioned stays unmentioned
+rather than being echoed as `null`.
+
+Three methods, and no others:
+
+```php
+$value->isDefined();        // was it there at all?
+$value->get();              // the value — throws on an absent one
+$value->getOrElse($other);  // the value, or $other when it is absent
+```
+
+On `BankAccount`, for instance, `getAccountHolder()` is required and reads as itself,
+while `getBankName()` is optional:
+
+```php
+$model->getAccountHolder();            // the value
+$model->getBankName()->getOrElse('');  // the value, or a default
+```
+
+Writing one is the other way round, and needs none of this. `create()` takes the required
+properties and fills every optional one in as absent; each `with…()` takes the bare value
+and wraps it for you, and returns a new model rather than changing this one. Query and
+header parameter objects work the same way with `set…()`. There is no reason to write
+`Some::create()` or `None::create()` yourself.
+
 ## Error handling
 
 Every exception this package raises itself implements `ApiException`, so one catch

@@ -39,7 +39,9 @@ final readonly class ShipmentDetails implements SelfNormalizingModel
     }
 
     /**
-     * Physical dimensions (aka 'Gurtmass') of the parcel. If you provide the dimension information, all attributes need to be provided. You cannot provide just the height, for example. If you provide length, width, and height in millimeters, they will be rounded to full cm.
+     * Physical dimensions (aka 'Gurtmass') of the parcel. If you provide the dimension information,
+     * all attributes need to be provided. You cannot provide just the height, for example. If you
+     * provide length, width, and height in millimeters, they will be rounded to full cm.
      *
      * @return Option<Dimensions>
      */
@@ -84,7 +86,9 @@ final readonly class ShipmentDetails implements SelfNormalizingModel
         if (array_key_exists('dim', $data)) {
             $dimRaw = $data['dim'];
             if (!is_array($dimRaw)) {
-                throw new MalformedDataException(sprintf('Property "dim" must be object, got %s.', get_debug_type($dimRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "dim" must be object, got %s.', get_debug_type($dimRaw)),
+                );
             }
             /** @var array<string, mixed> $dimRawTyped */
             $dimRawTyped = $dimRaw;
@@ -94,7 +98,9 @@ final readonly class ShipmentDetails implements SelfNormalizingModel
         if (array_key_exists('weight', $data)) {
             $weightRaw = $data['weight'];
             if (!is_array($weightRaw)) {
-                throw new MalformedDataException(sprintf('Property "weight" must be object, got %s.', get_debug_type($weightRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "weight" must be object, got %s.', get_debug_type($weightRaw)),
+                );
             }
             /** @var array<string, mixed> $weightRawTyped */
             $weightRawTyped = $weightRaw;

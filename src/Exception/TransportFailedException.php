@@ -21,9 +21,9 @@ use function sprintf;
  * The call failed and the client did not say how.
  *
  * PSR-18 requires every failure to carry `ClientExceptionInterface` but leaves the two finer
- * interfaces optional, so a client may report that something went wrong without classifying it as
- * a network problem or a rejected request. This is that case, kept as its own type rather than
- * folded into one of the other two: claiming `NetworkExceptionInterface` would tell retry logic a
+ * interfaces optional, so a client may report that something went wrong without classifying it as a
+ * network problem or a rejected request. This is that case, kept as its own type rather than folded
+ * into one of the other two: claiming `NetworkExceptionInterface` would tell retry logic a
  * connection failed when nobody established that, and claiming `RequestExceptionInterface` would
  * blame a request the client never faulted.
  *
@@ -34,7 +34,11 @@ final class TransportFailedException extends RuntimeException implements Transpo
 {
     public function __construct(private readonly RequestInterface $request, ClientExceptionInterface $previous)
     {
-        parent::__construct(sprintf('The request to %s failed: %s', $request->getUri(), $previous->getMessage()), 0, $previous);
+        parent::__construct(
+            sprintf('The request to %s failed: %s', $request->getUri(), $previous->getMessage()),
+            0,
+            $previous,
+        );
     }
 
     #[Override]

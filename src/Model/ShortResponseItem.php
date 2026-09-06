@@ -29,8 +29,11 @@ final readonly class ShortResponseItem implements SelfNormalizingModel
      * @param Option<string>           $shipmentNo
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private RequestStatus $sstatus, private Option $shipmentNo, private array $additionalProperties)
-    {
+    public function __construct(
+        private RequestStatus $sstatus,
+        private Option $shipmentNo,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -81,7 +84,9 @@ final readonly class ShortResponseItem implements SelfNormalizingModel
         if (array_key_exists('shipmentNo', $data)) {
             $shipmentNoRaw = $data['shipmentNo'];
             if (!is_string($shipmentNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)),
+                );
             }
             $shipmentNo = Some::create($shipmentNoRaw);
             unset($data['shipmentNo']);
@@ -89,7 +94,9 @@ final readonly class ShortResponseItem implements SelfNormalizingModel
         if (array_key_exists('sstatus', $data)) {
             $sstatusRaw = $data['sstatus'];
             if (!is_array($sstatusRaw)) {
-                throw new MalformedDataException(sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)),
+                );
             }
             /** @var array<string, mixed> $sstatusRawTyped */
             $sstatusRawTyped = $sstatusRaw;

@@ -36,7 +36,11 @@ final class BankAccountConstraint implements ConstraintProviderInterface
             new Collection([
                 'accountHolder' => new Required([new Length(null, null, 80), new Type(['string']), new NotNull()]),
                 'bankName' => new Optional([new Length(null, null, 80), new Type(['string']), new NotNull()]),
-                'iban' => new Required([new Regex('#[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}#'), new Type(['string']), new NotNull()]),
+                'iban' => new Required([
+                    new Regex('#[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}#'),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'bic' => new Optional([new Regex('#[a-zA-Z0-9]{8,11}#'), new Type(['string']), new NotNull()]),
             ], null, null, true),
         ];

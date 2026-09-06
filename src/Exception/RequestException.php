@@ -27,15 +27,23 @@ use function sprintf;
  * apart rather than folded together.
  *
  * Named to pair with `ResponseException`: that one is raised once a response exists, this one when
- * none ever will. The pairing is deliberate even though one is an interface and the other a class
- * — the generated status exceptions need a type to implement, a re-thrown transport failure needs
- * a type to be.
+ * none ever will. The pairing is deliberate even though one is an interface and the other a class —
+ * the generated status exceptions need a type to implement, a re-thrown transport failure needs a
+ * type to be.
  */
 final class RequestException extends RuntimeException implements TransportException, RequestExceptionInterface
 {
     public function __construct(private readonly RequestInterface $request, ClientExceptionInterface $previous)
     {
-        parent::__construct(sprintf('The request to %s was rejected before it was sent: %s', $request->getUri(), $previous->getMessage()), 0, $previous);
+        parent::__construct(
+            sprintf(
+                'The request to %s was rejected before it was sent: %s',
+                $request->getUri(),
+                $previous->getMessage(),
+            ),
+            0,
+            $previous,
+        );
     }
 
     #[Override]

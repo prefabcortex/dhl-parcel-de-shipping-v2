@@ -35,9 +35,11 @@ final readonly class GeneralApi
     }
 
     /**
-     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return
+     * more details (semantic version number, revision, environment) of the API layer.
      *
-     * @param list<RootGetAccept> $accept Accept content header application/json|application/problem+json
+     * @param list<RootGetAccept> $accept Accept content header
+     *                                    application/json|application/problem+json
      *
      * @throws ApiException
      * @throws UnsupportedValueException
@@ -55,9 +57,11 @@ final readonly class GeneralApi
     }
 
     /**
-     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return
+     * more details (semantic version number, revision, environment) of the API layer.
      *
-     * @param list<RootGetAccept> $accept Accept content header application/json|application/problem+json
+     * @param list<RootGetAccept> $accept Accept content header
+     *                                    application/json|application/problem+json
      *
      * @throws ApiException
      * @throws UnsupportedValueException

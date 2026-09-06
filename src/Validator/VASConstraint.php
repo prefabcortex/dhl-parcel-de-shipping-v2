@@ -33,7 +33,11 @@ final class VASConstraint implements ConstraintProviderInterface
         return [
             new NotNull(),
             new Collection([
-                'preferredNeighbour' => new Optional([new Length(null, null, 100), new Type(['string']), new NotNull()]),
+                'preferredNeighbour' => new Optional([
+                    new Length(null, null, 100),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'preferredLocation' => new Optional([new Length(null, null, 100), new Type(['string']), new NotNull()]),
                 'visualCheckOfAge' => new Optional([...VASVisualCheckOfAgeConstraint::constraints()]),
                 'namedPersonOnly' => new Optional([new Type(['bool']), new NotNull()]),
@@ -45,7 +49,11 @@ final class VASConstraint implements ConstraintProviderInterface
                 'additionalInsurance' => new Optional([new NotNull(), ...ValueConstraint::constraints()]),
                 'bulkyGoods' => new Optional([new Type(['bool']), new NotNull()]),
                 'cashOnDelivery' => new Optional([new NotNull(), ...VASCashOnDeliveryConstraint::constraints()]),
-                'individualSenderRequirement' => new Optional([new Regex('#[a-zA-Z0-9]{2}#'), new Type(['string']), new NotNull()]),
+                'individualSenderRequirement' => new Optional([
+                    new Regex('#[a-zA-Z0-9]{2}#'),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'premium' => new Optional([new Type(['bool']), new NotNull()]),
                 'closestDropPoint' => new Optional([new Type(['bool']), new NotNull()]),
                 'parcelOutletRouting' => new Optional([new Type(['string']), new NotNull()]),

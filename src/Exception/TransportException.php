@@ -30,15 +30,15 @@ use Psr\Http\Message\RequestInterface;
  * keeps matching, which is the level the generated `@throws` has always named.
  *
  * The classification the client made is preserved rather than flattened: a client that reported a
- * network failure produces {@see NetworkException}, one that reported a bad request produces
- * {@see RequestException}, and one that classified neither produces
- * {@see TransportFailedException}. Retry logic keys on exactly that distinction, so losing it to
- * save two files would have replaced one silent breakage with another.
+ * network failure produces {@see NetworkException}, one that reported a bad request produces {@see
+ * RequestException}, and one that classified neither produces {@see TransportFailedException}.
+ * Retry logic keys on exactly that distinction, so losing it to save two files would have replaced
+ * one silent breakage with another.
  *
- * `getRequest()` is declared here for the same reason `ResponseException` declares its accessors:
- * a caller who catches this type can always ask what was being sent. The PSR sub-interfaces
- * declare the identical method on two of the three, and the third would otherwise be the one case
- * where the question has no answer — even though the request is in hand at every throw site.
+ * `getRequest()` is declared here for the same reason `ResponseException` declares its accessors: a
+ * caller who catches this type can always ask what was being sent. The PSR sub-interfaces declare
+ * the identical method on two of the three, and the third would otherwise be the one case where the
+ * question has no answer — even though the request is in hand at every throw site.
  */
 interface TransportException extends ApiException, ClientExceptionInterface
 {

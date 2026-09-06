@@ -50,14 +50,55 @@ final readonly class VAS implements SelfNormalizingModel
      * @param Option<bool>                $postalDeliveryDutyPaid
      * @param array<int|string, mixed>    $additionalProperties
      */
-    public function __construct(private Option $preferredNeighbour, private Option $preferredLocation, private Option $visualCheckOfAge, private Option $namedPersonOnly, private Option $identCheck, private Option $signedForByRecipient, private Option $endorsement, private Option $preferredDay, private Option $noNeighbourDelivery, private Option $additionalInsurance, private Option $bulkyGoods, private Option $cashOnDelivery, private Option $individualSenderRequirement, private Option $premium, private Option $closestDropPoint, private Option $parcelOutletRouting, private Option $goGreenPlus, private Option $dhlRetoure, private Option $postalDeliveryDutyPaid, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $preferredNeighbour,
+        private Option $preferredLocation,
+        private Option $visualCheckOfAge,
+        private Option $namedPersonOnly,
+        private Option $identCheck,
+        private Option $signedForByRecipient,
+        private Option $endorsement,
+        private Option $preferredDay,
+        private Option $noNeighbourDelivery,
+        private Option $additionalInsurance,
+        private Option $bulkyGoods,
+        private Option $cashOnDelivery,
+        private Option $individualSenderRequirement,
+        private Option $premium,
+        private Option $closestDropPoint,
+        private Option $parcelOutletRouting,
+        private Option $goGreenPlus,
+        private Option $dhlRetoure,
+        private Option $postalDeliveryDutyPaid,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
     public static function create(array $additionalProperties = []): self
     {
-        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+        return new self(
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
@@ -72,7 +113,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withPreferredNeighbour(string $preferredNeighbour): self
     {
-        return new self(Some::create($preferredNeighbour), $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            Some::create($preferredNeighbour),
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -87,7 +149,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withPreferredLocation(string $preferredLocation): self
     {
-        return new self($this->preferredNeighbour, Some::create($preferredLocation), $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            Some::create($preferredLocation),
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -102,7 +185,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withVisualCheckOfAge(VASVisualCheckOfAge $visualCheckOfAge): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, Some::create($visualCheckOfAge), $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            Some::create($visualCheckOfAge),
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -117,11 +221,34 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withNamedPersonOnly(bool $namedPersonOnly): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, Some::create($namedPersonOnly), $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            Some::create($namedPersonOnly),
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Check the identity of the recipient via name (firstname, lastname), date of birth or age. This uses firstName and lastName as separate attributes since for identity check an automatic split of a one-line name is not considered reliable enough.
+     * Check the identity of the recipient via name (firstname, lastname), date of birth or age.
+     * This uses firstName and lastName as separate attributes since for identity check an automatic
+     * split of a one-line name is not considered reliable enough.
      *
      * @return Option<VASIdentCheck>
      */
@@ -132,7 +259,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withIdentCheck(VASIdentCheck $identCheck): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, Some::create($identCheck), $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            Some::create($identCheck),
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -147,11 +295,34 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withSignedForByRecipient(bool $signedForByRecipient): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, Some::create($signedForByRecipient), $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            Some::create($signedForByRecipient),
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Instructions and endorsement how to treat international undeliverable shipment. By default, shipments are returned if undeliverable. There are country specific rules whether the shipment is returned immediately or after a grace period.
+     * Instructions and endorsement how to treat international undeliverable shipment. By default,
+     * shipments are returned if undeliverable. There are country specific rules whether the
+     * shipment is returned immediately or after a grace period.
      *
      * @return Option<VASEndorsement>
      */
@@ -162,11 +333,33 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withEndorsement(VASEndorsement $endorsement): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, Some::create($endorsement), $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            Some::create($endorsement),
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Preferred day of delivery in format YYYY-MM-DD. Shipper can request a preferred day of delivery. The preferred day should be between 2 and 6 working days after handover to DHL.
+     * Preferred day of delivery in format YYYY-MM-DD. Shipper can request a preferred day of
+     * delivery. The preferred day should be between 2 and 6 working days after handover to DHL.
      *
      * @return Option<DateTimeInterface>
      */
@@ -177,7 +370,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withPreferredDay(DateTimeInterface $preferredDay): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, Some::create($preferredDay), $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            Some::create($preferredDay),
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -192,7 +406,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withNoNeighbourDelivery(bool $noNeighbourDelivery): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, Some::create($noNeighbourDelivery), $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            Some::create($noNeighbourDelivery),
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -207,7 +442,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withAdditionalInsurance(Value $additionalInsurance): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, Some::create($additionalInsurance), $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            Some::create($additionalInsurance),
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -222,11 +478,35 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withBulkyGoods(bool $bulkyGoods): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, Some::create($bulkyGoods), $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            Some::create($bulkyGoods),
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Cash on delivery (Nachnahme). Currency must be Euro. Either bank account information or account reference (from customer profile) must be provided. Transfernote1 + 2 are references transmitted during bank transfer. Providing account information explicitly requires elevated privileges.
+     * Cash on delivery (Nachnahme). Currency must be Euro. Either bank account information or
+     * account reference (from customer profile) must be provided. Transfernote1 + 2 are references
+     * transmitted during bank transfer. Providing account information explicitly requires elevated
+     * privileges.
      *
      * @return Option<VASCashOnDelivery>
      */
@@ -237,7 +517,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withCashOnDelivery(VASCashOnDelivery $cashOnDelivery): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, Some::create($cashOnDelivery), $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            Some::create($cashOnDelivery),
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -252,11 +553,33 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withIndividualSenderRequirement(string $individualSenderRequirement): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, Some::create($individualSenderRequirement), $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            Some::create($individualSenderRequirement),
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Choice of premium vs economy parcel. Availability is country dependent and may be manipulated by DHL if choice is not available. Please review the label.
+     * Choice of premium vs economy parcel. Availability is country dependent and may be manipulated
+     * by DHL if choice is not available. Please review the label.
      *
      * @return Option<bool>
      */
@@ -267,11 +590,36 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withPremium(bool $premium): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, Some::create($premium), $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            Some::create($premium),
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Closest Droppoint Delivery to the droppoint closest to the address of the recipient of the shipment. For this kind of delivery either the phone number and/or the e-mail address of the receiver is mandatory. For shipments using DHL Paket International it is recommended that you choose one of the three delivery types: Economy, Premium, CDP. Otherwise, the current default for the receiver country will be picked.
+     * Closest Droppoint Delivery to the droppoint closest to the address of the recipient of the
+     * shipment. For this kind of delivery either the phone number and/or the e-mail address of the
+     * receiver is mandatory. For shipments using DHL Paket International it is recommended that you
+     * choose one of the three delivery types: Economy, Premium, CDP. Otherwise, the current default
+     * for the receiver country will be picked.
      *
      * @return Option<bool>
      */
@@ -282,11 +630,33 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withClosestDropPoint(bool $closestDropPoint): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, Some::create($closestDropPoint), $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            Some::create($closestDropPoint),
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Undeliverable domestic shipment can be forwarded and held at retail. Notification to email (fallback: consignee email) will be used.
+     * Undeliverable domestic shipment can be forwarded and held at retail. Notification to email
+     * (fallback: consignee email) will be used.
      *
      * @return Option<string>
      */
@@ -297,11 +667,33 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withParcelOutletRouting(string $parcelOutletRouting): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, Some::create($parcelOutletRouting), $this->goGreenPlus, $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            Some::create($parcelOutletRouting),
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * GoGreen Plus enables sustainable shipping by investing in measures to reduce greenhouse gas emissions at DHL.
+     * GoGreen Plus enables sustainable shipping by investing in measures to reduce greenhouse gas
+     * emissions at DHL.
      *
      * @return Option<bool>
      */
@@ -312,11 +704,34 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withGoGreenPlus(bool $goGreenPlus): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, Some::create($goGreenPlus), $this->dhlRetoure, $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            Some::create($goGreenPlus),
+            $this->dhlRetoure,
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Requests return label (aka 'retoure') to be provided. Also requires returnAddress and return billing number. Neither weight nor dimension need to be specified for the retoure (flat rate service).
+     * Requests return label (aka 'retoure') to be provided. Also requires returnAddress and return
+     * billing number. Neither weight nor dimension need to be specified for the retoure (flat rate
+     * service).
      *
      * @return Option<VASDhlRetoure>
      */
@@ -327,7 +742,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withDhlRetoure(VASDhlRetoure $dhlRetoure): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, Some::create($dhlRetoure), $this->postalDeliveryDutyPaid, $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            Some::create($dhlRetoure),
+            $this->postalDeliveryDutyPaid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -342,7 +778,28 @@ final readonly class VAS implements SelfNormalizingModel
 
     public function withPostalDeliveryDutyPaid(bool $postalDeliveryDutyPaid): self
     {
-        return new self($this->preferredNeighbour, $this->preferredLocation, $this->visualCheckOfAge, $this->namedPersonOnly, $this->identCheck, $this->signedForByRecipient, $this->endorsement, $this->preferredDay, $this->noNeighbourDelivery, $this->additionalInsurance, $this->bulkyGoods, $this->cashOnDelivery, $this->individualSenderRequirement, $this->premium, $this->closestDropPoint, $this->parcelOutletRouting, $this->goGreenPlus, $this->dhlRetoure, Some::create($postalDeliveryDutyPaid), $this->additionalProperties);
+        return new self(
+            $this->preferredNeighbour,
+            $this->preferredLocation,
+            $this->visualCheckOfAge,
+            $this->namedPersonOnly,
+            $this->identCheck,
+            $this->signedForByRecipient,
+            $this->endorsement,
+            $this->preferredDay,
+            $this->noNeighbourDelivery,
+            $this->additionalInsurance,
+            $this->bulkyGoods,
+            $this->cashOnDelivery,
+            $this->individualSenderRequirement,
+            $this->premium,
+            $this->closestDropPoint,
+            $this->parcelOutletRouting,
+            $this->goGreenPlus,
+            $this->dhlRetoure,
+            Some::create($postalDeliveryDutyPaid),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -380,7 +837,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('preferredNeighbour', $data)) {
             $preferredNeighbourRaw = $data['preferredNeighbour'];
             if (!is_string($preferredNeighbourRaw)) {
-                throw new MalformedDataException(sprintf('Property "preferredNeighbour" must be string, got %s.', get_debug_type($preferredNeighbourRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "preferredNeighbour" must be string, got %s.',
+                        get_debug_type($preferredNeighbourRaw),
+                    ),
+                );
             }
             $preferredNeighbour = Some::create($preferredNeighbourRaw);
             unset($data['preferredNeighbour']);
@@ -388,7 +850,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('preferredLocation', $data)) {
             $preferredLocationRaw = $data['preferredLocation'];
             if (!is_string($preferredLocationRaw)) {
-                throw new MalformedDataException(sprintf('Property "preferredLocation" must be string, got %s.', get_debug_type($preferredLocationRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "preferredLocation" must be string, got %s.',
+                        get_debug_type($preferredLocationRaw),
+                    ),
+                );
             }
             $preferredLocation = Some::create($preferredLocationRaw);
             unset($data['preferredLocation']);
@@ -396,15 +863,27 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('visualCheckOfAge', $data)) {
             $visualCheckOfAgeRaw = $data['visualCheckOfAge'];
             if (!is_string($visualCheckOfAgeRaw)) {
-                throw new MalformedDataException(sprintf('Property "visualCheckOfAge" must be string, got %s.', get_debug_type($visualCheckOfAgeRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "visualCheckOfAge" must be string, got %s.',
+                        get_debug_type($visualCheckOfAgeRaw),
+                    ),
+                );
             }
-            $visualCheckOfAge = Some::create(VASVisualCheckOfAge::tryFrom($visualCheckOfAgeRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid VASVisualCheckOfAge.', $visualCheckOfAgeRaw)));
+            $visualCheckOfAge = Some::create(
+                VASVisualCheckOfAge::tryFrom($visualCheckOfAgeRaw)
+                    ?? throw new MalformedDataException(
+                        sprintf('"%s" is not a valid VASVisualCheckOfAge.', $visualCheckOfAgeRaw),
+                    ),
+            );
             unset($data['visualCheckOfAge']);
         }
         if (array_key_exists('namedPersonOnly', $data)) {
             $namedPersonOnlyRaw = $data['namedPersonOnly'];
             if (!is_bool($namedPersonOnlyRaw)) {
-                throw new MalformedDataException(sprintf('Property "namedPersonOnly" must be bool, got %s.', get_debug_type($namedPersonOnlyRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "namedPersonOnly" must be bool, got %s.', get_debug_type($namedPersonOnlyRaw)),
+                );
             }
             $namedPersonOnly = Some::create($namedPersonOnlyRaw);
             unset($data['namedPersonOnly']);
@@ -412,7 +891,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('identCheck', $data)) {
             $identCheckRaw = $data['identCheck'];
             if (!is_array($identCheckRaw)) {
-                throw new MalformedDataException(sprintf('Property "identCheck" must be object, got %s.', get_debug_type($identCheckRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "identCheck" must be object, got %s.', get_debug_type($identCheckRaw)),
+                );
             }
             /** @var array<string, mixed> $identCheckRawTyped */
             $identCheckRawTyped = $identCheckRaw;
@@ -422,7 +903,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('signedForByRecipient', $data)) {
             $signedForByRecipientRaw = $data['signedForByRecipient'];
             if (!is_bool($signedForByRecipientRaw)) {
-                throw new MalformedDataException(sprintf('Property "signedForByRecipient" must be bool, got %s.', get_debug_type($signedForByRecipientRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "signedForByRecipient" must be bool, got %s.',
+                        get_debug_type($signedForByRecipientRaw),
+                    ),
+                );
             }
             $signedForByRecipient = Some::create($signedForByRecipientRaw);
             unset($data['signedForByRecipient']);
@@ -430,15 +916,24 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('endorsement', $data)) {
             $endorsementRaw = $data['endorsement'];
             if (!is_string($endorsementRaw)) {
-                throw new MalformedDataException(sprintf('Property "endorsement" must be string, got %s.', get_debug_type($endorsementRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "endorsement" must be string, got %s.', get_debug_type($endorsementRaw)),
+                );
             }
-            $endorsement = Some::create(VASEndorsement::tryFrom($endorsementRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid VASEndorsement.', $endorsementRaw)));
+            $endorsement = Some::create(
+                VASEndorsement::tryFrom($endorsementRaw)
+                    ?? throw new MalformedDataException(
+                        sprintf('"%s" is not a valid VASEndorsement.', $endorsementRaw),
+                    ),
+            );
             unset($data['endorsement']);
         }
         if (array_key_exists('preferredDay', $data)) {
             $preferredDayRaw = $data['preferredDay'];
             if (!is_string($preferredDayRaw)) {
-                throw new MalformedDataException(sprintf('Property "preferredDay" must be object, got %s.', get_debug_type($preferredDayRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "preferredDay" must be object, got %s.', get_debug_type($preferredDayRaw)),
+                );
             }
             $date = DateTime::createFromFormat('Y-m-d', $preferredDayRaw);
             if ($date === false) {
@@ -450,7 +945,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('noNeighbourDelivery', $data)) {
             $noNeighbourDeliveryRaw = $data['noNeighbourDelivery'];
             if (!is_bool($noNeighbourDeliveryRaw)) {
-                throw new MalformedDataException(sprintf('Property "noNeighbourDelivery" must be bool, got %s.', get_debug_type($noNeighbourDeliveryRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "noNeighbourDelivery" must be bool, got %s.',
+                        get_debug_type($noNeighbourDeliveryRaw),
+                    ),
+                );
             }
             $noNeighbourDelivery = Some::create($noNeighbourDeliveryRaw);
             unset($data['noNeighbourDelivery']);
@@ -458,7 +958,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('additionalInsurance', $data)) {
             $additionalInsuranceRaw = $data['additionalInsurance'];
             if (!is_array($additionalInsuranceRaw)) {
-                throw new MalformedDataException(sprintf('Property "additionalInsurance" must be object, got %s.', get_debug_type($additionalInsuranceRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "additionalInsurance" must be object, got %s.',
+                        get_debug_type($additionalInsuranceRaw),
+                    ),
+                );
             }
             /** @var array<string, mixed> $additionalInsuranceRawTyped */
             $additionalInsuranceRawTyped = $additionalInsuranceRaw;
@@ -468,7 +973,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('bulkyGoods', $data)) {
             $bulkyGoodsRaw = $data['bulkyGoods'];
             if (!is_bool($bulkyGoodsRaw)) {
-                throw new MalformedDataException(sprintf('Property "bulkyGoods" must be bool, got %s.', get_debug_type($bulkyGoodsRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "bulkyGoods" must be bool, got %s.', get_debug_type($bulkyGoodsRaw)),
+                );
             }
             $bulkyGoods = Some::create($bulkyGoodsRaw);
             unset($data['bulkyGoods']);
@@ -476,7 +983,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('cashOnDelivery', $data)) {
             $cashOnDeliveryRaw = $data['cashOnDelivery'];
             if (!is_array($cashOnDeliveryRaw)) {
-                throw new MalformedDataException(sprintf('Property "cashOnDelivery" must be object, got %s.', get_debug_type($cashOnDeliveryRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "cashOnDelivery" must be object, got %s.', get_debug_type($cashOnDeliveryRaw)),
+                );
             }
             /** @var array<string, mixed> $cashOnDeliveryRawTyped */
             $cashOnDeliveryRawTyped = $cashOnDeliveryRaw;
@@ -486,7 +995,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('individualSenderRequirement', $data)) {
             $individualSenderRequirementRaw = $data['individualSenderRequirement'];
             if (!is_string($individualSenderRequirementRaw)) {
-                throw new MalformedDataException(sprintf('Property "individualSenderRequirement" must be string, got %s.', get_debug_type($individualSenderRequirementRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "individualSenderRequirement" must be string, got %s.',
+                        get_debug_type($individualSenderRequirementRaw),
+                    ),
+                );
             }
             $individualSenderRequirement = Some::create($individualSenderRequirementRaw);
             unset($data['individualSenderRequirement']);
@@ -494,7 +1008,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('premium', $data)) {
             $premiumRaw = $data['premium'];
             if (!is_bool($premiumRaw)) {
-                throw new MalformedDataException(sprintf('Property "premium" must be bool, got %s.', get_debug_type($premiumRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "premium" must be bool, got %s.', get_debug_type($premiumRaw)),
+                );
             }
             $premium = Some::create($premiumRaw);
             unset($data['premium']);
@@ -502,7 +1018,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('closestDropPoint', $data)) {
             $closestDropPointRaw = $data['closestDropPoint'];
             if (!is_bool($closestDropPointRaw)) {
-                throw new MalformedDataException(sprintf('Property "closestDropPoint" must be bool, got %s.', get_debug_type($closestDropPointRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "closestDropPoint" must be bool, got %s.', get_debug_type($closestDropPointRaw)),
+                );
             }
             $closestDropPoint = Some::create($closestDropPointRaw);
             unset($data['closestDropPoint']);
@@ -510,7 +1028,12 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('parcelOutletRouting', $data)) {
             $parcelOutletRoutingRaw = $data['parcelOutletRouting'];
             if (!is_string($parcelOutletRoutingRaw)) {
-                throw new MalformedDataException(sprintf('Property "parcelOutletRouting" must be string, got %s.', get_debug_type($parcelOutletRoutingRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "parcelOutletRouting" must be string, got %s.',
+                        get_debug_type($parcelOutletRoutingRaw),
+                    ),
+                );
             }
             $parcelOutletRouting = Some::create($parcelOutletRoutingRaw);
             unset($data['parcelOutletRouting']);
@@ -518,7 +1041,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('goGreenPlus', $data)) {
             $goGreenPlusRaw = $data['goGreenPlus'];
             if (!is_bool($goGreenPlusRaw)) {
-                throw new MalformedDataException(sprintf('Property "goGreenPlus" must be bool, got %s.', get_debug_type($goGreenPlusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "goGreenPlus" must be bool, got %s.', get_debug_type($goGreenPlusRaw)),
+                );
             }
             $goGreenPlus = Some::create($goGreenPlusRaw);
             unset($data['goGreenPlus']);
@@ -526,7 +1051,9 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('dhlRetoure', $data)) {
             $dhlRetoureRaw = $data['dhlRetoure'];
             if (!is_array($dhlRetoureRaw)) {
-                throw new MalformedDataException(sprintf('Property "dhlRetoure" must be object, got %s.', get_debug_type($dhlRetoureRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "dhlRetoure" must be object, got %s.', get_debug_type($dhlRetoureRaw)),
+                );
             }
             /** @var array<string, mixed> $dhlRetoureRawTyped */
             $dhlRetoureRawTyped = $dhlRetoureRaw;
@@ -536,14 +1063,40 @@ final readonly class VAS implements SelfNormalizingModel
         if (array_key_exists('postalDeliveryDutyPaid', $data)) {
             $postalDeliveryDutyPaidRaw = $data['postalDeliveryDutyPaid'];
             if (!is_bool($postalDeliveryDutyPaidRaw)) {
-                throw new MalformedDataException(sprintf('Property "postalDeliveryDutyPaid" must be bool, got %s.', get_debug_type($postalDeliveryDutyPaidRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "postalDeliveryDutyPaid" must be bool, got %s.',
+                        get_debug_type($postalDeliveryDutyPaidRaw),
+                    ),
+                );
             }
             $postalDeliveryDutyPaid = Some::create($postalDeliveryDutyPaidRaw);
             unset($data['postalDeliveryDutyPaid']);
         }
         $additionalProperties = $data;
 
-        return new self($preferredNeighbour, $preferredLocation, $visualCheckOfAge, $namedPersonOnly, $identCheck, $signedForByRecipient, $endorsement, $preferredDay, $noNeighbourDelivery, $additionalInsurance, $bulkyGoods, $cashOnDelivery, $individualSenderRequirement, $premium, $closestDropPoint, $parcelOutletRouting, $goGreenPlus, $dhlRetoure, $postalDeliveryDutyPaid, $additionalProperties);
+        return new self(
+            $preferredNeighbour,
+            $preferredLocation,
+            $visualCheckOfAge,
+            $namedPersonOnly,
+            $identCheck,
+            $signedForByRecipient,
+            $endorsement,
+            $preferredDay,
+            $noNeighbourDelivery,
+            $additionalInsurance,
+            $bulkyGoods,
+            $cashOnDelivery,
+            $individualSenderRequirement,
+            $premium,
+            $closestDropPoint,
+            $parcelOutletRouting,
+            $goGreenPlus,
+            $dhlRetoure,
+            $postalDeliveryDutyPaid,
+            $additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */

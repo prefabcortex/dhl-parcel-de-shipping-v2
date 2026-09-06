@@ -35,14 +35,45 @@ final class POBoxConstraint implements ConstraintProviderInterface
         return [
             new NotNull(),
             new Collection([
-                'name1' => new Required([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 50), new Type(['string']), new NotNull()]),
-                'name2' => new Optional([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 50), new Type(['string']), new NotNull()]),
-                'name3' => new Optional([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 50), new Type(['string']), new NotNull()]),
+                'name1' => new Required([
+                    new Length(null, 1),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 50),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
+                'name2' => new Optional([
+                    new Length(null, 1),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 50),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
+                'name3' => new Optional([
+                    new Length(null, 1),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 50),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'poBoxID' => new Required([new Type(['integer']), new NotNull()]),
-                'email' => new Optional([new Length(null, 3), new NotBlank(null, null, null), new Length(null, null, 80), new Type(['string']), new NotNull()]),
+                'email' => new Optional([
+                    new Length(null, 3),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 80),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'city' => new Required([new Length(null, null, 80), new Type(['string']), new NotNull()]),
                 'country' => new Optional([...CountryConstraint::constraints()]),
-                'postalCode' => new Required([new Length(null, 3), new NotBlank(null, null, null), new Length(null, null, 10), new Regex('#^[0-9A-Za-z]+([ -]?[0-9A-Za-z]+)*$#'), new Type(['string']), new NotNull()]),
+                'postalCode' => new Required([
+                    new Length(null, 3),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 10),
+                    new Regex('#^[0-9A-Za-z]+([ -]?[0-9A-Za-z]+)*$#'),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

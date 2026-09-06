@@ -22,10 +22,10 @@ use function substr;
 /**
  * Turns an error response body into the message its exception carries.
  *
- * APIs put the human-readable part of an error under one of a handful of names — RFC 7807 calls
- * it `detail` with `title` as the summary, plenty of others just say `message`. The first of
- * those that actually holds a string wins; a body that is not JSON, or holds none of them, leaves
- * the status description standing on its own.
+ * APIs put the human-readable part of an error under one of a handful of names — RFC 7807 calls it
+ * `detail` with `title` as the summary, plenty of others just say `message`. The first of those
+ * that actually holds a string wins; a body that is not JSON, or holds none of them, leaves the
+ * status description standing on its own.
  *
  * This used to be emitted into the constructor of every generated exception class, which put the
  * same ten lines — and the same two `mixed` values — into a package once per error status per
@@ -46,10 +46,10 @@ final class ErrorMessage
      * Error statuses only. A success status reaching {@see describeStatus()} means no response
      * declared it, and answering "OK" to that would be the one misleading thing to say.
      *
-     * Wording follows IANA's HTTP Status Code Registry, which is also where the RFC behind any
-     * one of these codes is to be looked up. A `match` rather than a constant array on purpose:
-     * this file is copied into every generated package and reprinted there, and reprinting puts
-     * an array literal on a single line — forty entries and fifteen hundred characters of it.
+     * Wording follows IANA's HTTP Status Code Registry, which is also where the RFC behind any one
+     * of these codes is to be looked up. A `match` rather than a constant array on purpose: this
+     * file is copied into every generated package and reprinted there, and reprinting puts an array
+     * literal on a single line — forty entries and fifteen hundred characters of it.
      */
     public static function statusText(int $status): string
     {
@@ -99,7 +99,7 @@ final class ErrorMessage
     }
 
     /**
-     *  In precedence order: RFC 7807's fields first, then the common informal one.
+     * In precedence order: RFC 7807's fields first, then the common informal one.
      */
     private const array DETAIL_KEYS = ['detail', 'title', 'message'];
     /**
@@ -138,7 +138,7 @@ final class ErrorMessage
     }
 
     /**
-     *  The first detail field holding a string, or the empty string if there is none.
+     * The first detail field holding a string, or the empty string if there is none.
      */
     private static function detailOf(string $rawResponse): string
     {

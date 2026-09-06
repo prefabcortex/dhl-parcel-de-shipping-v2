@@ -78,15 +78,20 @@ final readonly class Weight implements SelfNormalizingModel
         if (array_key_exists('uom', $data)) {
             $uomRaw = $data['uom'];
             if (!is_string($uomRaw)) {
-                throw new MalformedDataException(sprintf('Property "uom" must be string, got %s.', get_debug_type($uomRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "uom" must be string, got %s.', get_debug_type($uomRaw)),
+                );
             }
-            $uom = WeightUom::tryFrom($uomRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid WeightUom.', $uomRaw));
+            $uom = WeightUom::tryFrom($uomRaw)
+                ?? throw new MalformedDataException(sprintf('"%s" is not a valid WeightUom.', $uomRaw));
             unset($data['uom']);
         }
         if (array_key_exists('value', $data)) {
             $valueRaw = $data['value'];
             if (!is_float($valueRaw)) {
-                throw new MalformedDataException(sprintf('Property "value" must be float, got %s.', get_debug_type($valueRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "value" must be float, got %s.', get_debug_type($valueRaw)),
+                );
             }
             $value = $valueRaw;
             unset($data['value']);

@@ -46,6 +46,12 @@ return new PhpCsFixer\Config()
         'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
         'global_namespace_import' => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
 
+        // Off on purpose, and the one @Symfony rule the generator's width limit cannot live beside.
+        // It pulls a `throw` back onto one line whatever its length, which is exactly what the
+        // printer has just decided against for the calls inside it — and a rule that undoes a
+        // decision made with the finished line in view is the wrong of the two.
+        'single_line_throw' => false,
+
         // Off on purpose. `phpdoc_types` normalises the case of PHP's own type names and cannot
         // tell one from a class name, so a model called `Resource` — a name OpenAPI descriptions
         // use freely — comes back as the `resource` pseudo-type. That would have this pass

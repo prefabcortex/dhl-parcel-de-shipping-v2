@@ -34,9 +34,21 @@ final class SingleManifestResponseConstraint implements ConstraintProviderInterf
             new Collection([
                 'status' => new Optional([new NotNull(), ...RequestStatusConstraint::constraints()]),
                 'manifestDate' => new Optional([new Type(['string']), new NotNull()]),
-                'manifest' => new Optional([new All([...DocumentConstraint::constraints()]), new Type(['array']), new NotNull()]),
-                'sheetNo' => new Optional([new All([...BillingNoToSheetNoConstraint::constraints()]), new Type(['array']), new NotNull()]),
-                'items' => new Optional([new All([...ShipmentNoToSheetNoConstraint::constraints()]), new Type(['array']), new NotNull()]),
+                'manifest' => new Optional([
+                    new All([...DocumentConstraint::constraints()]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
+                'sheetNo' => new Optional([
+                    new All([...BillingNoToSheetNoConstraint::constraints()]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
+                'items' => new Optional([
+                    new All([...ShipmentNoToSheetNoConstraint::constraints()]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

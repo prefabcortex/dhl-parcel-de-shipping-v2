@@ -31,14 +31,36 @@ final readonly class PostOffice implements SelfNormalizingModel
      * @param Option<Country>          $country
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $name, private int $retailID, private string $city, private string $postalCode, private Option $postNumber, private Option $email, private Option $country, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $name,
+        private int $retailID,
+        private string $city,
+        private string $postalCode,
+        private Option $postNumber,
+        private Option $email,
+        private Option $country,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
-    public static function create(string $name, int $retailID, string $city, string $postalCode, array $additionalProperties = []): self
-    {
-        return new self($name, $retailID, $city, $postalCode, None::create(), None::create(), None::create(), $additionalProperties);
+    public static function create(
+        string $name,
+        int $retailID,
+        string $city,
+        string $postalCode,
+        array $additionalProperties = [],
+    ): self {
+        return new self(
+            $name,
+            $retailID,
+            $city,
+            $postalCode,
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
@@ -51,7 +73,16 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withName(string $name): self
     {
-        return new self($name, $this->retailID, $this->city, $this->postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $name,
+            $this->retailID,
+            $this->city,
+            $this->postalCode,
+            $this->postNumber,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -64,11 +95,22 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withRetailID(int $retailID): self
     {
-        return new self($this->name, $retailID, $this->city, $this->postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $retailID,
+            $this->city,
+            $this->postalCode,
+            $this->postNumber,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * postNumber (Postnummer) is the official account number a private DHL Customer gets upon registration. To address a post office or retail outlet directly, either the post number or e-mail address of the consignee is needed.
+     * postNumber (Postnummer) is the official account number a private DHL Customer gets upon
+     * registration. To address a post office or retail outlet directly, either the post number or
+     * e-mail address of the consignee is needed.
      *
      * @return Option<string>
      */
@@ -79,11 +121,21 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withPostNumber(string $postNumber): self
     {
-        return new self($this->name, $this->retailID, $this->city, $this->postalCode, Some::create($postNumber), $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->retailID,
+            $this->city,
+            $this->postalCode,
+            Some::create($postNumber),
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Email address of the consignee. To address a post office or retail outlet directly, either the post number or e-mail address of the consignee is needed.
+     * Email address of the consignee. To address a post office or retail outlet directly, either
+     * the post number or e-mail address of the consignee is needed.
      *
      * @return Option<string>
      */
@@ -94,7 +146,16 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withEmail(string $email): self
     {
-        return new self($this->name, $this->retailID, $this->city, $this->postalCode, $this->postNumber, Some::create($email), $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->retailID,
+            $this->city,
+            $this->postalCode,
+            $this->postNumber,
+            Some::create($email),
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -107,7 +168,16 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withCity(string $city): self
     {
-        return new self($this->name, $this->retailID, $city, $this->postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->retailID,
+            $city,
+            $this->postalCode,
+            $this->postNumber,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -122,7 +192,16 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withCountry(Country $country): self
     {
-        return new self($this->name, $this->retailID, $this->city, $this->postalCode, $this->postNumber, $this->email, Some::create($country), $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->retailID,
+            $this->city,
+            $this->postalCode,
+            $this->postNumber,
+            $this->email,
+            Some::create($country),
+            $this->additionalProperties,
+        );
     }
 
     public function getPostalCode(): string
@@ -132,7 +211,16 @@ final readonly class PostOffice implements SelfNormalizingModel
 
     public function withPostalCode(string $postalCode): self
     {
-        return new self($this->name, $this->retailID, $this->city, $postalCode, $this->postNumber, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->retailID,
+            $this->city,
+            $postalCode,
+            $this->postNumber,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -158,7 +246,9 @@ final readonly class PostOffice implements SelfNormalizingModel
         if (array_key_exists('name', $data)) {
             $nameRaw = $data['name'];
             if (!is_string($nameRaw)) {
-                throw new MalformedDataException(sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)),
+                );
             }
             $name = $nameRaw;
             unset($data['name']);
@@ -166,7 +256,9 @@ final readonly class PostOffice implements SelfNormalizingModel
         if (array_key_exists('retailID', $data)) {
             $retailIDRaw = $data['retailID'];
             if (!is_int($retailIDRaw)) {
-                throw new MalformedDataException(sprintf('Property "retailID" must be int, got %s.', get_debug_type($retailIDRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "retailID" must be int, got %s.', get_debug_type($retailIDRaw)),
+                );
             }
             $retailID = $retailIDRaw;
             unset($data['retailID']);
@@ -174,7 +266,9 @@ final readonly class PostOffice implements SelfNormalizingModel
         if (array_key_exists('postNumber', $data)) {
             $postNumberRaw = $data['postNumber'];
             if (!is_string($postNumberRaw)) {
-                throw new MalformedDataException(sprintf('Property "postNumber" must be string, got %s.', get_debug_type($postNumberRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "postNumber" must be string, got %s.', get_debug_type($postNumberRaw)),
+                );
             }
             $postNumber = Some::create($postNumberRaw);
             unset($data['postNumber']);
@@ -182,7 +276,9 @@ final readonly class PostOffice implements SelfNormalizingModel
         if (array_key_exists('email', $data)) {
             $emailRaw = $data['email'];
             if (!is_string($emailRaw)) {
-                throw new MalformedDataException(sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)),
+                );
             }
             $email = Some::create($emailRaw);
             unset($data['email']);
@@ -190,7 +286,9 @@ final readonly class PostOffice implements SelfNormalizingModel
         if (array_key_exists('city', $data)) {
             $cityRaw = $data['city'];
             if (!is_string($cityRaw)) {
-                throw new MalformedDataException(sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)),
+                );
             }
             $city = $cityRaw;
             unset($data['city']);
@@ -198,15 +296,22 @@ final readonly class PostOffice implements SelfNormalizingModel
         if (array_key_exists('country', $data)) {
             $countryRaw = $data['country'];
             if (!is_string($countryRaw)) {
-                throw new MalformedDataException(sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)),
+                );
             }
-            $country = Some::create(Country::tryFrom($countryRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)));
+            $country = Some::create(
+                Country::tryFrom($countryRaw)
+                    ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)),
+            );
             unset($data['country']);
         }
         if (array_key_exists('postalCode', $data)) {
             $postalCodeRaw = $data['postalCode'];
             if (!is_string($postalCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)),
+                );
             }
             $postalCode = $postalCodeRaw;
             unset($data['postalCode']);

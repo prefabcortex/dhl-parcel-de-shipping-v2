@@ -31,8 +31,14 @@ final readonly class RequestStatus implements SelfNormalizingModel
      * @param Option<string>           $detail
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $title, private int $statusCode, private Option $status, private Option $instance, private Option $detail, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $title,
+        private int $statusCode,
+        private Option $status,
+        private Option $instance,
+        private Option $detail,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -48,11 +54,19 @@ final readonly class RequestStatus implements SelfNormalizingModel
 
     public function withTitle(string $title): self
     {
-        return new self($title, $this->statusCode, $this->status, $this->instance, $this->detail, $this->additionalProperties);
+        return new self(
+            $title,
+            $this->statusCode,
+            $this->status,
+            $this->instance,
+            $this->detail,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * The status code of the response. Usually, but not necessarliy the HTTP status code. Same as attribut "status" but deprecated. Do not use. Will be removed in the next major version.
+     * The status code of the response. Usually, but not necessarliy the HTTP status code. Same as
+     * attribut "status" but deprecated. Do not use. Will be removed in the next major version.
      */
     public function getStatusCode(): int
     {
@@ -61,7 +75,14 @@ final readonly class RequestStatus implements SelfNormalizingModel
 
     public function withStatusCode(int $statusCode): self
     {
-        return new self($this->title, $statusCode, $this->status, $this->instance, $this->detail, $this->additionalProperties);
+        return new self(
+            $this->title,
+            $statusCode,
+            $this->status,
+            $this->instance,
+            $this->detail,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -76,7 +97,14 @@ final readonly class RequestStatus implements SelfNormalizingModel
 
     public function withStatus(int $status): self
     {
-        return new self($this->title, $this->statusCode, Some::create($status), $this->instance, $this->detail, $this->additionalProperties);
+        return new self(
+            $this->title,
+            $this->statusCode,
+            Some::create($status),
+            $this->instance,
+            $this->detail,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -91,7 +119,14 @@ final readonly class RequestStatus implements SelfNormalizingModel
 
     public function withInstance(string $instance): self
     {
-        return new self($this->title, $this->statusCode, $this->status, Some::create($instance), $this->detail, $this->additionalProperties);
+        return new self(
+            $this->title,
+            $this->statusCode,
+            $this->status,
+            Some::create($instance),
+            $this->detail,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -102,7 +137,14 @@ final readonly class RequestStatus implements SelfNormalizingModel
 
     public function withDetail(string $detail): self
     {
-        return new self($this->title, $this->statusCode, $this->status, $this->instance, Some::create($detail), $this->additionalProperties);
+        return new self(
+            $this->title,
+            $this->statusCode,
+            $this->status,
+            $this->instance,
+            Some::create($detail),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -126,7 +168,9 @@ final readonly class RequestStatus implements SelfNormalizingModel
         if (array_key_exists('title', $data)) {
             $titleRaw = $data['title'];
             if (!is_string($titleRaw)) {
-                throw new MalformedDataException(sprintf('Property "title" must be string, got %s.', get_debug_type($titleRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "title" must be string, got %s.', get_debug_type($titleRaw)),
+                );
             }
             $title = $titleRaw;
             unset($data['title']);
@@ -134,7 +178,9 @@ final readonly class RequestStatus implements SelfNormalizingModel
         if (array_key_exists('statusCode', $data)) {
             $statusCodeRaw = $data['statusCode'];
             if (!is_int($statusCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "statusCode" must be int, got %s.', get_debug_type($statusCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "statusCode" must be int, got %s.', get_debug_type($statusCodeRaw)),
+                );
             }
             $statusCode = $statusCodeRaw;
             unset($data['statusCode']);
@@ -142,7 +188,9 @@ final readonly class RequestStatus implements SelfNormalizingModel
         if (array_key_exists('status', $data)) {
             $statusRaw = $data['status'];
             if (!is_int($statusRaw)) {
-                throw new MalformedDataException(sprintf('Property "status" must be int, got %s.', get_debug_type($statusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "status" must be int, got %s.', get_debug_type($statusRaw)),
+                );
             }
             $status = Some::create($statusRaw);
             unset($data['status']);
@@ -150,7 +198,9 @@ final readonly class RequestStatus implements SelfNormalizingModel
         if (array_key_exists('instance', $data)) {
             $instanceRaw = $data['instance'];
             if (!is_string($instanceRaw)) {
-                throw new MalformedDataException(sprintf('Property "instance" must be string, got %s.', get_debug_type($instanceRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "instance" must be string, got %s.', get_debug_type($instanceRaw)),
+                );
             }
             $instance = Some::create($instanceRaw);
             unset($data['instance']);
@@ -158,7 +208,9 @@ final readonly class RequestStatus implements SelfNormalizingModel
         if (array_key_exists('detail', $data)) {
             $detailRaw = $data['detail'];
             if (!is_string($detailRaw)) {
-                throw new MalformedDataException(sprintf('Property "detail" must be string, got %s.', get_debug_type($detailRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "detail" must be string, got %s.', get_debug_type($detailRaw)),
+                );
             }
             $detail = Some::create($detailRaw);
             unset($data['detail']);

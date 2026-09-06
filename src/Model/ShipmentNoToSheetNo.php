@@ -31,8 +31,12 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
      * @param Option<RequestStatus>    $sstatus
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private Option $shipmentNo, private Option $sheetNo, private Option $sstatus, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $shipmentNo,
+        private Option $sheetNo,
+        private Option $sstatus,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -97,7 +101,9 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
         if (array_key_exists('shipmentNo', $data)) {
             $shipmentNoRaw = $data['shipmentNo'];
             if (!is_string($shipmentNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)),
+                );
             }
             $shipmentNo = Some::create($shipmentNoRaw);
             unset($data['shipmentNo']);
@@ -105,7 +111,9 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
         if (array_key_exists('sheetNo', $data)) {
             $sheetNoRaw = $data['sheetNo'];
             if (!is_string($sheetNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "sheetNo" must be string, got %s.', get_debug_type($sheetNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "sheetNo" must be string, got %s.', get_debug_type($sheetNoRaw)),
+                );
             }
             $sheetNo = Some::create($sheetNoRaw);
             unset($data['sheetNo']);
@@ -113,7 +121,9 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
         if (array_key_exists('sstatus', $data)) {
             $sstatusRaw = $data['sstatus'];
             if (!is_array($sstatusRaw)) {
-                throw new MalformedDataException(sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)),
+                );
             }
             /** @var array<string, mixed> $sstatusRawTyped */
             $sstatusRawTyped = $sstatusRaw;

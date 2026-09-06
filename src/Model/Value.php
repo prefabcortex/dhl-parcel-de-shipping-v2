@@ -24,8 +24,11 @@ use function sprintf;
 final readonly class Value implements SelfNormalizingModel
 {
     /** @param array<int|string, mixed> $additionalProperties */
-    public function __construct(private ValueCurrency $currency, private float $value, private array $additionalProperties)
-    {
+    public function __construct(
+        private ValueCurrency $currency,
+        private float $value,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -81,15 +84,20 @@ final readonly class Value implements SelfNormalizingModel
         if (array_key_exists('currency', $data)) {
             $currencyRaw = $data['currency'];
             if (!is_string($currencyRaw)) {
-                throw new MalformedDataException(sprintf('Property "currency" must be string, got %s.', get_debug_type($currencyRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "currency" must be string, got %s.', get_debug_type($currencyRaw)),
+                );
             }
-            $currency = ValueCurrency::tryFrom($currencyRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid ValueCurrency.', $currencyRaw));
+            $currency = ValueCurrency::tryFrom($currencyRaw)
+                ?? throw new MalformedDataException(sprintf('"%s" is not a valid ValueCurrency.', $currencyRaw));
             unset($data['currency']);
         }
         if (array_key_exists('value', $data)) {
             $valueRaw = $data['value'];
             if (!is_float($valueRaw)) {
-                throw new MalformedDataException(sprintf('Property "value" must be float, got %s.', get_debug_type($valueRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "value" must be float, got %s.', get_debug_type($valueRaw)),
+                );
             }
             $value = $valueRaw;
             unset($data['value']);

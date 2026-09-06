@@ -87,7 +87,9 @@ final readonly class ServiceInformationBackend implements SelfNormalizingModel
         if (array_key_exists('env', $data)) {
             $envRaw = $data['env'];
             if (!is_string($envRaw)) {
-                throw new MalformedDataException(sprintf('Property "env" must be string, got %s.', get_debug_type($envRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "env" must be string, got %s.', get_debug_type($envRaw)),
+                );
             }
             $env = Some::create($envRaw);
             unset($data['env']);
@@ -95,7 +97,9 @@ final readonly class ServiceInformationBackend implements SelfNormalizingModel
         if (array_key_exists('version', $data)) {
             $versionRaw = $data['version'];
             if (!is_string($versionRaw)) {
-                throw new MalformedDataException(sprintf('Property "version" must be string, got %s.', get_debug_type($versionRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "version" must be string, got %s.', get_debug_type($versionRaw)),
+                );
             }
             $version = Some::create($versionRaw);
             unset($data['version']);

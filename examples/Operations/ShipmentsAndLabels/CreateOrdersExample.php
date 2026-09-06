@@ -41,11 +41,44 @@ use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
 final class CreateOrdersExample
 {
     /**
-     * This request is used to create one or more shipments and return corresponding shipment tracking numbers, labels, and documentation. Up to 30 shipments can be created in a single call. #### Request The selected products and corresponding billing numbers, as well as the desired services and package details are required to create a shipment. Each shipment can have a dedicated shipper address. The example request body contains sample values for most services. #### Response The request will return shipment tracking numbers and the applicable labels for each shipment. If multiple shipments have been included, an HTTP 207 response (multistatus) is returned and holds detailed status for each shipment. Other standard HTTP response codes (401, 500, 400, 200, 429) are possible, too. Labels can be either provided as part of the response (base64 encoded for PDF, text for ZPL) or via URL link for view and download. Note that the format settings per query parameters apply to the shipping label. It may also apply to other labels included, depending on the configuration of your account. Label paper for return shipments can be specified separately since a different printer may be used here. If requesting labels to be provided as URL for separate download, the URLs can be shared. #### Validation It is recommended to validate the request first prior to shipment creation by setting the `validate` query parameter to `true`. Especially, during development and test, it is recommended to perform this validation. This functionality supports both JSON schema validation (against this API description). During development and test, it is recommended to do this validation. JSON schema is available for local validation Dry run against the DHL backend  If this succeeds, actual shipment creation will also succeed.
+     * This request is used to create one or more shipments and return corresponding shipment
+     * tracking numbers, labels, and documentation. Up to 30 shipments can be created in a single
+     * call.
+     *
+     * #### Request
+     *
+     * The selected products and corresponding billing numbers, as well as the desired services and
+     * package details are required to create a shipment. Each shipment can have a dedicated shipper
+     * address. The example request body contains sample values for most services.
+     *
+     * #### Response
+     *
+     * The request will return shipment tracking numbers and the applicable labels for each
+     * shipment. If multiple shipments have been included, an HTTP 207 response (multistatus) is
+     * returned and holds detailed status for each shipment. Other standard HTTP response codes
+     * (401, 500, 400, 200, 429) are possible, too. Labels can be either provided as part of the
+     * response (base64 encoded for PDF, text for ZPL) or via URL link for view and download. Note
+     * that the format settings per query parameters apply to the shipping label. It may also apply
+     * to other labels included, depending on the configuration of your account. Label paper for
+     * return shipments can be specified separately since a different printer may be used here. If
+     * requesting labels to be provided as URL for separate download, the URLs can be shared.
+     *
+     * #### Validation
+     *
+     * It is recommended to validate the request first prior to shipment creation by setting the
+     * `validate` query parameter to `true`. Especially, during development and test, it is
+     * recommended to perform this validation. This functionality supports both JSON schema
+     * validation (against this API description). During development and test, it is recommended to
+     * do this validation. JSON schema is available for local validation Dry run against the DHL
+     * backend.
+     *
+     * If this succeeds, actual shipment creation will also succeed.
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *
-     * Request body: pass the result of one of buildDHLPaket(), buildDHLPaketInternational(), buildDHLPaketInternationalWithCustoms(), buildDHLKleinpaket(), buildWarenpostInternationalWithCustoms().
+     * Request body: pass the result of one of buildDHLPaket(), buildDHLPaketInternational(),
+     * buildDHLPaketInternationalWithCustoms(), buildDHLKleinpaket(),
+     * buildWarenpostInternationalWithCustoms().
      *
      *   $client = Client::withBasicAuth(...); // withApiKey/withOAuth also available, see examples/Auth/
      *   $queryParameters = new CreateOrdersQueryParameters(...);
@@ -67,7 +100,7 @@ final class CreateOrdersExample
         Client $client,
         ShipmentOrderRequest $requestBody,
         CreateOrdersQueryParameters $queryParameters,
-        CreateOrdersHeaderParameters $headerParameters
+        CreateOrdersHeaderParameters $headerParameters,
     ): LabelDataResponse {
         $accept = [CreateOrdersAccept::application_json, CreateOrdersAccept::application_problem_json];
 
@@ -75,13 +108,14 @@ final class CreateOrdersExample
             $requestBody,
             $queryParameters,
             $headerParameters,
-            $accept
+            $accept,
         );
     }
 
     /**
-     * DHL Paket (V01PAK)
-     * Order example for DHL Paket (V01PAK).
+     * DHL Paket (V01PAK).
+     *
+     * Order example for DHL Paket (V01PAK)
      */
     public static function buildDHLPaket(): ShipmentOrderRequest
     {
@@ -89,7 +123,7 @@ final class CreateOrdersExample
             'My Online Shop GmbH',
             'Sträßchensweg 10',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withEmail('max@mustermann.de');
@@ -97,20 +131,20 @@ final class CreateOrdersExample
             'Maria Musterfrau',
             'Kurt-Schumacher-Str. 20',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withPhone('+49 987654321')
             ->withEmail('maria@musterfrau.de');
         $weight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
         $dim = Dimensions::create(
             DimensionsUom::mm,
             100,
             200,
-            150
+            150,
         );
         $details = ShipmentDetails::create($weight)
             ->withDim($dim);
@@ -124,13 +158,14 @@ final class CreateOrdersExample
 
         return ShipmentOrderRequest::create(
             'STANDARD_GRUPPENPROFIL',
-            [$shipment]
+            [$shipment],
         );
     }
 
     /**
-     * DHL Paket International (V53WPAK)
-     * Order example for DHL Paket International (V53WPAK).
+     * DHL Paket International (V53WPAK).
+     *
+     * Order example for DHL Paket International (V53WPAK)
      */
     public static function buildDHLPaketInternational(): ShipmentOrderRequest
     {
@@ -138,7 +173,7 @@ final class CreateOrdersExample
             'My Online Shop GmbH',
             'Sträßchensweg 10',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withEmail('max@mustermann.de');
@@ -146,7 +181,7 @@ final class CreateOrdersExample
             'Jan Vermeer',
             'Museumstraat',
             'Amsterdam',
-            Country::NLD
+            Country::NLD,
         )
             ->withAddressHouse('1')
             ->withAdditionalAddressInformation1('2. Floor')
@@ -155,13 +190,13 @@ final class CreateOrdersExample
             ->withEmail('jan@vermeer.com');
         $weight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
         $dim = Dimensions::create(
             DimensionsUom::mm,
             100,
             200,
-            150
+            150,
         );
         $details = ShipmentDetails::create($weight)
             ->withDim($dim);
@@ -175,13 +210,14 @@ final class CreateOrdersExample
 
         return ShipmentOrderRequest::create(
             'STANDARD_GRUPPENPROFIL',
-            [$shipment]
+            [$shipment],
         );
     }
 
     /**
-     * DHL Paket International (V53WPAK) with customs
-     * Order example for DHL Paket International (V53WPAK) with customs.
+     * DHL Paket International (V53WPAK) with customs.
+     *
+     * Order example for DHL Paket International (V53WPAK) with customs
      */
     public static function buildDHLPaketInternationalWithCustoms(): ShipmentOrderRequest
     {
@@ -189,7 +225,7 @@ final class CreateOrdersExample
             'My Online Shop GmbH',
             'Sträßchensweg 10',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withEmail('max@mustermann.de');
@@ -197,7 +233,7 @@ final class CreateOrdersExample
             'Joe Black',
             '10 Downing Street',
             'London',
-            Country::GBR
+            Country::GBR,
         )
             ->withAdditionalAddressInformation1('2. Floor')
             ->withPostalCode('SW1A 1AA')
@@ -205,13 +241,13 @@ final class CreateOrdersExample
             ->withEmail('joe@black.uk');
         $weight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
         $dim = Dimensions::create(
             DimensionsUom::mm,
             100,
             200,
-            150
+            150,
         );
         $details = ShipmentDetails::create($weight)
             ->withDim($dim);
@@ -219,28 +255,28 @@ final class CreateOrdersExample
             ->withEndorsement(VASEndorsement::RETURN);
         $postalCharges = Value::create(
             ValueCurrency::EUR,
-            1.0
+            1.0,
         );
         $itemValue = Value::create(
             ValueCurrency::EUR,
-            10.0
+            10.0,
         );
         $itemWeight = Weight::create(
             WeightUom::g,
-            400.0
+            400.0,
         );
         $commodity = Commodity::create(
             'Red T-Shirt',
             1,
             $itemValue,
-            $itemWeight
+            $itemWeight,
         )
             ->withCountryOfOrigin(Country::FRA)
             ->withHsCode('123456');
         $customs = CustomsDetails::create(
             CustomsDetailsExportType::COMMERCIAL_GOODS,
             $postalCharges,
-            [$commodity]
+            [$commodity],
         );
         $shipment = Shipment::create()
             ->withProduct(Product::V53WPAK)
@@ -254,13 +290,14 @@ final class CreateOrdersExample
 
         return ShipmentOrderRequest::create(
             'STANDARD_GRUPPENPROFIL',
-            [$shipment]
+            [$shipment],
         );
     }
 
     /**
-     * DHL Kleinpaket (V62KP)
-     * Order example for DHL Kleinpaket (V62KP).
+     * DHL Kleinpaket (V62KP).
+     *
+     * Order example for DHL Kleinpaket (V62KP)
      */
     public static function buildDHLKleinpaket(): ShipmentOrderRequest
     {
@@ -268,7 +305,7 @@ final class CreateOrdersExample
             'My Online Shop GmbH',
             'Sträßchensweg 10',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withEmail('max@mustermann.de');
@@ -276,20 +313,20 @@ final class CreateOrdersExample
             'Maria Musterfrau',
             'Kurt-Schumacher-Str. 20',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withPhone('+49 987654321')
             ->withEmail('maria@musterfrau.de');
         $weight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
         $dim = Dimensions::create(
             DimensionsUom::cm,
             1,
             10,
-            15
+            15,
         );
         $details = ShipmentDetails::create($weight)
             ->withDim($dim);
@@ -303,13 +340,14 @@ final class CreateOrdersExample
 
         return ShipmentOrderRequest::create(
             'STANDARD_GRUPPENPROFIL',
-            [$shipment]
+            [$shipment],
         );
     }
 
     /**
-     * Warenpost International (V66WPI) with customs
-     * Order example for Warenpost International (V66WPI) with customs.
+     * Warenpost International (V66WPI) with customs.
+     *
+     * Order example for Warenpost International (V66WPI) with customs
      */
     public static function buildWarenpostInternationalWithCustoms(): ShipmentOrderRequest
     {
@@ -317,7 +355,7 @@ final class CreateOrdersExample
             'My Online Shop GmbH',
             'Sträßchensweg 10',
             'Bonn',
-            Country::DEU
+            Country::DEU,
         )
             ->withPostalCode('53113')
             ->withEmail('max@mustermann.de');
@@ -325,7 +363,7 @@ final class CreateOrdersExample
             'Joe Black',
             '42 Street',
             'London',
-            Country::GBR
+            Country::GBR,
         )
             ->withAdditionalAddressInformation1('2. Floor')
             ->withPostalCode('SW1A 1AA')
@@ -333,13 +371,13 @@ final class CreateOrdersExample
             ->withEmail('joe@black.uk');
         $weight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
         $dim = Dimensions::create(
             DimensionsUom::cm,
             1,
             10,
-            15
+            15,
         );
         $details = ShipmentDetails::create($weight)
             ->withDim($dim);
@@ -347,28 +385,28 @@ final class CreateOrdersExample
             ->withEndorsement(VASEndorsement::RETURN);
         $postalCharges = Value::create(
             ValueCurrency::EUR,
-            1.0
+            1.0,
         );
         $itemValue = Value::create(
             ValueCurrency::EUR,
-            10.0
+            10.0,
         );
         $itemWeight = Weight::create(
             WeightUom::g,
-            300.0
+            300.0,
         );
         $commodity = Commodity::create(
             'Item 1',
             1,
             $itemValue,
-            $itemWeight
+            $itemWeight,
         )
             ->withCountryOfOrigin(Country::FRA)
             ->withHsCode('123456');
         $customs = CustomsDetails::create(
             CustomsDetailsExportType::PRESENT,
             $postalCharges,
-            [$commodity]
+            [$commodity],
         );
         $shipment = Shipment::create()
             ->withProduct(Product::V66WPI)
@@ -382,7 +420,7 @@ final class CreateOrdersExample
 
         return ShipmentOrderRequest::create(
             'STANDARD_GRUPPENPROFIL',
-            [$shipment]
+            [$shipment],
         );
     }
 }

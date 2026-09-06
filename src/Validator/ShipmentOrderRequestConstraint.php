@@ -35,7 +35,13 @@ final class ShipmentOrderRequestConstraint implements ConstraintProviderInterfac
             new NotNull(),
             new Collection([
                 'profile' => new Required([new Length(null, null, 35), new Type(['string']), new NotNull()]),
-                'shipments' => new Required([new Count(null, null, 30), new Count(null, 1), new All([...ShipmentConstraint::constraints()]), new Type(['array']), new NotNull()]),
+                'shipments' => new Required([
+                    new Count(null, null, 30),
+                    new Count(null, 1),
+                    new All([...ShipmentConstraint::constraints()]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

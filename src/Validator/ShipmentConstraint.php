@@ -36,7 +36,13 @@ final class ShipmentConstraint implements ConstraintProviderInterface
             new Collection([
                 'product' => new Optional([...ProductConstraint::constraints()]),
                 'billingNumber' => new Optional([new Regex('#\w{10}\d{2}\w{2}#'), new Type(['string']), new NotNull()]),
-                'refNo' => new Optional([new Length(null, 8), new NotBlank(null, null, null), new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'refNo' => new Optional([
+                    new Length(null, 8),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 35),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'costCenter' => new Optional([new Length(null, null, 50), new Type(['string']), new NotNull()]),
                 'creationSoftware' => new Optional([new Type(['string']), new NotNull()]),
                 'shipDate' => new Optional([new Type(['string']), new NotNull()]),

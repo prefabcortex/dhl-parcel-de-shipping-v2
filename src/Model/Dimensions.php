@@ -23,13 +23,23 @@ use function sprintf;
 final readonly class Dimensions implements SelfNormalizingModel
 {
     /** @param array<int|string, mixed> $additionalProperties */
-    public function __construct(private DimensionsUom $uom, private int $height, private int $length, private int $width, private array $additionalProperties)
-    {
+    public function __construct(
+        private DimensionsUom $uom,
+        private int $height,
+        private int $length,
+        private int $width,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
-    public static function create(DimensionsUom $uom, int $height, int $length, int $width, array $additionalProperties = []): self
-    {
+    public static function create(
+        DimensionsUom $uom,
+        int $height,
+        int $length,
+        int $width,
+        array $additionalProperties = [],
+    ): self {
         return new self($uom, $height, $length, $width, $additionalProperties);
     }
 
@@ -96,15 +106,20 @@ final readonly class Dimensions implements SelfNormalizingModel
         if (array_key_exists('uom', $data)) {
             $uomRaw = $data['uom'];
             if (!is_string($uomRaw)) {
-                throw new MalformedDataException(sprintf('Property "uom" must be string, got %s.', get_debug_type($uomRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "uom" must be string, got %s.', get_debug_type($uomRaw)),
+                );
             }
-            $uom = DimensionsUom::tryFrom($uomRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid DimensionsUom.', $uomRaw));
+            $uom = DimensionsUom::tryFrom($uomRaw)
+                ?? throw new MalformedDataException(sprintf('"%s" is not a valid DimensionsUom.', $uomRaw));
             unset($data['uom']);
         }
         if (array_key_exists('height', $data)) {
             $heightRaw = $data['height'];
             if (!is_int($heightRaw)) {
-                throw new MalformedDataException(sprintf('Property "height" must be int, got %s.', get_debug_type($heightRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "height" must be int, got %s.', get_debug_type($heightRaw)),
+                );
             }
             $height = $heightRaw;
             unset($data['height']);
@@ -112,7 +127,9 @@ final readonly class Dimensions implements SelfNormalizingModel
         if (array_key_exists('length', $data)) {
             $lengthRaw = $data['length'];
             if (!is_int($lengthRaw)) {
-                throw new MalformedDataException(sprintf('Property "length" must be int, got %s.', get_debug_type($lengthRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "length" must be int, got %s.', get_debug_type($lengthRaw)),
+                );
             }
             $length = $lengthRaw;
             unset($data['length']);
@@ -120,7 +137,9 @@ final readonly class Dimensions implements SelfNormalizingModel
         if (array_key_exists('width', $data)) {
             $widthRaw = $data['width'];
             if (!is_int($widthRaw)) {
-                throw new MalformedDataException(sprintf('Property "width" must be int, got %s.', get_debug_type($widthRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "width" must be int, got %s.', get_debug_type($widthRaw)),
+                );
             }
             $width = $widthRaw;
             unset($data['width']);

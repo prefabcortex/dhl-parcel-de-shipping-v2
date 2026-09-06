@@ -59,12 +59,25 @@ final class GetManifests implements Operation
     private readonly GetManifestsHeaderParameters $headerParameters;
 
     /**
-     * Return the manifest document for the specific date (abbreviated ISO8601 format YYYY-MM-DD). If no date is provided, the manifest for today will be returned. The manifest PDF document will list the shipments for your EKP, separated by billing numbers. Potentially, the document is large and response time will reflect this. <br />Additionally, the response contains a mapping of billing numbers to sheet numbers of the manifest and a mapping of shipment numbers to sheet numbers.<br />The call can be repeated as often as needed. Should a date be provided which is too old or lies within the future, HTTP 400 is returned.
+     * Return the manifest document for the specific date (abbreviated ISO8601 format YYYY-MM-DD).
+     * If no date is provided, the manifest for today will be returned. The manifest PDF document
+     * will list the shipments for your EKP, separated by billing numbers. Potentially, the document
+     * is large and response time will reflect this.
      *
-     * @param list<GetManifestsAccept> $accept Accept content header application/json|application/problem+json
+     * Additionally, the response contains a mapping of billing numbers to sheet numbers of the
+     * manifest and a mapping of shipment numbers to sheet numbers.
+     *
+     * The call can be repeated as often as needed. Should a date be provided which is too old or
+     * lies within the future, HTTP 400 is returned.
+     *
+     * @param list<GetManifestsAccept> $accept Accept content header
+     *                                         application/json|application/problem+json
      */
-    public function __construct(GetManifestsQueryParameters $queryParameters, GetManifestsHeaderParameters $headerParameters, array $accept)
-    {
+    public function __construct(
+        GetManifestsQueryParameters $queryParameters,
+        GetManifestsHeaderParameters $headerParameters,
+        array $accept,
+    ) {
         $this->queryParameters = $queryParameters;
         $this->headerParameters = $headerParameters;
         $this->accept = $accept;
@@ -95,7 +108,12 @@ final class GetManifests implements Operation
             return ['Accept' => ['application/json', 'application/problem+json']];
         }
 
-        return ['Accept' => array_map(static fn (GetManifestsAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+        return [
+            'Accept' => array_map(
+                static fn (GetManifestsAccept $acceptValue): string => $acceptValue->value,
+                $this->accept,
+            ),
+        ];
     }
 
     protected function getQueryParameters(): QueryParameters
@@ -121,8 +139,10 @@ final class GetManifests implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): SingleManifestResponse
-    {
+    protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+    ): SingleManifestResponse {
         $status = $response->getStatusCode();
         $body = (string) $response->getBody();
         if (200 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {

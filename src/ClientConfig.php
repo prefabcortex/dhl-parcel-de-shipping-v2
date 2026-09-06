@@ -29,8 +29,8 @@ final readonly class ClientConfig
     }
 
     /**
-     * A configuration for this API at an address of your own — a staging deployment, a
-     * mock server, a recorded fixture.
+     * A configuration for this API at an address of your own — a staging deployment, a mock server,
+     * a recorded fixture.
      *
      * For the address the description names, see `production()`.
      */

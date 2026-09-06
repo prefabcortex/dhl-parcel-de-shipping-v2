@@ -31,8 +31,8 @@ trait BaseOperationTrait
     abstract public function getSecurityRequirements(): array;
 
     /**
-     * Transforms the raw HTTP response body into this operation's declared return type.
-     * Generated overrides always emit an inheritdoc tag here, so this description must stay non-empty.
+     * Transforms the raw HTTP response body into this operation's declared return type. Generated
+     * overrides always emit an inheritdoc tag here, so this description must stay non-empty.
      */
     abstract protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): mixed;
 
@@ -44,8 +44,8 @@ trait BaseOperationTrait
 
     /**
      * The operation's query parameters. Overridden by operations that have any, returning the
-     * collection their typed parameter object builds from its own properties — which is why
-     * nothing here has to inspect a value to find out what it is.
+     * collection their typed parameter object builds from its own properties — which is why nothing
+     * here has to inspect a value to find out what it is.
      */
     protected function getQueryParameters(): QueryParameters
     {
@@ -53,7 +53,7 @@ trait BaseOperationTrait
     }
 
     /**
-     *  The operation's header parameters; see {@see getQueryParameters()}.
+     * The operation's header parameters; see {@see getQueryParameters()}.
      */
     protected function getHeaderParameters(): HeaderParameters
     {

@@ -32,8 +32,12 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
      * @param Option<string>           $billingNumber
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $profile, private Option $shipmentNumbers, private Option $billingNumber, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $profile,
+        private Option $shipmentNumbers,
+        private Option $billingNumber,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -65,7 +69,12 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
     /** @param list<string> $shipmentNumbers */
     public function withShipmentNumbers(array $shipmentNumbers): self
     {
-        return new self($this->profile, Some::create($shipmentNumbers), $this->billingNumber, $this->additionalProperties);
+        return new self(
+            $this->profile,
+            Some::create($shipmentNumbers),
+            $this->billingNumber,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -80,7 +89,12 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
 
     public function withBillingNumber(string $billingNumber): self
     {
-        return new self($this->profile, $this->shipmentNumbers, Some::create($billingNumber), $this->additionalProperties);
+        return new self(
+            $this->profile,
+            $this->shipmentNumbers,
+            Some::create($billingNumber),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -102,7 +116,9 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
         if (array_key_exists('profile', $data)) {
             $profileRaw = $data['profile'];
             if (!is_string($profileRaw)) {
-                throw new MalformedDataException(sprintf('Property "profile" must be string, got %s.', get_debug_type($profileRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "profile" must be string, got %s.', get_debug_type($profileRaw)),
+                );
             }
             $profile = $profileRaw;
             unset($data['profile']);
@@ -110,11 +126,15 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
         if (array_key_exists('shipmentNumbers', $data)) {
             $shipmentNumbersRaw = $data['shipmentNumbers'];
             if (!(is_array($shipmentNumbersRaw) && array_is_list($shipmentNumbersRaw))) {
-                throw new MalformedDataException(sprintf('Property "shipmentNumbers" must be array, got %s.', get_debug_type($shipmentNumbersRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipmentNumbers" must be array, got %s.', get_debug_type($shipmentNumbersRaw)),
+                );
             }
             $shipmentNumbers = Some::create(array_map(static function (mixed $value): string {
                 if (!is_string($value)) {
-                    throw new MalformedDataException(sprintf('Array item must be string, got %s.', get_debug_type($value)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be string, got %s.', get_debug_type($value)),
+                    );
                 }
 
                 return $value;
@@ -124,7 +144,9 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
         if (array_key_exists('billingNumber', $data)) {
             $billingNumberRaw = $data['billingNumber'];
             if (!is_string($billingNumberRaw)) {
-                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)),
+                );
             }
             $billingNumber = Some::create($billingNumberRaw);
             unset($data['billingNumber']);

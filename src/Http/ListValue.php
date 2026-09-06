@@ -19,8 +19,8 @@ use function array_values;
  * An ordered list of parameter values.
  *
  * Rendered in OpenAPI's default array style (`style: form, explode: true`): the wire name is
- * repeated once per element (`tags=a&tags=b`) rather than PHP's `tags[0]=a` bracket notation,
- * which real APIs reject.
+ * repeated once per element (`tags=a&tags=b`) rather than PHP's `tags[0]=a` bracket notation, which
+ * real APIs reject.
  *
  * @internal plumbing of the generated package, not part of its public contract: only the
  *                    generated operations and client touch this, and it may change in any release
@@ -37,14 +37,21 @@ final readonly class ListValue implements ParameterValue
      * and needs no per-element wrapping at the call site.
      *
      * Keys are dropped rather than required to be absent: a parameter object is filled through a
-     * setter that accepts any `array<string>`, so the caller may well hand over one with gaps —
-     * and this style puts only the values on the wire anyway, in order.
+     * setter that accepts any `array<string>`, so the caller may well hand over one with gaps — and
+     * this style puts only the values on the wire anyway, in order.
      *
      * @param array<array-key, string|int|float|bool> $scalars
      */
     public static function ofScalars(array $scalars): self
     {
-        return new self(array_values(array_map(static fn (string|int|float|bool $scalar): ParameterValue => new ScalarValue($scalar), $scalars)));
+        return new self(
+            array_values(
+                array_map(
+                    static fn (string|int|float|bool $scalar): ParameterValue => new ScalarValue($scalar),
+                    $scalars,
+                ),
+            ),
+        );
     }
 
     #[Override]

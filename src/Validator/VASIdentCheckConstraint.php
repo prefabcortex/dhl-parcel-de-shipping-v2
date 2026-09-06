@@ -34,8 +34,20 @@ final class VASIdentCheckConstraint implements ConstraintProviderInterface
         return [
             new NotNull(),
             new Collection([
-                'firstName' => new Required([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 35), new Type(['string']), new NotNull()]),
-                'lastName' => new Required([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 35), new Type(['string']), new NotNull()]),
+                'firstName' => new Required([
+                    new Length(null, 1),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 35),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
+                'lastName' => new Required([
+                    new Length(null, 1),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 35),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'dateOfBirth' => new Optional([new Type(['string']), new NotNull()]),
                 'minimumAge' => new Optional([...VASIdentCheckMinimumAgeConstraint::constraints()]),
             ], null, null, true),

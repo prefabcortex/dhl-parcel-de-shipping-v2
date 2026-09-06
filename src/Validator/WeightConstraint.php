@@ -34,7 +34,12 @@ final class WeightConstraint implements ConstraintProviderInterface
             new NotNull(),
             new Collection([
                 'uom' => new Required([...WeightUomConstraint::constraints()]),
-                'value' => new Required([new LessThanOrEqual(31500.0), new GreaterThanOrEqual(0.0), new Type(['number']), new NotNull()]),
+                'value' => new Required([
+                    new LessThanOrEqual(31500.0),
+                    new GreaterThanOrEqual(0.0),
+                    new Type(['number']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

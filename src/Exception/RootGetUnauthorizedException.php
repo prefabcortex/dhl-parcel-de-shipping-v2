@@ -17,8 +17,11 @@ use Psr\Http\Message\ResponseInterface;
 
 final class RootGetUnauthorizedException extends UnauthorizedException
 {
-    public function __construct(private readonly RequestStatus $requestStatus, private readonly ResponseInterface $response, private readonly string $rawResponse)
-    {
+    public function __construct(
+        private readonly RequestStatus $requestStatus,
+        private readonly ResponseInterface $response,
+        private readonly string $rawResponse,
+    ) {
         parent::__construct(ErrorMessage::describe($rawResponse, 'Unauthorized'));
     }
 

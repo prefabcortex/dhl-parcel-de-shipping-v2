@@ -31,12 +31,31 @@ final readonly class ScalarValue implements ParameterValue
      * Percent-encodings of the RFC 3986 reserved set — gen-delims `:/?#[]@` and sub-delims
      * `!$&'()*+,;=` — mapped back to their literal character.
      *
-     * `allowReserved` is expressed as a subtraction from full encoding rather than as a
-     * character allowlist: encode everything, then let exactly these back through. A value like
-     * a space is therefore still `%20`, because it is not reserved — passing it through raw
-     * would produce a URL that is invalid rather than merely unpretty.
+     * `allowReserved` is expressed as a subtraction from full encoding rather than as a character
+     * allowlist: encode everything, then let exactly these back through. A value like a space is
+     * therefore still `%20`, because it is not reserved — passing it through raw would produce a
+     * URL that is invalid rather than merely unpretty.
      */
-    private const array RESERVED = ['%3A' => ':', '%2F' => '/', '%3F' => '?', '%23' => '#', '%5B' => '[', '%5D' => ']', '%40' => '@', '%21' => '!', '%24' => '$', '%26' => '&', '%27' => "'", '%28' => '(', '%29' => ')', '%2A' => '*', '%2B' => '+', '%2C' => ',', '%3B' => ';', '%3D' => '='];
+    private const array RESERVED = [
+        '%3A' => ':',
+        '%2F' => '/',
+        '%3F' => '?',
+        '%23' => '#',
+        '%5B' => '[',
+        '%5D' => ']',
+        '%40' => '@',
+        '%21' => '!',
+        '%24' => '$',
+        '%26' => '&',
+        '%27' => "'",
+        '%28' => '(',
+        '%29' => ')',
+        '%2A' => '*',
+        '%2B' => '+',
+        '%2C' => ',',
+        '%3B' => ';',
+        '%3D' => '=',
+    ];
 
     public function __construct(public string|int|float|bool $value)
     {

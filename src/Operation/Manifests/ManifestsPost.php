@@ -61,25 +61,53 @@ final class ManifestsPost implements Operation
     private readonly ManifestsPostHeaderParameters $headerParameters;
 
     /**
-     * Shipments are normally ''closed out'' at a fixed time of the day (such as 6 pm, configured by EKP/account) for the date provided as shipDate in the create call.
-     * <br />This call allows forcing the closeout for sets of shipments earlier. This will also override the original shipDate. Afterwards, the shipment cannot be changed and the shipment labels cannot be queried anymore (however they may remain cached for limited duration).
-     * Once a shipment has been closed, then calling closeout for the same shipment will result in a warning. The same warning will also be returned if the automatic closeout happened prior to the call. It is however possible to add new shipments, they will be manifested as well and be part of the day's manifest.
-     * <br />Note on billing: The manifesting step has billing implications. Some products (Parcel International partially) are billed based on the shipment data available to DHL at the end of the day. All other products (including DHL Paket Standard) are billed based on production data. For more details, please contact your account representative.
+     * Shipments are normally ''closed out'' at a fixed time of the day (such as 6 pm, configured by
+     * EKP/account) for the date provided as shipDate in the create call.
+     *
+     * This call allows forcing the closeout for sets of shipments earlier. This will also override
+     * the original shipDate. Afterwards, the shipment cannot be changed and the shipment labels
+     * cannot be queried anymore (however they may remain cached for limited duration). Once a
+     * shipment has been closed, then calling closeout for the same shipment will result in a
+     * warning. The same warning will also be returned if the automatic closeout happened prior to
+     * the call. It is however possible to add new shipments, they will be manifested as well and be
+     * part of the day's manifest.
+     *
+     * Note on billing: The manifesting step has billing implications. Some products (Parcel
+     * International partially) are billed based on the shipment data available to DHL at the end of
+     * the day. All other products (including DHL Paket Standard) are billed based on production
+     * data. For more details, please contact your account representative.
      *
      * #### Request
-     * It's changing the status of the shipment, so parameters are provided in the body or as query parameter.
-     * * ''profile'' attribute (request body parameter) - defines the user group profile. A user group is permitted to specific billing numbers. Shipments are only closed out if they belong to a billing number that the user group profile is entitled to use. This attribute is mandatory. Please use the standard user group profile ''STANDARD_GRUPPENPROFIL'' if no dedicated user group profile is available.
-     * * ''billingNumber'' attribute (query parameter) - defines the billing number for which shipments shall be closed out. If a billing number is set, then only the shipments of that billing number are closed out. In that case no list of specific shipment numbers needs to be passed.
-     * * ''shipmentNumbers'' attribute (request body parameter) - lists the specific shipping numbers of the shipments that shall be closed out.
-     * If all shipments shall be closed, the query parameter ''all'' needs to be set to ''true''. In that case neither a billing number nor a list of shipment numbers need to be passed in the request.
+     *
+     * It's changing the status of the shipment, so parameters are provided in the body or as query
+     * parameter.
+     * * ''profile'' attribute (request body parameter) - defines the user group profile. A user
+     *   group is permitted to specific billing numbers. Shipments are only closed out if they
+     *   belong to a billing number that the user group profile is entitled to use. This attribute
+     *   is mandatory. Please use the standard user group profile ''STANDARD_GRUPPENPROFIL'' if no
+     *   dedicated user group profile is available.
+     * * ''billingNumber'' attribute (query parameter) - defines the billing number for which
+     *   shipments shall be closed out. If a billing number is set, then only the shipments of that
+     *   billing number are closed out. In that case no list of specific shipment numbers needs to
+     *   be passed.
+     * * ''shipmentNumbers'' attribute (request body parameter) - lists the specific shipping
+     *   numbers of the shipments that shall be closed out. If all shipments shall be closed, the
+     *   query parameter ''all'' needs to be set to ''true''. In that case neither a billing number
+     *   nor a list of shipment numbers need to be passed in the request.
      *
      * #### Response
+     *
      * * Closing status for each shipment
      *
-     * @param list<ManifestsPostAccept> $accept Accept content header application/json|application/problem+json
+     * @param list<ManifestsPostAccept> $accept Accept content header
+     *                                          application/json|application/problem+json
      */
-    public function __construct(ShipmentManifestingRequest $requestBody, ManifestsPostQueryParameters $queryParameters, ManifestsPostHeaderParameters $headerParameters, array $accept)
-    {
+    public function __construct(
+        ShipmentManifestingRequest $requestBody,
+        ManifestsPostQueryParameters $queryParameters,
+        ManifestsPostHeaderParameters $headerParameters,
+        array $accept,
+    ) {
         $this->body = $requestBody;
         $this->queryParameters = $queryParameters;
         $this->headerParameters = $headerParameters;
@@ -118,7 +146,12 @@ final class ManifestsPost implements Operation
             return ['Accept' => ['application/json', 'application/problem+json']];
         }
 
-        return ['Accept' => array_map(static fn (ManifestsPostAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+        return [
+            'Accept' => array_map(
+                static fn (ManifestsPostAccept $acceptValue): string => $acceptValue->value,
+                $this->accept,
+            ),
+        ];
     }
 
     protected function getQueryParameters(): QueryParameters
@@ -143,8 +176,10 @@ final class ManifestsPost implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): MultipleManifestResponse
-    {
+    protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+    ): MultipleManifestResponse {
         $status = $response->getStatusCode();
         $body = (string) $response->getBody();
         if (207 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {

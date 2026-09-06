@@ -60,22 +60,48 @@ final class CreateOrders implements Operation
     private readonly CreateOrdersHeaderParameters $headerParameters;
 
     /**
-     * This request is used to create one or more shipments and return corresponding shipment tracking numbers, labels, and documentation. Up to 30 shipments can be created in a single call.
+     * This request is used to create one or more shipments and return corresponding shipment
+     * tracking numbers, labels, and documentation. Up to 30 shipments can be created in a single
+     * call.
+     *
      * #### Request
-     * The selected products and corresponding billing numbers, as well as the desired services and package details are required to create a shipment. Each shipment can have a dedicated shipper address. The example request body contains sample values for most services.
+     *
+     * The selected products and corresponding billing numbers, as well as the desired services and
+     * package details are required to create a shipment. Each shipment can have a dedicated shipper
+     * address. The example request body contains sample values for most services.
+     *
      * #### Response
-     * The request will return shipment tracking numbers and the applicable labels for each shipment. If multiple shipments have been included, an HTTP 207 response (multistatus) is returned and holds detailed status for each shipment. Other standard HTTP response codes (401, 500, 400, 200, 429) are possible, too. Labels can be either provided as part of the response (base64 encoded for PDF, text for ZPL) or via URL link for view and download. Note that the format settings per query parameters apply to the shipping label. It may also apply to other labels included, depending on the configuration of your account. Label paper for return shipments can be specified separately since a different printer may be used here. If requesting labels to be provided as URL for separate download, the URLs can be shared.
+     *
+     * The request will return shipment tracking numbers and the applicable labels for each
+     * shipment. If multiple shipments have been included, an HTTP 207 response (multistatus) is
+     * returned and holds detailed status for each shipment. Other standard HTTP response codes
+     * (401, 500, 400, 200, 429) are possible, too. Labels can be either provided as part of the
+     * response (base64 encoded for PDF, text for ZPL) or via URL link for view and download. Note
+     * that the format settings per query parameters apply to the shipping label. It may also apply
+     * to other labels included, depending on the configuration of your account. Label paper for
+     * return shipments can be specified separately since a different printer may be used here. If
+     * requesting labels to be provided as URL for separate download, the URLs can be shared.
+     *
      * #### Validation
-     * It is recommended to validate the request first prior to shipment creation by setting the `validate` query parameter to `true`. Especially, during development and test, it is recommended to perform this validation. This functionality supports both
-     * * JSON schema validation (against this API description). During development and test, it is recommended to do this validation. JSON schema is available for local validation
+     *
+     * It is recommended to validate the request first prior to shipment creation by setting the
+     * `validate` query parameter to `true`. Especially, during development and test, it is
+     * recommended to perform this validation. This functionality supports both
+     * * JSON schema validation (against this API description). During development and test, it is
+     *   recommended to do this validation. JSON schema is available for local validation
      * * Dry run against the DHL backend.
      *
      * If this succeeds, actual shipment creation will also succeed.
      *
-     * @param list<CreateOrdersAccept> $accept Accept content header application/json|application/problem+json
+     * @param list<CreateOrdersAccept> $accept Accept content header
+     *                                         application/json|application/problem+json
      */
-    public function __construct(ShipmentOrderRequest $requestBody, CreateOrdersQueryParameters $queryParameters, CreateOrdersHeaderParameters $headerParameters, array $accept)
-    {
+    public function __construct(
+        ShipmentOrderRequest $requestBody,
+        CreateOrdersQueryParameters $queryParameters,
+        CreateOrdersHeaderParameters $headerParameters,
+        array $accept,
+    ) {
         $this->body = $requestBody;
         $this->queryParameters = $queryParameters;
         $this->headerParameters = $headerParameters;
@@ -114,7 +140,12 @@ final class CreateOrders implements Operation
             return ['Accept' => ['application/json', 'application/problem+json']];
         }
 
-        return ['Accept' => array_map(static fn (CreateOrdersAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+        return [
+            'Accept' => array_map(
+                static fn (CreateOrdersAccept $acceptValue): string => $acceptValue->value,
+                $this->accept,
+            ),
+        ];
     }
 
     protected function getQueryParameters(): QueryParameters
@@ -145,7 +176,10 @@ final class CreateOrders implements Operation
         $body = (string) $response->getBody();
         // 200: Success response for requests with a single shipment.
         // 207: Response for requests taking multiple input elements
-        if (in_array($status, [200, 207], true) && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
+        if (
+            in_array($status, [200, 207], true)
+            && $contentType->isAnyOf(['application/json', 'application/problem+json'])
+        ) {
             $typedData = JsonBody::toArray($body);
             $this->validate($typedData, LabelDataResponseConstraint::constraints());
 

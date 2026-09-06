@@ -29,14 +29,14 @@ use function sprintf;
 /**
  * Every operation called once, against a client that records the request instead of sending it.
  *
- * Nothing leaves the process and no credentials are needed: PSR-18 is one method, so the
- * client is stood in for. What runs is everything up to the wire — the URI assembled, the
- * query string encoded, the body serialised, the authenticator applied.
+ * Nothing leaves the process and no credentials are needed: PSR-18 is one method, so the client is
+ * stood in for. What runs is everything up to the wire — the URI assembled, the query string
+ * encoded, the body serialised, the authenticator applied.
  *
- * The assertions are deliberately thin. These calls go through the `…Raw()` methods, which
- * hand the response back unparsed, so the canned answer never has to match a status or
- * content type from the description — an answer invented from that document would say
- * nothing about a client built from the same one. What is watched is the request.
+ * The assertions are deliberately thin. These calls go through the `…Raw()` methods, which hand the
+ * response back unparsed, so the canned answer never has to match a status or content type from the
+ * description — an answer invented from that document would say nothing about a client built from
+ * the same one. What is watched is the request.
  */
 final class OperationSmokeTest extends TestCase
 {
@@ -56,7 +56,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 
@@ -74,7 +78,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 
@@ -84,7 +92,11 @@ final class OperationSmokeTest extends TestCase
         $httpClient = new RecordingHttpClient(CannedResponse::empty());
         try {
             $client = Client::create(ClientConfig::forBaseUrl(self::BASE_URL)->withHttpClient($httpClient));
-            $client->shipmentsAndLabels()->ordersAccountDeleteRaw(new OrdersAccountDeleteQueryParameters('smoke-test', 'smoke-test'), new OrdersAccountDeleteHeaderParameters(), []);
+            $client->shipmentsAndLabels()->ordersAccountDeleteRaw(
+                new OrdersAccountDeleteQueryParameters('smoke-test', 'smoke-test'),
+                new OrdersAccountDeleteHeaderParameters(),
+                [],
+            );
         } catch (ApiException $error) {
             self::fail(sprintf('%s could not be called: %s', 'ordersAccountDelete', $error->getMessage()));
         }
@@ -92,7 +104,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 
@@ -102,7 +118,11 @@ final class OperationSmokeTest extends TestCase
         $httpClient = new RecordingHttpClient(CannedResponse::empty());
         try {
             $client = Client::create(ClientConfig::forBaseUrl(self::BASE_URL)->withHttpClient($httpClient));
-            $client->shipmentsAndLabels()->getOrderRaw(new GetOrderQueryParameters([]), new GetOrderHeaderParameters(), []);
+            $client->shipmentsAndLabels()->getOrderRaw(
+                new GetOrderQueryParameters([]),
+                new GetOrderHeaderParameters(),
+                [],
+            );
         } catch (ApiException $error) {
             self::fail(sprintf('%s could not be called: %s', 'getOrder', $error->getMessage()));
         }
@@ -110,7 +130,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 
@@ -120,7 +144,12 @@ final class OperationSmokeTest extends TestCase
         $httpClient = new RecordingHttpClient(CannedResponse::empty());
         try {
             $client = Client::create(ClientConfig::forBaseUrl(self::BASE_URL)->withHttpClient($httpClient));
-            $client->shipmentsAndLabels()->createOrdersRaw(ModelFixtures::buildShipmentOrderRequest(), new CreateOrdersQueryParameters(), new CreateOrdersHeaderParameters(), []);
+            $client->shipmentsAndLabels()->createOrdersRaw(
+                ModelFixtures::buildShipmentOrderRequest(),
+                new CreateOrdersQueryParameters(),
+                new CreateOrdersHeaderParameters(),
+                [],
+            );
         } catch (ApiException $error) {
             self::fail(sprintf('%s could not be called: %s', 'createOrders', $error->getMessage()));
         }
@@ -128,7 +157,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 
@@ -138,7 +171,11 @@ final class OperationSmokeTest extends TestCase
         $httpClient = new RecordingHttpClient(CannedResponse::empty());
         try {
             $client = Client::create(ClientConfig::forBaseUrl(self::BASE_URL)->withHttpClient($httpClient));
-            $client->manifests()->getManifestsRaw(new GetManifestsQueryParameters(), new GetManifestsHeaderParameters(), []);
+            $client->manifests()->getManifestsRaw(
+                new GetManifestsQueryParameters(),
+                new GetManifestsHeaderParameters(),
+                [],
+            );
         } catch (ApiException $error) {
             self::fail(sprintf('%s could not be called: %s', 'getManifests', $error->getMessage()));
         }
@@ -146,7 +183,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 
@@ -156,7 +197,12 @@ final class OperationSmokeTest extends TestCase
         $httpClient = new RecordingHttpClient(CannedResponse::empty());
         try {
             $client = Client::create(ClientConfig::forBaseUrl(self::BASE_URL)->withHttpClient($httpClient));
-            $client->manifests()->manifestsPostRaw(ModelFixtures::buildShipmentManifestingRequest(), new ManifestsPostQueryParameters(), new ManifestsPostHeaderParameters(), []);
+            $client->manifests()->manifestsPostRaw(
+                ModelFixtures::buildShipmentManifestingRequest(),
+                new ManifestsPostQueryParameters(),
+                new ManifestsPostHeaderParameters(),
+                [],
+            );
         } catch (ApiException $error) {
             self::fail(sprintf('%s could not be called: %s', 'manifestsPost', $error->getMessage()));
         }
@@ -164,7 +210,11 @@ final class OperationSmokeTest extends TestCase
         self::assertCount(1, $requests, 'the operation did not hand exactly one request to the HTTP client');
         foreach ($requests as $request) {
             self::assertNotSame('', $request->getMethod(), 'the request went out without an HTTP method');
-            self::assertStringStartsWith(self::BASE_URL, (string) $request->getUri(), 'the request did not go to the configured base URL');
+            self::assertStringStartsWith(
+                self::BASE_URL,
+                (string) $request->getUri(),
+                'the request did not go to the configured base URL',
+            );
         }
     }
 }

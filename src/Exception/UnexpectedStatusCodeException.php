@@ -19,7 +19,10 @@ final class UnexpectedStatusCodeException extends RuntimeException implements Re
 {
     public function __construct(private readonly ResponseInterface $response, private readonly string $rawResponse)
     {
-        parent::__construct(ErrorMessage::describeStatus($rawResponse, $response->getStatusCode()), $response->getStatusCode());
+        parent::__construct(
+            ErrorMessage::describeStatus($rawResponse, $response->getStatusCode()),
+            $response->getStatusCode(),
+        );
     }
 
     #[Override]

@@ -20,8 +20,10 @@ use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
 final class GetManifestsHeaderParameters
 {
     /**
+     * Control the APIs response language via locale abbreviation. English (en-US) and german
+     * (de-DE) are supported. If not specified, the default is english.
+     *
      * @var Option<string>
-     *                     Control the APIs response language via locale abbreviation. English (en-US) and german (de-DE) are supported. If not specified, the default is english.
      */
     private Option $acceptLanguage;
 

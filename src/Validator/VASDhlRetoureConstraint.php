@@ -36,7 +36,13 @@ final class VASDhlRetoureConstraint implements ConstraintProviderInterface
             new NotNull(),
             new Collection([
                 'billingNumber' => new Required([new Regex('#\w{10}\d{2}\w{2}#'), new Type(['string']), new NotNull()]),
-                'refNo' => new Optional([new Length(null, 6), new NotBlank(null, null, null), new Length(null, null, 50), new Type(['string']), new NotNull()]),
+                'refNo' => new Optional([
+                    new Length(null, 6),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 50),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'returnAddress' => new Optional([new NotNull(), ...ContactAddressConstraint::constraints()]),
                 'goGreenPlus' => new Optional([new Type(['bool']), new NotNull()]),
             ], null, null, true),

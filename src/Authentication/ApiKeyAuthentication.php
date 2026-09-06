@@ -17,10 +17,8 @@ use SensitiveParameter;
 
 final readonly class ApiKeyAuthentication implements Authenticator
 {
-    public function __construct(
-        #[SensitiveParameter]
-        private string $apiKey
-    ) {
+    public function __construct(#[SensitiveParameter] private string $apiKey)
+    {
     }
 
     /** @throws InvalidArgumentException */

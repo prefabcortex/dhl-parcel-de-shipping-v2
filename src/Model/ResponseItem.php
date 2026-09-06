@@ -41,14 +41,41 @@ final readonly class ResponseItem implements SelfNormalizingModel
      * @param Option<string>                      $uuid
      * @param array<int|string, mixed>            $additionalProperties
      */
-    public function __construct(private RequestStatus $sstatus, private Option $shipmentNo, private Option $routingCode, private Option $returnRoutingCode, private Option $returnShipmentNo, private Option $shipmentRefNo, private Option $label, private Option $returnLabel, private Option $customsDoc, private Option $codLabel, private Option $validationMessages, private Option $uuid, private array $additionalProperties)
-    {
+    public function __construct(
+        private RequestStatus $sstatus,
+        private Option $shipmentNo,
+        private Option $routingCode,
+        private Option $returnRoutingCode,
+        private Option $returnShipmentNo,
+        private Option $shipmentRefNo,
+        private Option $label,
+        private Option $returnLabel,
+        private Option $customsDoc,
+        private Option $codLabel,
+        private Option $validationMessages,
+        private Option $uuid,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
     public static function create(RequestStatus $sstatus, array $additionalProperties = []): self
     {
-        return new self($sstatus, None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+        return new self(
+            $sstatus,
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -59,7 +86,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withShipmentNo(string $shipmentNo): self
     {
-        return new self($this->sstatus, Some::create($shipmentNo), $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            Some::create($shipmentNo),
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -74,7 +115,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withRoutingCode(string $routingCode): self
     {
-        return new self($this->sstatus, $this->shipmentNo, Some::create($routingCode), $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            Some::create($routingCode),
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -89,7 +144,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withReturnRoutingCode(string $returnRoutingCode): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, Some::create($returnRoutingCode), $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            Some::create($returnRoutingCode),
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -100,7 +169,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withReturnShipmentNo(string $returnShipmentNo): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, Some::create($returnShipmentNo), $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            Some::create($returnShipmentNo),
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -113,7 +196,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withSstatus(RequestStatus $sstatus): self
     {
-        return new self($sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -124,7 +221,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withShipmentRefNo(string $shipmentRefNo): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, Some::create($shipmentRefNo), $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            Some::create($shipmentRefNo),
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -139,7 +250,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withLabel(Document $label): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, Some::create($label), $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            Some::create($label),
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -154,7 +279,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withReturnLabel(Document $returnLabel): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, Some::create($returnLabel), $this->customsDoc, $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            Some::create($returnLabel),
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -169,7 +308,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withCustomsDoc(Document $customsDoc): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, Some::create($customsDoc), $this->codLabel, $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            Some::create($customsDoc),
+            $this->codLabel,
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -184,7 +337,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withCodLabel(Document $codLabel): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, Some::create($codLabel), $this->validationMessages, $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            Some::create($codLabel),
+            $this->validationMessages,
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -200,7 +367,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
     /** @param list<ValidationMessageItem> $validationMessages */
     public function withValidationMessages(array $validationMessages): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, Some::create($validationMessages), $this->uuid, $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            Some::create($validationMessages),
+            $this->uuid,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -215,7 +396,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
 
     public function withUuid(string $uuid): self
     {
-        return new self($this->sstatus, $this->shipmentNo, $this->routingCode, $this->returnRoutingCode, $this->returnShipmentNo, $this->shipmentRefNo, $this->label, $this->returnLabel, $this->customsDoc, $this->codLabel, $this->validationMessages, Some::create($uuid), $this->additionalProperties);
+        return new self(
+            $this->sstatus,
+            $this->shipmentNo,
+            $this->routingCode,
+            $this->returnRoutingCode,
+            $this->returnShipmentNo,
+            $this->shipmentRefNo,
+            $this->label,
+            $this->returnLabel,
+            $this->customsDoc,
+            $this->codLabel,
+            $this->validationMessages,
+            Some::create($uuid),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -246,7 +441,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('shipmentNo', $data)) {
             $shipmentNoRaw = $data['shipmentNo'];
             if (!is_string($shipmentNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipmentNo" must be string, got %s.', get_debug_type($shipmentNoRaw)),
+                );
             }
             $shipmentNo = Some::create($shipmentNoRaw);
             unset($data['shipmentNo']);
@@ -254,7 +451,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('routingCode', $data)) {
             $routingCodeRaw = $data['routingCode'];
             if (!is_string($routingCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "routingCode" must be string, got %s.', get_debug_type($routingCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "routingCode" must be string, got %s.', get_debug_type($routingCodeRaw)),
+                );
             }
             $routingCode = Some::create($routingCodeRaw);
             unset($data['routingCode']);
@@ -262,7 +461,12 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('returnRoutingCode', $data)) {
             $returnRoutingCodeRaw = $data['returnRoutingCode'];
             if (!is_string($returnRoutingCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "returnRoutingCode" must be string, got %s.', get_debug_type($returnRoutingCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "returnRoutingCode" must be string, got %s.',
+                        get_debug_type($returnRoutingCodeRaw),
+                    ),
+                );
             }
             $returnRoutingCode = Some::create($returnRoutingCodeRaw);
             unset($data['returnRoutingCode']);
@@ -270,7 +474,12 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('returnShipmentNo', $data)) {
             $returnShipmentNoRaw = $data['returnShipmentNo'];
             if (!is_string($returnShipmentNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "returnShipmentNo" must be string, got %s.', get_debug_type($returnShipmentNoRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "returnShipmentNo" must be string, got %s.',
+                        get_debug_type($returnShipmentNoRaw),
+                    ),
+                );
             }
             $returnShipmentNo = Some::create($returnShipmentNoRaw);
             unset($data['returnShipmentNo']);
@@ -278,7 +487,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('sstatus', $data)) {
             $sstatusRaw = $data['sstatus'];
             if (!is_array($sstatusRaw)) {
-                throw new MalformedDataException(sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "sstatus" must be object, got %s.', get_debug_type($sstatusRaw)),
+                );
             }
             /** @var array<string, mixed> $sstatusRawTyped */
             $sstatusRawTyped = $sstatusRaw;
@@ -288,7 +499,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('shipmentRefNo', $data)) {
             $shipmentRefNoRaw = $data['shipmentRefNo'];
             if (!is_string($shipmentRefNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "shipmentRefNo" must be string, got %s.', get_debug_type($shipmentRefNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipmentRefNo" must be string, got %s.', get_debug_type($shipmentRefNoRaw)),
+                );
             }
             $shipmentRefNo = Some::create($shipmentRefNoRaw);
             unset($data['shipmentRefNo']);
@@ -296,7 +509,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('label', $data)) {
             $labelRaw = $data['label'];
             if (!is_array($labelRaw)) {
-                throw new MalformedDataException(sprintf('Property "label" must be object, got %s.', get_debug_type($labelRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "label" must be object, got %s.', get_debug_type($labelRaw)),
+                );
             }
             /** @var array<string, mixed> $labelRawTyped */
             $labelRawTyped = $labelRaw;
@@ -306,7 +521,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('returnLabel', $data)) {
             $returnLabelRaw = $data['returnLabel'];
             if (!is_array($returnLabelRaw)) {
-                throw new MalformedDataException(sprintf('Property "returnLabel" must be object, got %s.', get_debug_type($returnLabelRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "returnLabel" must be object, got %s.', get_debug_type($returnLabelRaw)),
+                );
             }
             /** @var array<string, mixed> $returnLabelRawTyped */
             $returnLabelRawTyped = $returnLabelRaw;
@@ -316,7 +533,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('customsDoc', $data)) {
             $customsDocRaw = $data['customsDoc'];
             if (!is_array($customsDocRaw)) {
-                throw new MalformedDataException(sprintf('Property "customsDoc" must be object, got %s.', get_debug_type($customsDocRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "customsDoc" must be object, got %s.', get_debug_type($customsDocRaw)),
+                );
             }
             /** @var array<string, mixed> $customsDocRawTyped */
             $customsDocRawTyped = $customsDocRaw;
@@ -326,7 +545,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('codLabel', $data)) {
             $codLabelRaw = $data['codLabel'];
             if (!is_array($codLabelRaw)) {
-                throw new MalformedDataException(sprintf('Property "codLabel" must be object, got %s.', get_debug_type($codLabelRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "codLabel" must be object, got %s.', get_debug_type($codLabelRaw)),
+                );
             }
             /** @var array<string, mixed> $codLabelRawTyped */
             $codLabelRawTyped = $codLabelRaw;
@@ -336,11 +557,18 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('validationMessages', $data)) {
             $validationMessagesRaw = $data['validationMessages'];
             if (!(is_array($validationMessagesRaw) && array_is_list($validationMessagesRaw))) {
-                throw new MalformedDataException(sprintf('Property "validationMessages" must be array, got %s.', get_debug_type($validationMessagesRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "validationMessages" must be array, got %s.',
+                        get_debug_type($validationMessagesRaw),
+                    ),
+                );
             }
             $validationMessages = Some::create(array_map(static function (mixed $value): ValidationMessageItem {
                 if (!is_array($value)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value)),
+                    );
                 }
                 /** @var array<string, mixed> $valueTyped */
                 $valueTyped = $value;
@@ -352,7 +580,9 @@ final readonly class ResponseItem implements SelfNormalizingModel
         if (array_key_exists('uuid', $data)) {
             $uuidRaw = $data['uuid'];
             if (!is_string($uuidRaw)) {
-                throw new MalformedDataException(sprintf('Property "uuid" must be string, got %s.', get_debug_type($uuidRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "uuid" must be string, got %s.', get_debug_type($uuidRaw)),
+                );
             }
             $uuid = Some::create($uuidRaw);
             unset($data['uuid']);
@@ -362,7 +592,21 @@ final readonly class ResponseItem implements SelfNormalizingModel
             throw new MalformedDataException('Required property "sstatus" is missing from the document.');
         }
 
-        return new self($sstatus, $shipmentNo, $routingCode, $returnRoutingCode, $returnShipmentNo, $shipmentRefNo, $label, $returnLabel, $customsDoc, $codLabel, $validationMessages, $uuid, $additionalProperties);
+        return new self(
+            $sstatus,
+            $shipmentNo,
+            $routingCode,
+            $returnRoutingCode,
+            $returnShipmentNo,
+            $shipmentRefNo,
+            $label,
+            $returnLabel,
+            $customsDoc,
+            $codLabel,
+            $validationMessages,
+            $uuid,
+            $additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */

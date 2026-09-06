@@ -32,8 +32,13 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
      * @param Option<bool>             $goGreenPlus
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $billingNumber, private Option $refNo, private Option $returnAddress, private Option $goGreenPlus, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $billingNumber,
+        private Option $refNo,
+        private Option $returnAddress,
+        private Option $goGreenPlus,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -49,7 +54,13 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
 
     public function withBillingNumber(string $billingNumber): self
     {
-        return new self($billingNumber, $this->refNo, $this->returnAddress, $this->goGreenPlus, $this->additionalProperties);
+        return new self(
+            $billingNumber,
+            $this->refNo,
+            $this->returnAddress,
+            $this->goGreenPlus,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -60,11 +71,21 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
 
     public function withRefNo(string $refNo): self
     {
-        return new self($this->billingNumber, Some::create($refNo), $this->returnAddress, $this->goGreenPlus, $this->additionalProperties);
+        return new self(
+            $this->billingNumber,
+            Some::create($refNo),
+            $this->returnAddress,
+            $this->goGreenPlus,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Combines name, address, contact information. The recommended way is to use the mandatory attribute addressStreet and submit the streetname and housenumber together â€“ alternatively addressHouse + addressStreet can be used. For many international addresses there is no house number, please do not set a period or any other sign to indicate that the address does not have a housenumber.
+     * Combines name, address, contact information. The recommended way is to use the mandatory
+     * attribute addressStreet and submit the streetname and housenumber together â€“ alternatively
+     * addressHouse + addressStreet can be used. For many international addresses there is no house
+     * number, please do not set a period or any other sign to indicate that the address does not
+     * have a housenumber.
      *
      * @return Option<ContactAddress>
      */
@@ -75,11 +96,18 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
 
     public function withReturnAddress(ContactAddress $returnAddress): self
     {
-        return new self($this->billingNumber, $this->refNo, Some::create($returnAddress), $this->goGreenPlus, $this->additionalProperties);
+        return new self(
+            $this->billingNumber,
+            $this->refNo,
+            Some::create($returnAddress),
+            $this->goGreenPlus,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * GoGreen Plus enables sustainable shipping by investing in measures to reduce greenhouse gas emissions at DHL.
+     * GoGreen Plus enables sustainable shipping by investing in measures to reduce greenhouse gas
+     * emissions at DHL.
      *
      * @return Option<bool>
      */
@@ -90,7 +118,13 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
 
     public function withGoGreenPlus(bool $goGreenPlus): self
     {
-        return new self($this->billingNumber, $this->refNo, $this->returnAddress, Some::create($goGreenPlus), $this->additionalProperties);
+        return new self(
+            $this->billingNumber,
+            $this->refNo,
+            $this->returnAddress,
+            Some::create($goGreenPlus),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -113,7 +147,9 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
         if (array_key_exists('billingNumber', $data)) {
             $billingNumberRaw = $data['billingNumber'];
             if (!is_string($billingNumberRaw)) {
-                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)),
+                );
             }
             $billingNumber = $billingNumberRaw;
             unset($data['billingNumber']);
@@ -121,7 +157,9 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
         if (array_key_exists('refNo', $data)) {
             $refNoRaw = $data['refNo'];
             if (!is_string($refNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "refNo" must be string, got %s.', get_debug_type($refNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "refNo" must be string, got %s.', get_debug_type($refNoRaw)),
+                );
             }
             $refNo = Some::create($refNoRaw);
             unset($data['refNo']);
@@ -129,7 +167,9 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
         if (array_key_exists('returnAddress', $data)) {
             $returnAddressRaw = $data['returnAddress'];
             if (!is_array($returnAddressRaw)) {
-                throw new MalformedDataException(sprintf('Property "returnAddress" must be object, got %s.', get_debug_type($returnAddressRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "returnAddress" must be object, got %s.', get_debug_type($returnAddressRaw)),
+                );
             }
             /** @var array<string, mixed> $returnAddressRawTyped */
             $returnAddressRawTyped = $returnAddressRaw;
@@ -139,7 +179,9 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
         if (array_key_exists('goGreenPlus', $data)) {
             $goGreenPlusRaw = $data['goGreenPlus'];
             if (!is_bool($goGreenPlusRaw)) {
-                throw new MalformedDataException(sprintf('Property "goGreenPlus" must be bool, got %s.', get_debug_type($goGreenPlusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "goGreenPlus" must be bool, got %s.', get_debug_type($goGreenPlusRaw)),
+                );
             }
             $goGreenPlus = Some::create($goGreenPlusRaw);
             unset($data['goGreenPlus']);

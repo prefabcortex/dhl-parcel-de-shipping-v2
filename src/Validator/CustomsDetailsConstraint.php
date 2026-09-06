@@ -46,8 +46,18 @@ final class CustomsDetailsConstraint implements ConstraintProviderInterface
                 'postalCharges' => new Required([new NotNull()]),
                 'officeOfOrigin' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
                 'shipperCustomsRef' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
-                'consigneeCustomsRef' => new Optional([new Length(null, null, 35), new Type(['string']), new NotNull()]),
-                'items' => new Required([new Count(null, null, 99), new Count(null, 1), new All([...CommodityConstraint::constraints()]), new Type(['array']), new NotNull()]),
+                'consigneeCustomsRef' => new Optional([
+                    new Length(null, null, 35),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
+                'items' => new Required([
+                    new Count(null, null, 99),
+                    new Count(null, 1),
+                    new All([...CommodityConstraint::constraints()]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

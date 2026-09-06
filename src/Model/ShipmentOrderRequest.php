@@ -85,7 +85,9 @@ final readonly class ShipmentOrderRequest implements SelfNormalizingModel
         if (array_key_exists('profile', $data)) {
             $profileRaw = $data['profile'];
             if (!is_string($profileRaw)) {
-                throw new MalformedDataException(sprintf('Property "profile" must be string, got %s.', get_debug_type($profileRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "profile" must be string, got %s.', get_debug_type($profileRaw)),
+                );
             }
             $profile = $profileRaw;
             unset($data['profile']);
@@ -93,11 +95,15 @@ final readonly class ShipmentOrderRequest implements SelfNormalizingModel
         if (array_key_exists('shipments', $data)) {
             $shipmentsRaw = $data['shipments'];
             if (!(is_array($shipmentsRaw) && array_is_list($shipmentsRaw))) {
-                throw new MalformedDataException(sprintf('Property "shipments" must be array, got %s.', get_debug_type($shipmentsRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipments" must be array, got %s.', get_debug_type($shipmentsRaw)),
+                );
             }
             $shipments = array_map(static function (mixed $value): Shipment {
                 if (!is_array($value)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value)),
+                    );
                 }
                 /** @var array<string, mixed> $valueTyped */
                 $valueTyped = $value;

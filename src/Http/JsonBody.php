@@ -31,23 +31,22 @@ use const JSON_THROW_ON_ERROR;
 /**
  * The one place where a JSON response body crosses from untyped into typed territory.
  *
- * `json_decode()` returns `mixed`, so every call site used to carry the same four lines to get
- * back to a usable type: decode, check it is an array, re-assign through a `@var` docblock, use.
+ * `json_decode()` returns `mixed`, so every call site used to carry the same four lines to get back
+ * to a usable type: decode, check it is an array, re-assign through a `@var` docblock, use.
  * Emitting that into every operation spread the widest type in the language across the whole
- * package, once per status code and media type — and static analysis rightly complained at each
- * of them.
+ * package, once per status code and media type — and static analysis rightly complained at each of
+ * them.
  *
  * Narrowing happens here instead, so callers receive a typed array and the `mixed` never leaves
  * this file.
  *
  * Every check throws {@see MalformedDataException}, which is the `UnexpectedValueException` each
  * generated `parseResponse()` and `transformResponseBody()` has always declared plus the marker
- * that puts it under the package's own `ApiException` — a body that is not the JSON the
- * description promised is the likeliest way a call fails, and as a bare SPL type it was the one
- * failure the documented single catch went past. Writing these checks as `assert()` looked
- * equivalent and was not: `php.ini-production` ships `zend.assertions=-1`, which drops the calls at
- * compile time,
- * so a published SDK ran with none of them and a truncated or mistyped response reached a typed
+ * that puts it under the package's own `ApiException` — a body that is not the JSON the description
+ * promised is the likeliest way a call fails, and as a bare SPL type it was the one failure the
+ * documented single catch went past. Writing these checks as `assert()` looked equivalent and was
+ * not: `php.ini-production` ships `zend.assertions=-1`, which drops the calls at compile time, so a
+ * published SDK ran with none of them and a truncated or mistyped response reached a typed
  * constructor and raised a bare `TypeError` no `@throws` names. This is the boundary — it has to
  * hold in the configuration the package is actually deployed under.
  *
@@ -236,7 +235,11 @@ final class JsonBody
             // Positional, as everywhere else here: named arguments are out project-wide.
             return json_encode($value, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new MalformedDataException(sprintf('The request body cannot be written as JSON: %s.', $exception->getMessage()), 0, $exception);
+            throw new MalformedDataException(
+                sprintf('The request body cannot be written as JSON: %s.', $exception->getMessage()),
+                0,
+                $exception,
+            );
         }
     }
 
@@ -259,7 +262,16 @@ final class JsonBody
             // packages inherit that rule with the file. 512 is json_decode()'s own default depth.
             $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new MalformedDataException(sprintf('Expected %s in the response body, but it is not valid JSON (%s): %s', $expected, $exception->getMessage(), self::excerpt($json)), 0, $exception);
+            throw new MalformedDataException(
+                sprintf(
+                    'Expected %s in the response body, but it is not valid JSON (%s): %s',
+                    $expected,
+                    $exception->getMessage(),
+                    self::excerpt($json),
+                ),
+                0,
+                $exception,
+            );
         }
         if (null === $decoded) {
             throw self::mismatch($expected, null, $json);
@@ -269,11 +281,18 @@ final class JsonBody
     }
 
     /**
-     *  Says what was expected, what arrived, and enough of the body to tell which is at fault.
+     * Says what was expected, what arrived, and enough of the body to tell which is at fault.
      */
     private static function mismatch(string $expected, mixed $decoded, string $json): MalformedDataException
     {
-        return new MalformedDataException(sprintf('Expected %s in the response body, got %s: %s', $expected, get_debug_type($decoded), self::excerpt($json)));
+        return new MalformedDataException(
+            sprintf(
+                'Expected %s in the response body, got %s: %s',
+                $expected,
+                get_debug_type($decoded),
+                self::excerpt($json),
+            ),
+        );
     }
 
     /**

@@ -24,7 +24,7 @@ final readonly class BasicAuthAuthentication implements Authenticator
         #[SensitiveParameter]
         private string $username,
         #[SensitiveParameter]
-        private string $password
+        private string $password,
     ) {
     }
 

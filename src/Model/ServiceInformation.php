@@ -79,7 +79,9 @@ final readonly class ServiceInformation implements SelfNormalizingModel
         if (array_key_exists('amp', $data)) {
             $ampRaw = $data['amp'];
             if (!is_array($ampRaw)) {
-                throw new MalformedDataException(sprintf('Property "amp" must be object, got %s.', get_debug_type($ampRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "amp" must be object, got %s.', get_debug_type($ampRaw)),
+                );
             }
             /** @var array<string, mixed> $ampRawTyped */
             $ampRawTyped = $ampRaw;
@@ -89,7 +91,9 @@ final readonly class ServiceInformation implements SelfNormalizingModel
         if (array_key_exists('backend', $data)) {
             $backendRaw = $data['backend'];
             if (!is_array($backendRaw)) {
-                throw new MalformedDataException(sprintf('Property "backend" must be object, got %s.', get_debug_type($backendRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "backend" must be object, got %s.', get_debug_type($backendRaw)),
+                );
             }
             /** @var array<string, mixed> $backendRawTyped */
             $backendRawTyped = $backendRaw;

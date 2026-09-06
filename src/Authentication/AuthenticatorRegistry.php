@@ -20,10 +20,10 @@ use function in_array;
  * The authenticators a client was built with, and the rule for choosing among them.
  *
  * An operation states its security requirements as alternatives: a list of scheme-name sets, any
- * one of which is sufficient. This applies the first alternative whose schemes are all covered by
- * a registered authenticator, which is what "OR between entries, AND within one" means in an
- * OpenAPI `security` block. A request whose requirements none of the registered authenticators
- * satisfy goes out unsigned — the server, not the client, decides what that is worth.
+ * one of which is sufficient. This applies the first alternative whose schemes are all covered by a
+ * registered authenticator, which is what "OR between entries, AND within one" means in an OpenAPI
+ * `security` block. A request whose requirements none of the registered authenticators satisfy goes
+ * out unsigned — the server, not the client, decides what that is worth.
  *
  * That last rule stays deliberately quiet, and it is worth saying why, because it once hid a real
  * defect: for a description requiring two schemes at once, no generated factory could register
@@ -49,7 +49,10 @@ final readonly class AuthenticatorRegistry
     /** @param list<list<string>> $securityRequirements alternatives, each a set of scheme names */
     public function authenticate(RequestInterface $request, array $securityRequirements): RequestInterface
     {
-        $registeredSchemes = array_map(static fn (Authenticator $authenticator): string => $authenticator->getSecuritySchemeName(), $this->authenticators);
+        $registeredSchemes = array_map(
+            static fn (Authenticator $authenticator): string => $authenticator->getSecuritySchemeName(),
+            $this->authenticators,
+        );
         foreach ($securityRequirements as $requiredSchemes) {
             if ([] === array_diff($requiredSchemes, $registeredSchemes)) {
                 foreach ($this->authenticators as $authenticator) {

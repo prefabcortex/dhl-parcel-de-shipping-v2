@@ -57,14 +57,32 @@ final class GetOrder implements Operation
     private readonly GetOrderHeaderParameters $headerParameters;
 
     /**
-     * Returns documents for existing shipment(s). The call accepts multiple shipment numbers and will provide sets of documents for those. The **format (PDF,ZPL)** and **method of delivery (URL, encoded, data)** can be selected for **all** shipments and labels in that call. You cannot chose one format and delivery method for one label and different for another label within the same call. You can also specify if you want regular labels, return labels, cod labels, or customsDoc. Any combination is possible.
+     * Returns documents for existing shipment(s). The call accepts multiple shipment numbers and
+     * will provide sets of documents for those. The **format (PDF,ZPL)** and **method of delivery
+     * (URL, encoded, data)** can be selected for **all** shipments and labels in that call. You
+     * cannot chose one format and delivery method for one label and different for another label
+     * within the same call. You can also specify if you want regular labels, return labels, cod
+     * labels, or customsDoc. Any combination is possible.
      *
-     * The call returns for each shipment number the status indicator and the selected labels and documents. If a label type (for example a cod label) does not exist for a shipment, it will not be returned. This is not an error. If you were sending multiple shipments, you will get an HTTP 207 response (multistatus) with detailed status for each shipment. Other standard HTTP response codes (200, 400, 401, 429, 500) are possible as well. Labels can be either provided as part of the response (base64 encoded for PDF, text for ZPL) or via URL link for view and download (PDF). Note that the format settings per query parameters apply to the shipping label. Retoure label paper type can be specified separately since a different printer may be used here. If requesting labels to be returned as URL for separate download, the URLs provided can be shared.
+     * The call returns for each shipment number the status indicator and the selected labels and
+     * documents. If a label type (for example a cod label) does not exist for a shipment, it will
+     * not be returned. This is not an error. If you were sending multiple shipments, you will get
+     * an HTTP 207 response (multistatus) with detailed status for each shipment. Other standard
+     * HTTP response codes (200, 400, 401, 429, 500) are possible as well. Labels can be either
+     * provided as part of the response (base64 encoded for PDF, text for ZPL) or via URL link for
+     * view and download (PDF). Note that the format settings per query parameters apply to the
+     * shipping label. Retoure label paper type can be specified separately since a different
+     * printer may be used here. If requesting labels to be returned as URL for separate download,
+     * the URLs provided can be shared.
      *
-     * @param list<GetOrderAccept> $accept Accept content header application/json|application/problem+json
+     * @param list<GetOrderAccept> $accept Accept content header
+     *                                     application/json|application/problem+json
      */
-    public function __construct(GetOrderQueryParameters $queryParameters, GetOrderHeaderParameters $headerParameters, array $accept)
-    {
+    public function __construct(
+        GetOrderQueryParameters $queryParameters,
+        GetOrderHeaderParameters $headerParameters,
+        array $accept,
+    ) {
         $this->queryParameters = $queryParameters;
         $this->headerParameters = $headerParameters;
         $this->accept = $accept;
@@ -95,7 +113,12 @@ final class GetOrder implements Operation
             return ['Accept' => ['application/json', 'application/problem+json']];
         }
 
-        return ['Accept' => array_map(static fn (GetOrderAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+        return [
+            'Accept' => array_map(
+                static fn (GetOrderAccept $acceptValue): string => $acceptValue->value,
+                $this->accept,
+            ),
+        ];
     }
 
     protected function getQueryParameters(): QueryParameters

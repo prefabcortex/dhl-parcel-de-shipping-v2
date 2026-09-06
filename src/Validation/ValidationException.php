@@ -17,8 +17,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use function sprintf;
 
 /**
- * A document — a request body on its way out, a response body on its way in — that does not
- * satisfy the constraints its schema declares.
+ * A document — a request body on its way out, a response body on its way in — that does not satisfy
+ * the constraints its schema declares.
  *
  * Carries {@see ApiException} because it is thrown straight out of `transformResponseBody()`, on
  * the same path and in the same `@throws` list as the operation exceptions beside it. Without the

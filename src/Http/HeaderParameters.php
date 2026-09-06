@@ -25,7 +25,7 @@ final readonly class HeaderParameters
     public array $parameters;
 
     /**
-     *  Variadic for the same reason as {@see QueryParameters::__construct()}.
+     * Variadic for the same reason as {@see QueryParameters::__construct()}.
      */
     public function __construct(HeaderParameter ...$parameters)
     {

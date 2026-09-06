@@ -32,14 +32,38 @@ final readonly class POBox implements SelfNormalizingModel
      * @param Option<Country>          $country
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $name1, private int $poBoxID, private string $city, private string $postalCode, private Option $name2, private Option $name3, private Option $email, private Option $country, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $name1,
+        private int $poBoxID,
+        private string $city,
+        private string $postalCode,
+        private Option $name2,
+        private Option $name3,
+        private Option $email,
+        private Option $country,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
-    public static function create(string $name1, int $poBoxID, string $city, string $postalCode, array $additionalProperties = []): self
-    {
-        return new self($name1, $poBoxID, $city, $postalCode, None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+    public static function create(
+        string $name1,
+        int $poBoxID,
+        string $city,
+        string $postalCode,
+        array $additionalProperties = [],
+    ): self {
+        return new self(
+            $name1,
+            $poBoxID,
+            $city,
+            $postalCode,
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
@@ -52,7 +76,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withName1(string $name1): self
     {
-        return new self($name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $name1,
+            $this->poBoxID,
+            $this->city,
+            $this->postalCode,
+            $this->name2,
+            $this->name3,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -67,7 +101,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withName2(string $name2): self
     {
-        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, Some::create($name2), $this->name3, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $this->poBoxID,
+            $this->city,
+            $this->postalCode,
+            Some::create($name2),
+            $this->name3,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -82,7 +126,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withName3(string $name3): self
     {
-        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, Some::create($name3), $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $this->poBoxID,
+            $this->city,
+            $this->postalCode,
+            $this->name2,
+            Some::create($name3),
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -95,7 +149,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withPoBoxID(int $poBoxID): self
     {
-        return new self($this->name1, $poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $poBoxID,
+            $this->city,
+            $this->postalCode,
+            $this->name2,
+            $this->name3,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -110,7 +174,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withEmail(string $email): self
     {
-        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, Some::create($email), $this->country, $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $this->poBoxID,
+            $this->city,
+            $this->postalCode,
+            $this->name2,
+            $this->name3,
+            Some::create($email),
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -123,7 +197,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withCity(string $city): self
     {
-        return new self($this->name1, $this->poBoxID, $city, $this->postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $this->poBoxID,
+            $city,
+            $this->postalCode,
+            $this->name2,
+            $this->name3,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -138,7 +222,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withCountry(Country $country): self
     {
-        return new self($this->name1, $this->poBoxID, $this->city, $this->postalCode, $this->name2, $this->name3, $this->email, Some::create($country), $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $this->poBoxID,
+            $this->city,
+            $this->postalCode,
+            $this->name2,
+            $this->name3,
+            $this->email,
+            Some::create($country),
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -151,7 +245,17 @@ final readonly class POBox implements SelfNormalizingModel
 
     public function withPostalCode(string $postalCode): self
     {
-        return new self($this->name1, $this->poBoxID, $this->city, $postalCode, $this->name2, $this->name3, $this->email, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name1,
+            $this->poBoxID,
+            $this->city,
+            $postalCode,
+            $this->name2,
+            $this->name3,
+            $this->email,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -178,7 +282,9 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('name1', $data)) {
             $name1Raw = $data['name1'];
             if (!is_string($name1Raw)) {
-                throw new MalformedDataException(sprintf('Property "name1" must be string, got %s.', get_debug_type($name1Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "name1" must be string, got %s.', get_debug_type($name1Raw)),
+                );
             }
             $name1 = $name1Raw;
             unset($data['name1']);
@@ -186,7 +292,9 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('name2', $data)) {
             $name2Raw = $data['name2'];
             if (!is_string($name2Raw)) {
-                throw new MalformedDataException(sprintf('Property "name2" must be string, got %s.', get_debug_type($name2Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "name2" must be string, got %s.', get_debug_type($name2Raw)),
+                );
             }
             $name2 = Some::create($name2Raw);
             unset($data['name2']);
@@ -194,7 +302,9 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('name3', $data)) {
             $name3Raw = $data['name3'];
             if (!is_string($name3Raw)) {
-                throw new MalformedDataException(sprintf('Property "name3" must be string, got %s.', get_debug_type($name3Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "name3" must be string, got %s.', get_debug_type($name3Raw)),
+                );
             }
             $name3 = Some::create($name3Raw);
             unset($data['name3']);
@@ -202,7 +312,9 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('poBoxID', $data)) {
             $poBoxIDRaw = $data['poBoxID'];
             if (!is_int($poBoxIDRaw)) {
-                throw new MalformedDataException(sprintf('Property "poBoxID" must be int, got %s.', get_debug_type($poBoxIDRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "poBoxID" must be int, got %s.', get_debug_type($poBoxIDRaw)),
+                );
             }
             $poBoxID = $poBoxIDRaw;
             unset($data['poBoxID']);
@@ -210,7 +322,9 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('email', $data)) {
             $emailRaw = $data['email'];
             if (!is_string($emailRaw)) {
-                throw new MalformedDataException(sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "email" must be string, got %s.', get_debug_type($emailRaw)),
+                );
             }
             $email = Some::create($emailRaw);
             unset($data['email']);
@@ -218,7 +332,9 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('city', $data)) {
             $cityRaw = $data['city'];
             if (!is_string($cityRaw)) {
-                throw new MalformedDataException(sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)),
+                );
             }
             $city = $cityRaw;
             unset($data['city']);
@@ -226,15 +342,22 @@ final readonly class POBox implements SelfNormalizingModel
         if (array_key_exists('country', $data)) {
             $countryRaw = $data['country'];
             if (!is_string($countryRaw)) {
-                throw new MalformedDataException(sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)),
+                );
             }
-            $country = Some::create(Country::tryFrom($countryRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)));
+            $country = Some::create(
+                Country::tryFrom($countryRaw)
+                    ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)),
+            );
             unset($data['country']);
         }
         if (array_key_exists('postalCode', $data)) {
             $postalCodeRaw = $data['postalCode'];
             if (!is_string($postalCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)),
+                );
             }
             $postalCode = $postalCodeRaw;
             unset($data['postalCode']);

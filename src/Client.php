@@ -52,7 +52,7 @@ final class Client
         string $username,
         #[SensitiveParameter]
         string $password,
-        ClientConfig $config
+        ClientConfig $config,
     ): self {
         return self::withAuthenticators($config, new Authentication\BasicAuthAuthentication($username, $password));
     }
@@ -61,11 +61,8 @@ final class Client
      * @throws UnsupportedValueException
      * @throws NoHttpClientException
      */
-    public static function withApiKey(
-        #[SensitiveParameter]
-        string $apiKey,
-        ClientConfig $config
-    ): self {
+    public static function withApiKey(#[SensitiveParameter] string $apiKey, ClientConfig $config): self
+    {
         return self::withAuthenticators($config, new Authentication\ApiKeyAuthentication($apiKey));
     }
 
@@ -73,24 +70,21 @@ final class Client
      * @throws UnsupportedValueException
      * @throws NoHttpClientException
      */
-    public static function withOAuth(
-        #[SensitiveParameter]
-        string $token,
-        ClientConfig $config
-    ): self {
+    public static function withOAuth(#[SensitiveParameter] string $token, ClientConfig $config): self
+    {
         return self::withAuthenticators($config, new Authentication\OAuth2Authentication($token));
     }
 
     /**
      * A client signing with authenticators you assemble yourself.
      *
-     * Every other factory on this class is a shorthand for this one. Reach for it directly
-     * when the description cannot say what your API needs: a scheme this package does not
-     * generate an authenticator for, a combination the description does not declare, or a
-     * signing scheme of your own — implement `Authentication\Authenticator` and pass it.
+     * Every other factory on this class is a shorthand for this one. Reach for it directly when the
+     * description cannot say what your API needs: a scheme this package does not generate an
+     * authenticator for, a combination the description does not declare, or a signing scheme of
+     * your own — implement `Authentication\Authenticator` and pass it.
      *
-     * Note the argument order: `$config` comes first, because the authenticators are
-     * variadic and have to come last.
+     * Note the argument order: `$config` comes first, because the authenticators are variadic and
+     * have to come last.
      *
      * @throws UnsupportedValueException
      * @throws NoHttpClientException
@@ -98,20 +92,28 @@ final class Client
     public static function withAuthenticators(ClientConfig $config, Authenticator ...$authenticators): self
     {
         $factory = new Psr17Factory();
-        $httpClient = $config->httpClient->isDefined() ? $config->httpClient->get() : HttpClientResolver::resolve($factory, $factory);
+        $httpClient = $config->httpClient->isDefined() ? $config->httpClient->get() : HttpClientResolver::resolve(
+            $factory,
+            $factory,
+        );
 
-        return new self($config->baseUrl, $httpClient, $factory, $factory, new AuthenticatorRegistry(array_values($authenticators)));
+        return new self(
+            $config->baseUrl,
+            $httpClient,
+            $factory,
+            $factory,
+            new AuthenticatorRegistry(array_values($authenticators)),
+        );
     }
 
     /**
      * A client that signs nothing.
      *
-     * For operations the description leaves without a security requirement, and for
-     * callers whose own HTTP client already authenticates — see
-     * `ClientConfig::withHttpClient()`. A request whose requirements no registered
-     * authenticator satisfies goes out unsigned, which is the point here and a mistake
-     * anywhere else: to send credentials, use one of the `with…()` factories above, or
-     * `withAuthenticators()` for a combination they do not cover.
+     * For operations the description leaves without a security requirement, and for callers whose
+     * own HTTP client already authenticates — see `ClientConfig::withHttpClient()`. A request whose
+     * requirements no registered authenticator satisfies goes out unsigned, which is the point here
+     * and a mistake anywhere else: to send credentials, use one of the `with…()` factories above,
+     * or `withAuthenticators()` for a combination they do not cover.
      *
      * @throws UnsupportedValueException
      * @throws NoHttpClientException

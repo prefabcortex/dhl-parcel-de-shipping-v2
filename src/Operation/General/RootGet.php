@@ -49,9 +49,11 @@ final class RootGet implements Operation
     protected array $accept;
 
     /**
-     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return
+     * more details (semantic version number, revision, environment) of the API layer.
      *
-     * @param list<RootGetAccept> $accept Accept content header application/json|application/problem+json
+     * @param list<RootGetAccept> $accept Accept content header
+     *                                    application/json|application/problem+json
      */
     public function __construct(array $accept)
     {
@@ -83,7 +85,9 @@ final class RootGet implements Operation
             return ['Accept' => ['application/json', 'application/problem+json']];
         }
 
-        return ['Accept' => array_map(static fn (RootGetAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+        return [
+            'Accept' => array_map(static fn (RootGetAccept $acceptValue): string => $acceptValue->value, $this->accept),
+        ];
     }
 
     /**

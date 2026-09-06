@@ -86,7 +86,9 @@ final readonly class MultipleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('status', $data)) {
             $statusRaw = $data['status'];
             if (!is_array($statusRaw)) {
-                throw new MalformedDataException(sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)),
+                );
             }
             /** @var array<string, mixed> $statusRawTyped */
             $statusRawTyped = $statusRaw;
@@ -96,11 +98,15 @@ final readonly class MultipleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('items', $data)) {
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
-                throw new MalformedDataException(sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)),
+                );
             }
             $items = Some::create(array_map(static function (mixed $value): ShortResponseItem {
                 if (!is_array($value)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value)),
+                    );
                 }
                 /** @var array<string, mixed> $valueTyped */
                 $valueTyped = $value;

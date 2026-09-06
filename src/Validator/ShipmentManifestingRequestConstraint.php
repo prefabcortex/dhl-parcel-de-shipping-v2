@@ -36,7 +36,13 @@ final class ShipmentManifestingRequestConstraint implements ConstraintProviderIn
             new NotNull(),
             new Collection([
                 'profile' => new Required([new Length(null, null, 35), new Type(['string']), new NotNull()]),
-                'shipmentNumbers' => new Optional([new Count(null, null, 30), new Count(null, 1), new All([new Type(['string'])]), new Type(['array']), new NotNull()]),
+                'shipmentNumbers' => new Optional([
+                    new Count(null, null, 30),
+                    new Count(null, 1),
+                    new All([new Type(['string'])]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
                 'billingNumber' => new Optional([new Type(['string']), new NotNull()]),
             ], null, null, true),
         ];

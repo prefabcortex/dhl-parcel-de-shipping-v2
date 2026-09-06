@@ -50,9 +50,13 @@ final class GetLabel implements Operation
     private readonly GetLabelQueryParameters $queryParameters;
 
     /**
-     * Public download URL for shipment labels and documents. The URL is provided in the response of the POST /orders or GET /orders resources. The document is identified via the token query parameter. There is no additional authorization, the resource URL can be shared. Please protect the URL as needed. The call returns a PDF label.
+     * Public download URL for shipment labels and documents. The URL is provided in the response of
+     * the POST /orders or GET /orders resources. The document is identified via the token query
+     * parameter. There is no additional authorization, the resource URL can be shared. Please
+     * protect the URL as needed. The call returns a PDF label.
      *
-     * @param list<GetLabelAccept> $accept Accept content header application/pdf|application/problem+json
+     * @param list<GetLabelAccept> $accept Accept content header
+     *                                     application/pdf|application/problem+json
      */
     public function __construct(GetLabelQueryParameters $queryParameters, array $accept)
     {
@@ -85,7 +89,12 @@ final class GetLabel implements Operation
             return ['Accept' => ['application/pdf', 'application/problem+json']];
         }
 
-        return ['Accept' => array_map(static fn (GetLabelAccept $acceptValue): string => $acceptValue->value, $this->accept)];
+        return [
+            'Accept' => array_map(
+                static fn (GetLabelAccept $acceptValue): string => $acceptValue->value,
+                $this->accept,
+            ),
+        ];
     }
 
     protected function getQueryParameters(): QueryParameters

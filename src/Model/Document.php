@@ -32,14 +32,27 @@ final readonly class Document implements SelfNormalizingModel
      * @param Option<DocumentPrintFormat> $printFormat
      * @param array<int|string, mixed>    $additionalProperties
      */
-    public function __construct(private Option $b64, private Option $zpl2, private Option $url, private Option $fileFormat, private Option $printFormat, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $b64,
+        private Option $zpl2,
+        private Option $url,
+        private Option $fileFormat,
+        private Option $printFormat,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
     public static function create(array $additionalProperties = []): self
     {
-        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+        return new self(
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
@@ -54,7 +67,14 @@ final readonly class Document implements SelfNormalizingModel
 
     public function withB64(string $b64): self
     {
-        return new self(Some::create($b64), $this->zpl2, $this->url, $this->fileFormat, $this->printFormat, $this->additionalProperties);
+        return new self(
+            Some::create($b64),
+            $this->zpl2,
+            $this->url,
+            $this->fileFormat,
+            $this->printFormat,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -69,7 +89,14 @@ final readonly class Document implements SelfNormalizingModel
 
     public function withZpl2(string $zpl2): self
     {
-        return new self($this->b64, Some::create($zpl2), $this->url, $this->fileFormat, $this->printFormat, $this->additionalProperties);
+        return new self(
+            $this->b64,
+            Some::create($zpl2),
+            $this->url,
+            $this->fileFormat,
+            $this->printFormat,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -84,7 +111,14 @@ final readonly class Document implements SelfNormalizingModel
 
     public function withUrl(string $url): self
     {
-        return new self($this->b64, $this->zpl2, Some::create($url), $this->fileFormat, $this->printFormat, $this->additionalProperties);
+        return new self(
+            $this->b64,
+            $this->zpl2,
+            Some::create($url),
+            $this->fileFormat,
+            $this->printFormat,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -99,11 +133,19 @@ final readonly class Document implements SelfNormalizingModel
 
     public function withFileFormat(DocumentFileFormat $fileFormat): self
     {
-        return new self($this->b64, $this->zpl2, $this->url, Some::create($fileFormat), $this->printFormat, $this->additionalProperties);
+        return new self(
+            $this->b64,
+            $this->zpl2,
+            $this->url,
+            Some::create($fileFormat),
+            $this->printFormat,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * The print format used. Customs documents and cash on delivery documents can only be returned in format A4.
+     * The print format used. Customs documents and cash on delivery documents can only be returned
+     * in format A4.
      *
      * @return Option<DocumentPrintFormat>
      */
@@ -114,7 +156,14 @@ final readonly class Document implements SelfNormalizingModel
 
     public function withPrintFormat(DocumentPrintFormat $printFormat): self
     {
-        return new self($this->b64, $this->zpl2, $this->url, $this->fileFormat, Some::create($printFormat), $this->additionalProperties);
+        return new self(
+            $this->b64,
+            $this->zpl2,
+            $this->url,
+            $this->fileFormat,
+            Some::create($printFormat),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -138,7 +187,9 @@ final readonly class Document implements SelfNormalizingModel
         if (array_key_exists('b64', $data)) {
             $b64Raw = $data['b64'];
             if (!is_string($b64Raw)) {
-                throw new MalformedDataException(sprintf('Property "b64" must be string, got %s.', get_debug_type($b64Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "b64" must be string, got %s.', get_debug_type($b64Raw)),
+                );
             }
             $b64 = Some::create($b64Raw);
             unset($data['b64']);
@@ -146,7 +197,9 @@ final readonly class Document implements SelfNormalizingModel
         if (array_key_exists('zpl2', $data)) {
             $zpl2Raw = $data['zpl2'];
             if (!is_string($zpl2Raw)) {
-                throw new MalformedDataException(sprintf('Property "zpl2" must be string, got %s.', get_debug_type($zpl2Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "zpl2" must be string, got %s.', get_debug_type($zpl2Raw)),
+                );
             }
             $zpl2 = Some::create($zpl2Raw);
             unset($data['zpl2']);
@@ -154,7 +207,9 @@ final readonly class Document implements SelfNormalizingModel
         if (array_key_exists('url', $data)) {
             $urlRaw = $data['url'];
             if (!is_string($urlRaw)) {
-                throw new MalformedDataException(sprintf('Property "url" must be string, got %s.', get_debug_type($urlRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "url" must be string, got %s.', get_debug_type($urlRaw)),
+                );
             }
             $url = Some::create($urlRaw);
             unset($data['url']);
@@ -162,17 +217,31 @@ final readonly class Document implements SelfNormalizingModel
         if (array_key_exists('fileFormat', $data)) {
             $fileFormatRaw = $data['fileFormat'];
             if (!is_string($fileFormatRaw)) {
-                throw new MalformedDataException(sprintf('Property "fileFormat" must be string, got %s.', get_debug_type($fileFormatRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "fileFormat" must be string, got %s.', get_debug_type($fileFormatRaw)),
+                );
             }
-            $fileFormat = Some::create(DocumentFileFormat::tryFrom($fileFormatRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid DocumentFileFormat.', $fileFormatRaw)));
+            $fileFormat = Some::create(
+                DocumentFileFormat::tryFrom($fileFormatRaw)
+                    ?? throw new MalformedDataException(
+                        sprintf('"%s" is not a valid DocumentFileFormat.', $fileFormatRaw),
+                    ),
+            );
             unset($data['fileFormat']);
         }
         if (array_key_exists('printFormat', $data)) {
             $printFormatRaw = $data['printFormat'];
             if (!is_string($printFormatRaw)) {
-                throw new MalformedDataException(sprintf('Property "printFormat" must be string, got %s.', get_debug_type($printFormatRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "printFormat" must be string, got %s.', get_debug_type($printFormatRaw)),
+                );
             }
-            $printFormat = Some::create(DocumentPrintFormat::tryFrom($printFormatRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid DocumentPrintFormat.', $printFormatRaw)));
+            $printFormat = Some::create(
+                DocumentPrintFormat::tryFrom($printFormatRaw)
+                    ?? throw new MalformedDataException(
+                        sprintf('"%s" is not a valid DocumentPrintFormat.', $printFormatRaw),
+                    ),
+            );
             unset($data['printFormat']);
         }
         $additionalProperties = $data;

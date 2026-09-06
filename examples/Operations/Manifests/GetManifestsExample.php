@@ -24,7 +24,16 @@ use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
 final class GetManifestsExample
 {
     /**
-     * Return the manifest document for the specific date (abbreviated ISO8601 format YYYY-MM-DD). If no date is provided, the manifest for today will be returned. The manifest PDF document will list the shipments for your EKP, separated by billing numbers. Potentially, the document is large and response time will reflect this. <br />Additionally, the response contains a mapping of billing numbers to sheet numbers of the manifest and a mapping of shipment numbers to sheet numbers.<br />The call can be repeated as often as needed. Should a date be provided which is too old or lies within the future, HTTP 400 is returned.
+     * Return the manifest document for the specific date (abbreviated ISO8601 format YYYY-MM-DD).
+     * If no date is provided, the manifest for today will be returned. The manifest PDF document
+     * will list the shipments for your EKP, separated by billing numbers. Potentially, the document
+     * is large and response time will reflect this.
+     *
+     * Additionally, the response contains a mapping of billing numbers to sheet numbers of the
+     * manifest and a mapping of shipment numbers to sheet numbers.
+     *
+     * The call can be repeated as often as needed. Should a date be provided which is too old or
+     * lies within the future, HTTP 400 is returned.
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *
@@ -48,14 +57,14 @@ final class GetManifestsExample
     public static function getManifests(
         Client $client,
         GetManifestsQueryParameters $queryParameters,
-        GetManifestsHeaderParameters $headerParameters
+        GetManifestsHeaderParameters $headerParameters,
     ): SingleManifestResponse {
         $accept = [GetManifestsAccept::application_json, GetManifestsAccept::application_problem_json];
 
         return $client->manifests()->getManifests(
             $queryParameters,
             $headerParameters,
-            $accept
+            $accept,
         );
     }
 }

@@ -33,7 +33,11 @@ final class MultipleManifestResponseConstraint implements ConstraintProviderInte
             new NotNull(),
             new Collection([
                 'status' => new Optional([new NotNull(), ...RequestStatusConstraint::constraints()]),
-                'items' => new Optional([new All([...ShortResponseItemConstraint::constraints()]), new Type(['array']), new NotNull()]),
+                'items' => new Optional([
+                    new All([...ShortResponseItemConstraint::constraints()]),
+                    new Type(['array']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

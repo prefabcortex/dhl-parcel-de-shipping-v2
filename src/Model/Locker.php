@@ -29,13 +29,26 @@ final readonly class Locker implements SelfNormalizingModel
      * @param Option<Country>          $country
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $name, private int $lockerID, private string $postNumber, private string $city, private string $postalCode, private Option $country, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $name,
+        private int $lockerID,
+        private string $postNumber,
+        private string $city,
+        private string $postalCode,
+        private Option $country,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
-    public static function create(string $name, int $lockerID, string $postNumber, string $city, string $postalCode, array $additionalProperties = []): self
-    {
+    public static function create(
+        string $name,
+        int $lockerID,
+        string $postNumber,
+        string $city,
+        string $postalCode,
+        array $additionalProperties = [],
+    ): self {
         return new self($name, $lockerID, $postNumber, $city, $postalCode, None::create(), $additionalProperties);
     }
 
@@ -49,11 +62,20 @@ final readonly class Locker implements SelfNormalizingModel
 
     public function withName(string $name): self
     {
-        return new self($name, $this->lockerID, $this->postNumber, $this->city, $this->postalCode, $this->country, $this->additionalProperties);
+        return new self(
+            $name,
+            $this->lockerID,
+            $this->postNumber,
+            $this->city,
+            $this->postalCode,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Packstationnummer. Three digit number identifying the parcel locker in conjunction with city and postal code.
+     * Packstationnummer. Three digit number identifying the parcel locker in conjunction with city
+     * and postal code.
      */
     public function getLockerID(): int
     {
@@ -62,11 +84,20 @@ final readonly class Locker implements SelfNormalizingModel
 
     public function withLockerID(int $lockerID): self
     {
-        return new self($this->name, $lockerID, $this->postNumber, $this->city, $this->postalCode, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $lockerID,
+            $this->postNumber,
+            $this->city,
+            $this->postalCode,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * postNumber (Postnummer) is the official account number a private DHL Customer gets upon registration.
+     * postNumber (Postnummer) is the official account number a private DHL Customer gets upon
+     * registration.
      */
     public function getPostNumber(): string
     {
@@ -75,7 +106,15 @@ final readonly class Locker implements SelfNormalizingModel
 
     public function withPostNumber(string $postNumber): self
     {
-        return new self($this->name, $this->lockerID, $postNumber, $this->city, $this->postalCode, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->lockerID,
+            $postNumber,
+            $this->city,
+            $this->postalCode,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -88,7 +127,15 @@ final readonly class Locker implements SelfNormalizingModel
 
     public function withCity(string $city): self
     {
-        return new self($this->name, $this->lockerID, $this->postNumber, $city, $this->postalCode, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->lockerID,
+            $this->postNumber,
+            $city,
+            $this->postalCode,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -103,7 +150,15 @@ final readonly class Locker implements SelfNormalizingModel
 
     public function withCountry(Country $country): self
     {
-        return new self($this->name, $this->lockerID, $this->postNumber, $this->city, $this->postalCode, Some::create($country), $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->lockerID,
+            $this->postNumber,
+            $this->city,
+            $this->postalCode,
+            Some::create($country),
+            $this->additionalProperties,
+        );
     }
 
     public function getPostalCode(): string
@@ -113,7 +168,15 @@ final readonly class Locker implements SelfNormalizingModel
 
     public function withPostalCode(string $postalCode): self
     {
-        return new self($this->name, $this->lockerID, $this->postNumber, $this->city, $postalCode, $this->country, $this->additionalProperties);
+        return new self(
+            $this->name,
+            $this->lockerID,
+            $this->postNumber,
+            $this->city,
+            $postalCode,
+            $this->country,
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -138,7 +201,9 @@ final readonly class Locker implements SelfNormalizingModel
         if (array_key_exists('name', $data)) {
             $nameRaw = $data['name'];
             if (!is_string($nameRaw)) {
-                throw new MalformedDataException(sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "name" must be string, got %s.', get_debug_type($nameRaw)),
+                );
             }
             $name = $nameRaw;
             unset($data['name']);
@@ -146,7 +211,9 @@ final readonly class Locker implements SelfNormalizingModel
         if (array_key_exists('lockerID', $data)) {
             $lockerIDRaw = $data['lockerID'];
             if (!is_int($lockerIDRaw)) {
-                throw new MalformedDataException(sprintf('Property "lockerID" must be int, got %s.', get_debug_type($lockerIDRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "lockerID" must be int, got %s.', get_debug_type($lockerIDRaw)),
+                );
             }
             $lockerID = $lockerIDRaw;
             unset($data['lockerID']);
@@ -154,7 +221,9 @@ final readonly class Locker implements SelfNormalizingModel
         if (array_key_exists('postNumber', $data)) {
             $postNumberRaw = $data['postNumber'];
             if (!is_string($postNumberRaw)) {
-                throw new MalformedDataException(sprintf('Property "postNumber" must be string, got %s.', get_debug_type($postNumberRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "postNumber" must be string, got %s.', get_debug_type($postNumberRaw)),
+                );
             }
             $postNumber = $postNumberRaw;
             unset($data['postNumber']);
@@ -162,7 +231,9 @@ final readonly class Locker implements SelfNormalizingModel
         if (array_key_exists('city', $data)) {
             $cityRaw = $data['city'];
             if (!is_string($cityRaw)) {
-                throw new MalformedDataException(sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "city" must be string, got %s.', get_debug_type($cityRaw)),
+                );
             }
             $city = $cityRaw;
             unset($data['city']);
@@ -170,15 +241,22 @@ final readonly class Locker implements SelfNormalizingModel
         if (array_key_exists('country', $data)) {
             $countryRaw = $data['country'];
             if (!is_string($countryRaw)) {
-                throw new MalformedDataException(sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "country" must be string, got %s.', get_debug_type($countryRaw)),
+                );
             }
-            $country = Some::create(Country::tryFrom($countryRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)));
+            $country = Some::create(
+                Country::tryFrom($countryRaw)
+                    ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)),
+            );
             unset($data['country']);
         }
         if (array_key_exists('postalCode', $data)) {
             $postalCodeRaw = $data['postalCode'];
             if (!is_string($postalCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "postalCode" must be string, got %s.', get_debug_type($postalCodeRaw)),
+                );
             }
             $postalCode = $postalCodeRaw;
             unset($data['postalCode']);

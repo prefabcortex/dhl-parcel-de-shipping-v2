@@ -15,23 +15,23 @@ use Throwable;
 /**
  * The root of everything a generated package throws.
  *
- * The README promises that one `catch (ApiException $e)` covers the whole package, and that
- * promise is only worth having if it is literally true — a consumer who writes the catch the
- * documentation shows them and still loses the two most common failures of a broken response
+ * The README promises that one `catch (ApiException $e)` covers the whole package, and that promise
+ * is only worth having if it is literally true — a consumer who writes the catch the documentation
+ * shows them and still loses the two most common failures of a broken response
  * (`ValidationException` and a body that is not valid JSON) is worse off than one who was told
  * nothing. So the marker is not a decoration on the operation exceptions: it is the type every
  * throw site in a generated package answers to.
  *
- * That is why it lives in the JSON-Schema runtime rather than beside the OpenAPI-level
- * interfaces it heads. The lowest layer that throws is here — `ValidationException`, raised by
- * both the request-body check and the response check — and a marker cannot be implemented by a
- * class that sits below it. Naming it `ApiException` in a package of pure models reads oddly for
- * exactly one file; the alternative was a second root the OpenAPI one could not extend without
- * inverting the catch, which reads oddly in every consumer.
+ * That is why it lives in the JSON-Schema runtime rather than beside the OpenAPI-level interfaces
+ * it heads. The lowest layer that throws is here — `ValidationException`, raised by both the
+ * request-body check and the response check — and a marker cannot be implemented by a class that
+ * sits below it. Naming it `ApiException` in a package of pure models reads oddly for exactly one
+ * file; the alternative was a second root the OpenAPI one could not extend without inverting the
+ * catch, which reads oddly in every consumer.
  *
  * The interface stays empty on purpose. Everything a caller can *ask* an exception is declared one
- * level down on `ResponseException`, because it is only true one level down: `NoHttpClientException`
- * is thrown before a request is ever made and has no response to hand back.
+ * level down on `ResponseException`, because it is only true one level down:
+ * `NoHttpClientException` is thrown before a request is ever made and has no response to hand back.
  */
 interface ApiException extends Throwable
 {

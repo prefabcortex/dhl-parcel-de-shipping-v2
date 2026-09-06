@@ -20,7 +20,8 @@ use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
 final class RootGetExample
 {
     /**
-     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return more details (semantic version number, revision, environment) of the API layer.
+     * Returns the current version of the API as major.minor.patch. Furthermore, it will also return
+     * more details (semantic version number, revision, environment) of the API layer.
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *

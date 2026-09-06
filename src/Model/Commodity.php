@@ -31,18 +31,39 @@ final readonly class Commodity implements SelfNormalizingModel
      * @param Option<string>           $hsCode
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $itemDescription, private int $packagedQuantity, private Value $itemValue, private Weight $itemWeight, private Option $countryOfOrigin, private Option $hsCode, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $itemDescription,
+        private int $packagedQuantity,
+        private Value $itemValue,
+        private Weight $itemWeight,
+        private Option $countryOfOrigin,
+        private Option $hsCode,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
-    public static function create(string $itemDescription, int $packagedQuantity, Value $itemValue, Weight $itemWeight, array $additionalProperties = []): self
-    {
-        return new self($itemDescription, $packagedQuantity, $itemValue, $itemWeight, None::create(), None::create(), $additionalProperties);
+    public static function create(
+        string $itemDescription,
+        int $packagedQuantity,
+        Value $itemValue,
+        Weight $itemWeight,
+        array $additionalProperties = [],
+    ): self {
+        return new self(
+            $itemDescription,
+            $packagedQuantity,
+            $itemValue,
+            $itemWeight,
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
-     * A text that describes the commodity item. Only the first 50 characters of the description text is printed on the customs declaration form CN23.
+     * A text that describes the commodity item. Only the first 50 characters of the description
+     * text is printed on the customs declaration form CN23.
      */
     public function getItemDescription(): string
     {
@@ -51,7 +72,15 @@ final readonly class Commodity implements SelfNormalizingModel
 
     public function withItemDescription(string $itemDescription): self
     {
-        return new self($itemDescription, $this->packagedQuantity, $this->itemValue, $this->itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+        return new self(
+            $itemDescription,
+            $this->packagedQuantity,
+            $this->itemValue,
+            $this->itemWeight,
+            $this->countryOfOrigin,
+            $this->hsCode,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -66,7 +95,15 @@ final readonly class Commodity implements SelfNormalizingModel
 
     public function withCountryOfOrigin(Country $countryOfOrigin): self
     {
-        return new self($this->itemDescription, $this->packagedQuantity, $this->itemValue, $this->itemWeight, Some::create($countryOfOrigin), $this->hsCode, $this->additionalProperties);
+        return new self(
+            $this->itemDescription,
+            $this->packagedQuantity,
+            $this->itemValue,
+            $this->itemWeight,
+            Some::create($countryOfOrigin),
+            $this->hsCode,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -81,7 +118,15 @@ final readonly class Commodity implements SelfNormalizingModel
 
     public function withHsCode(string $hsCode): self
     {
-        return new self($this->itemDescription, $this->packagedQuantity, $this->itemValue, $this->itemWeight, $this->countryOfOrigin, Some::create($hsCode), $this->additionalProperties);
+        return new self(
+            $this->itemDescription,
+            $this->packagedQuantity,
+            $this->itemValue,
+            $this->itemWeight,
+            $this->countryOfOrigin,
+            Some::create($hsCode),
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -94,7 +139,15 @@ final readonly class Commodity implements SelfNormalizingModel
 
     public function withPackagedQuantity(int $packagedQuantity): self
     {
-        return new self($this->itemDescription, $packagedQuantity, $this->itemValue, $this->itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+        return new self(
+            $this->itemDescription,
+            $packagedQuantity,
+            $this->itemValue,
+            $this->itemWeight,
+            $this->countryOfOrigin,
+            $this->hsCode,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -107,7 +160,15 @@ final readonly class Commodity implements SelfNormalizingModel
 
     public function withItemValue(Value $itemValue): self
     {
-        return new self($this->itemDescription, $this->packagedQuantity, $itemValue, $this->itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+        return new self(
+            $this->itemDescription,
+            $this->packagedQuantity,
+            $itemValue,
+            $this->itemWeight,
+            $this->countryOfOrigin,
+            $this->hsCode,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -120,7 +181,15 @@ final readonly class Commodity implements SelfNormalizingModel
 
     public function withItemWeight(Weight $itemWeight): self
     {
-        return new self($this->itemDescription, $this->packagedQuantity, $this->itemValue, $itemWeight, $this->countryOfOrigin, $this->hsCode, $this->additionalProperties);
+        return new self(
+            $this->itemDescription,
+            $this->packagedQuantity,
+            $this->itemValue,
+            $itemWeight,
+            $this->countryOfOrigin,
+            $this->hsCode,
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -145,7 +214,9 @@ final readonly class Commodity implements SelfNormalizingModel
         if (array_key_exists('itemDescription', $data)) {
             $itemDescriptionRaw = $data['itemDescription'];
             if (!is_string($itemDescriptionRaw)) {
-                throw new MalformedDataException(sprintf('Property "itemDescription" must be string, got %s.', get_debug_type($itemDescriptionRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "itemDescription" must be string, got %s.', get_debug_type($itemDescriptionRaw)),
+                );
             }
             $itemDescription = $itemDescriptionRaw;
             unset($data['itemDescription']);
@@ -153,15 +224,22 @@ final readonly class Commodity implements SelfNormalizingModel
         if (array_key_exists('countryOfOrigin', $data)) {
             $countryOfOriginRaw = $data['countryOfOrigin'];
             if (!is_string($countryOfOriginRaw)) {
-                throw new MalformedDataException(sprintf('Property "countryOfOrigin" must be string, got %s.', get_debug_type($countryOfOriginRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "countryOfOrigin" must be string, got %s.', get_debug_type($countryOfOriginRaw)),
+                );
             }
-            $countryOfOrigin = Some::create(Country::tryFrom($countryOfOriginRaw) ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryOfOriginRaw)));
+            $countryOfOrigin = Some::create(
+                Country::tryFrom($countryOfOriginRaw)
+                    ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryOfOriginRaw)),
+            );
             unset($data['countryOfOrigin']);
         }
         if (array_key_exists('hsCode', $data)) {
             $hsCodeRaw = $data['hsCode'];
             if (!is_string($hsCodeRaw)) {
-                throw new MalformedDataException(sprintf('Property "hsCode" must be string, got %s.', get_debug_type($hsCodeRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "hsCode" must be string, got %s.', get_debug_type($hsCodeRaw)),
+                );
             }
             $hsCode = Some::create($hsCodeRaw);
             unset($data['hsCode']);
@@ -169,7 +247,9 @@ final readonly class Commodity implements SelfNormalizingModel
         if (array_key_exists('packagedQuantity', $data)) {
             $packagedQuantityRaw = $data['packagedQuantity'];
             if (!is_int($packagedQuantityRaw)) {
-                throw new MalformedDataException(sprintf('Property "packagedQuantity" must be int, got %s.', get_debug_type($packagedQuantityRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "packagedQuantity" must be int, got %s.', get_debug_type($packagedQuantityRaw)),
+                );
             }
             $packagedQuantity = $packagedQuantityRaw;
             unset($data['packagedQuantity']);
@@ -177,7 +257,9 @@ final readonly class Commodity implements SelfNormalizingModel
         if (array_key_exists('itemValue', $data)) {
             $itemValueRaw = $data['itemValue'];
             if (!is_array($itemValueRaw)) {
-                throw new MalformedDataException(sprintf('Property "itemValue" must be object, got %s.', get_debug_type($itemValueRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "itemValue" must be object, got %s.', get_debug_type($itemValueRaw)),
+                );
             }
             /** @var array<string, mixed> $itemValueRawTyped */
             $itemValueRawTyped = $itemValueRaw;
@@ -187,7 +269,9 @@ final readonly class Commodity implements SelfNormalizingModel
         if (array_key_exists('itemWeight', $data)) {
             $itemWeightRaw = $data['itemWeight'];
             if (!is_array($itemWeightRaw)) {
-                throw new MalformedDataException(sprintf('Property "itemWeight" must be object, got %s.', get_debug_type($itemWeightRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "itemWeight" must be object, got %s.', get_debug_type($itemWeightRaw)),
+                );
             }
             /** @var array<string, mixed> $itemWeightRawTyped */
             $itemWeightRawTyped = $itemWeightRaw;
@@ -208,7 +292,15 @@ final readonly class Commodity implements SelfNormalizingModel
             throw new MalformedDataException('Required property "itemWeight" is missing from the document.');
         }
 
-        return new self($itemDescription, $packagedQuantity, $itemValue, $itemWeight, $countryOfOrigin, $hsCode, $additionalProperties);
+        return new self(
+            $itemDescription,
+            $packagedQuantity,
+            $itemValue,
+            $itemWeight,
+            $countryOfOrigin,
+            $hsCode,
+            $additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */

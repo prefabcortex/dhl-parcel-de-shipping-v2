@@ -18,19 +18,19 @@ use Psr\Http\Message\RequestInterface;
  * One implementation is generated per `securitySchemes` entry — HTTP basic/bearer, API key, or
  * OAuth2 — and {@see AuthenticatorRegistry} picks the ones an operation actually requires.
  *
- * Lives beside those generated classes rather than in the transport namespace: an authenticator
- * is not transport plumbing, it is what the specification says about credentials.
+ * Lives beside those generated classes rather than in the transport namespace: an authenticator is
+ * not transport plumbing, it is what the specification says about credentials.
  */
 interface Authenticator
 {
     /**
-     *  Returns the request with this scheme's credentials applied.
+     * Returns the request with this scheme's credentials applied.
      */
     public function authenticate(RequestInterface $request): RequestInterface;
 
     /**
-     * The name this scheme carries in the specification's `securitySchemes` map — the same
-     * string an operation's security requirements refer to.
+     * The name this scheme carries in the specification's `securitySchemes` map — the same string
+     * an operation's security requirements refer to.
      */
     public function getSecuritySchemeName(): string;
 }

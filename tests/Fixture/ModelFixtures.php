@@ -52,10 +52,10 @@ use Prefabcortex\DhlParcelDeShippingV2\Model\WeightUom;
 /**
  * One schema-conformant instance of every model in this package.
  *
- * Values are the ones the API description states — `example` or `default` where it gives
- * one, a typed placeholder where it does not. They are shaped like real data, not equal to
- * it: nothing here has been sent to the service, so a value being accepted by the schema
- * says nothing about it being accepted by the server.
+ * Values are the ones the API description states — `example` or `default` where it gives one, a
+ * typed placeholder where it does not. They are shaped like real data, not equal to it: nothing
+ * here has been sent to the service, so a value being accepted by the schema says nothing about it
+ * being accepted by the server.
  */
 final class ModelFixtures
 {
@@ -92,7 +92,7 @@ final class ModelFixtures
     {
         return RequestStatus::create(
             'ok',
-            200
+            200,
         )
             ->withStatus(200)
             ->withDetail('The Webservice call ran successfully.');
@@ -102,7 +102,7 @@ final class ModelFixtures
     {
         $sstatus = RequestStatus::create(
             'ok',
-            200
+            200,
         )
             ->withStatus(200)
             ->withDetail('The Webservice call ran successfully.');
@@ -116,7 +116,7 @@ final class ModelFixtures
     {
         $sstatus = RequestStatus::create(
             'ok',
-            200
+            200,
         )
             ->withStatus(200)
             ->withDetail('The Webservice call ran successfully.');
@@ -156,7 +156,7 @@ final class ModelFixtures
     {
         $sstatus = RequestStatus::create(
             'ok',
-            200
+            200,
         )
             ->withStatus(200)
             ->withDetail('The Webservice call ran successfully.');
@@ -174,7 +174,7 @@ final class ModelFixtures
     {
         return BankAccount::create(
             'John D. Rockefeller',
-            'DE02100100100006820101'
+            'DE02100100100006820101',
         )
             ->withBankName('The Iron Bank, Braavos')
             ->withBic('DEUTDEFFXXX');
@@ -184,18 +184,18 @@ final class ModelFixtures
     {
         $itemValue = Value::create(
             ValueCurrency::AED,
-            0.0
+            0.0,
         );
         $itemWeight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
 
         return Commodity::create(
             'T-Shirt Boys size 164 yellow',
             1,
             $itemValue,
-            $itemWeight
+            $itemWeight,
         )
             ->withHsCode('61099090');
     }
@@ -206,7 +206,7 @@ final class ModelFixtures
             'Blumen Krause',
             'Hauptstrasse',
             'Berlin',
-            Country::ABW
+            Country::ABW,
         )
             ->withName2('To the attention of Erna.')
             ->withName3('Backdrawer all the way back.')
@@ -225,28 +225,28 @@ final class ModelFixtures
     {
         $postalCharges = Value::create(
             ValueCurrency::AED,
-            0.0
+            0.0,
         );
         $itemValue = Value::create(
             ValueCurrency::AED,
-            0.0
+            0.0,
         );
         $itemWeight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
         $commodity = Commodity::create(
             'T-Shirt Boys size 164 yellow',
             1,
             $itemValue,
-            $itemWeight
+            $itemWeight,
         )
             ->withHsCode('61099090');
 
         return CustomsDetails::create(
             CustomsDetailsExportType::OTHER,
             $postalCharges,
-            [$commodity]
+            [$commodity],
         )
             ->withExportDescription('Detailed description for OTHER goods.')
             ->withMRN('abcd1234567890')
@@ -260,7 +260,7 @@ final class ModelFixtures
             DimensionsUom::cm,
             10,
             20,
-            15
+            15,
         );
     }
 
@@ -271,7 +271,7 @@ final class ModelFixtures
             118,
             'REPLACE_ME',
             'Berlin',
-            'REPLACE_ME'
+            'REPLACE_ME',
         );
     }
 
@@ -281,7 +281,7 @@ final class ModelFixtures
             'Fritz Filialabholer',
             518,
             'Berlin',
-            'REPLACE_ME'
+            'REPLACE_ME',
         )
             ->withEmail('mustermann@example.com');
     }
@@ -292,7 +292,7 @@ final class ModelFixtures
             'Joe Black',
             0,
             'Berlin',
-            'REPLACE_ME'
+            'REPLACE_ME',
         )
             ->withName2('To the attention of Mr. Black.')
             ->withName3('Backdrawer all the way back.');
@@ -308,7 +308,7 @@ final class ModelFixtures
     {
         $weight = Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
 
         return ShipmentDetails::create($weight);
@@ -321,7 +321,7 @@ final class ModelFixtures
 
         return ShipmentOrderRequest::create(
             'REPLACE_ME',
-            [$shipment]
+            [$shipment],
         );
     }
 
@@ -331,7 +331,7 @@ final class ModelFixtures
             'Blumen Krause',
             'Hauptstrasse',
             'Berlin',
-            Country::ABW
+            Country::ABW,
         )
             ->withName2('To the attention of Erna.')
             ->withName3('Backdrawer all the way back.')
@@ -380,7 +380,7 @@ final class ModelFixtures
     {
         return VASIdentCheck::create(
             'Max',
-            'Mustermann'
+            'Mustermann',
         )
             ->withMinimumAge(VASIdentCheckMinimumAge::A18);
     }
@@ -389,7 +389,7 @@ final class ModelFixtures
     {
         return Value::create(
             ValueCurrency::AED,
-            0.0
+            0.0,
         );
     }
 
@@ -397,7 +397,7 @@ final class ModelFixtures
     {
         return Weight::create(
             WeightUom::g,
-            500.0
+            500.0,
         );
     }
 
@@ -410,7 +410,10 @@ final class ModelFixtures
     {
         yield 'ServiceInformation' => [self::buildServiceInformation(), ServiceInformation::fromArray(...)];
         yield 'ServiceInformationAmp' => [self::buildServiceInformationAmp(), ServiceInformationAmp::fromArray(...)];
-        yield 'ServiceInformationBackend' => [self::buildServiceInformationBackend(), ServiceInformationBackend::fromArray(...)];
+        yield 'ServiceInformationBackend' => [
+            self::buildServiceInformationBackend(),
+            ServiceInformationBackend::fromArray(...),
+        ];
         yield 'Document' => [self::buildDocument(), Document::fromArray(...)];
         yield 'RequestStatus' => [self::buildRequestStatus(), RequestStatus::fromArray(...)];
         yield 'LabelDataResponse' => [self::buildLabelDataResponse(), LabelDataResponse::fromArray(...)];
@@ -419,9 +422,15 @@ final class ModelFixtures
         yield 'SingleManifestResponse' => [self::buildSingleManifestResponse(), SingleManifestResponse::fromArray(...)];
         yield 'BillingNoToSheetNo' => [self::buildBillingNoToSheetNo(), BillingNoToSheetNo::fromArray(...)];
         yield 'ShipmentNoToSheetNo' => [self::buildShipmentNoToSheetNo(), ShipmentNoToSheetNo::fromArray(...)];
-        yield 'MultipleManifestResponse' => [self::buildMultipleManifestResponse(), MultipleManifestResponse::fromArray(...)];
+        yield 'MultipleManifestResponse' => [
+            self::buildMultipleManifestResponse(),
+            MultipleManifestResponse::fromArray(...),
+        ];
         yield 'ShortResponseItem' => [self::buildShortResponseItem(), ShortResponseItem::fromArray(...)];
-        yield 'ShipmentManifestingRequest' => [self::buildShipmentManifestingRequest(), ShipmentManifestingRequest::fromArray(...)];
+        yield 'ShipmentManifestingRequest' => [
+            self::buildShipmentManifestingRequest(),
+            ShipmentManifestingRequest::fromArray(...),
+        ];
         yield 'BankAccount' => [self::buildBankAccount(), BankAccount::fromArray(...)];
         yield 'Commodity' => [self::buildCommodity(), Commodity::fromArray(...)];
         yield 'ContactAddress' => [self::buildContactAddress(), ContactAddress::fromArray(...)];
@@ -453,20 +462,60 @@ final class ModelFixtures
         yield 'RequestStatus' => [self::buildRequestStatus(), RequestStatus::fromArray(...), ['title', 'statusCode']];
         yield 'ResponseItem' => [self::buildResponseItem(), ResponseItem::fromArray(...), ['sstatus']];
         yield 'ShortResponseItem' => [self::buildShortResponseItem(), ShortResponseItem::fromArray(...), ['sstatus']];
-        yield 'ShipmentManifestingRequest' => [self::buildShipmentManifestingRequest(), ShipmentManifestingRequest::fromArray(...), ['profile']];
+        yield 'ShipmentManifestingRequest' => [
+            self::buildShipmentManifestingRequest(),
+            ShipmentManifestingRequest::fromArray(...),
+            ['profile'],
+        ];
         yield 'BankAccount' => [self::buildBankAccount(), BankAccount::fromArray(...), ['accountHolder', 'iban']];
-        yield 'Commodity' => [self::buildCommodity(), Commodity::fromArray(...), ['itemDescription', 'packagedQuantity', 'itemValue', 'itemWeight']];
-        yield 'ContactAddress' => [self::buildContactAddress(), ContactAddress::fromArray(...), ['name1', 'addressStreet', 'city', 'country']];
-        yield 'CustomsDetails' => [self::buildCustomsDetails(), CustomsDetails::fromArray(...), ['exportType', 'postalCharges', 'items']];
-        yield 'Dimensions' => [self::buildDimensions(), Dimensions::fromArray(...), ['uom', 'height', 'length', 'width']];
-        yield 'Locker' => [self::buildLocker(), Locker::fromArray(...), ['name', 'lockerID', 'postNumber', 'city', 'postalCode']];
-        yield 'PostOffice' => [self::buildPostOffice(), PostOffice::fromArray(...), ['name', 'retailID', 'city', 'postalCode']];
+        yield 'Commodity' => [
+            self::buildCommodity(),
+            Commodity::fromArray(...),
+            ['itemDescription', 'packagedQuantity', 'itemValue', 'itemWeight'],
+        ];
+        yield 'ContactAddress' => [
+            self::buildContactAddress(),
+            ContactAddress::fromArray(...),
+            ['name1', 'addressStreet', 'city', 'country'],
+        ];
+        yield 'CustomsDetails' => [
+            self::buildCustomsDetails(),
+            CustomsDetails::fromArray(...),
+            ['exportType', 'postalCharges', 'items'],
+        ];
+        yield 'Dimensions' => [
+            self::buildDimensions(),
+            Dimensions::fromArray(...),
+            ['uom', 'height', 'length', 'width'],
+        ];
+        yield 'Locker' => [
+            self::buildLocker(),
+            Locker::fromArray(...),
+            ['name', 'lockerID', 'postNumber', 'city', 'postalCode'],
+        ];
+        yield 'PostOffice' => [
+            self::buildPostOffice(),
+            PostOffice::fromArray(...),
+            ['name', 'retailID', 'city', 'postalCode'],
+        ];
         yield 'POBox' => [self::buildPOBox(), POBox::fromArray(...), ['name1', 'poBoxID', 'city', 'postalCode']];
         yield 'ShipmentDetails' => [self::buildShipmentDetails(), ShipmentDetails::fromArray(...), ['weight']];
-        yield 'ShipmentOrderRequest' => [self::buildShipmentOrderRequest(), ShipmentOrderRequest::fromArray(...), ['profile', 'shipments']];
-        yield 'Shipper' => [self::buildShipper(), Shipper::fromArray(...), ['name1', 'addressStreet', 'city', 'country']];
+        yield 'ShipmentOrderRequest' => [
+            self::buildShipmentOrderRequest(),
+            ShipmentOrderRequest::fromArray(...),
+            ['profile', 'shipments'],
+        ];
+        yield 'Shipper' => [
+            self::buildShipper(),
+            Shipper::fromArray(...),
+            ['name1', 'addressStreet', 'city', 'country'],
+        ];
         yield 'ShipperReference' => [self::buildShipperReference(), ShipperReference::fromArray(...), ['shipperRef']];
-        yield 'VASCashOnDelivery' => [self::buildVASCashOnDelivery(), VASCashOnDelivery::fromArray(...), ['transferNote1']];
+        yield 'VASCashOnDelivery' => [
+            self::buildVASCashOnDelivery(),
+            VASCashOnDelivery::fromArray(...),
+            ['transferNote1'],
+        ];
         yield 'VASDhlRetoure' => [self::buildVASDhlRetoure(), VASDhlRetoure::fromArray(...), ['billingNumber']];
         yield 'VASIdentCheck' => [self::buildVASIdentCheck(), VASIdentCheck::fromArray(...), ['firstName', 'lastName']];
         yield 'Value' => [self::buildValue(), Value::fromArray(...), ['currency', 'value']];
@@ -476,32 +525,109 @@ final class ModelFixtures
     /**
      * Each model with, per wire name, a value of a type that property cannot hold.
      *
-     * Only properties whose type is a single closed shape appear. A union may legitimately
-     * accept what looks like the wrong type, and a schema stating no type accepts anything.
+     * Only properties whose type is a single closed shape appear. A union may legitimately accept
+     * what looks like the wrong type, and a schema stating no type accepts anything.
      *
      * @return iterable<string, array{SelfNormalizingModel, callable(array<int|string, mixed>): SelfNormalizingModel, array<string, int|string>}>
      */
     public static function documentsWithAMistypedProperty(): iterable
     {
-        yield 'RequestStatus' => [self::buildRequestStatus(), RequestStatus::fromArray(...), ['title' => 42, 'statusCode' => 'not-a-number']];
-        yield 'ResponseItem' => [self::buildResponseItem(), ResponseItem::fromArray(...), ['sstatus' => 'not-an-object']];
-        yield 'ShortResponseItem' => [self::buildShortResponseItem(), ShortResponseItem::fromArray(...), ['sstatus' => 'not-an-object']];
-        yield 'ShipmentManifestingRequest' => [self::buildShipmentManifestingRequest(), ShipmentManifestingRequest::fromArray(...), ['profile' => 42]];
-        yield 'BankAccount' => [self::buildBankAccount(), BankAccount::fromArray(...), ['accountHolder' => 42, 'iban' => 42]];
-        yield 'Commodity' => [self::buildCommodity(), Commodity::fromArray(...), ['itemDescription' => 42, 'packagedQuantity' => 'not-a-number', 'itemValue' => 'not-an-object', 'itemWeight' => 'not-an-object']];
-        yield 'ContactAddress' => [self::buildContactAddress(), ContactAddress::fromArray(...), ['name1' => 42, 'addressStreet' => 42, 'city' => 42, 'country' => 42]];
-        yield 'CustomsDetails' => [self::buildCustomsDetails(), CustomsDetails::fromArray(...), ['exportType' => 42, 'postalCharges' => 'not-an-object', 'items' => 'not-an-object']];
-        yield 'Dimensions' => [self::buildDimensions(), Dimensions::fromArray(...), ['uom' => 42, 'height' => 'not-a-number', 'length' => 'not-a-number', 'width' => 'not-a-number']];
-        yield 'Locker' => [self::buildLocker(), Locker::fromArray(...), ['name' => 42, 'lockerID' => 'not-a-number', 'postNumber' => 42, 'city' => 42, 'postalCode' => 42]];
-        yield 'PostOffice' => [self::buildPostOffice(), PostOffice::fromArray(...), ['name' => 42, 'retailID' => 'not-a-number', 'city' => 42, 'postalCode' => 42]];
-        yield 'POBox' => [self::buildPOBox(), POBox::fromArray(...), ['name1' => 42, 'poBoxID' => 'not-a-number', 'city' => 42, 'postalCode' => 42]];
-        yield 'ShipmentDetails' => [self::buildShipmentDetails(), ShipmentDetails::fromArray(...), ['weight' => 'not-an-object']];
-        yield 'ShipmentOrderRequest' => [self::buildShipmentOrderRequest(), ShipmentOrderRequest::fromArray(...), ['profile' => 42, 'shipments' => 'not-an-object']];
-        yield 'Shipper' => [self::buildShipper(), Shipper::fromArray(...), ['name1' => 42, 'addressStreet' => 42, 'city' => 42, 'country' => 42]];
-        yield 'ShipperReference' => [self::buildShipperReference(), ShipperReference::fromArray(...), ['shipperRef' => 42]];
-        yield 'VASCashOnDelivery' => [self::buildVASCashOnDelivery(), VASCashOnDelivery::fromArray(...), ['transferNote1' => 42]];
+        yield 'RequestStatus' => [
+            self::buildRequestStatus(),
+            RequestStatus::fromArray(...),
+            ['title' => 42, 'statusCode' => 'not-a-number'],
+        ];
+        yield 'ResponseItem' => [
+            self::buildResponseItem(),
+            ResponseItem::fromArray(...),
+            ['sstatus' => 'not-an-object'],
+        ];
+        yield 'ShortResponseItem' => [
+            self::buildShortResponseItem(),
+            ShortResponseItem::fromArray(...),
+            ['sstatus' => 'not-an-object'],
+        ];
+        yield 'ShipmentManifestingRequest' => [
+            self::buildShipmentManifestingRequest(),
+            ShipmentManifestingRequest::fromArray(...),
+            ['profile' => 42],
+        ];
+        yield 'BankAccount' => [
+            self::buildBankAccount(),
+            BankAccount::fromArray(...),
+            ['accountHolder' => 42, 'iban' => 42],
+        ];
+        yield 'Commodity' => [
+            self::buildCommodity(),
+            Commodity::fromArray(...),
+            [
+                'itemDescription' => 42,
+                'packagedQuantity' => 'not-a-number',
+                'itemValue' => 'not-an-object',
+                'itemWeight' => 'not-an-object',
+            ],
+        ];
+        yield 'ContactAddress' => [
+            self::buildContactAddress(),
+            ContactAddress::fromArray(...),
+            ['name1' => 42, 'addressStreet' => 42, 'city' => 42, 'country' => 42],
+        ];
+        yield 'CustomsDetails' => [
+            self::buildCustomsDetails(),
+            CustomsDetails::fromArray(...),
+            ['exportType' => 42, 'postalCharges' => 'not-an-object', 'items' => 'not-an-object'],
+        ];
+        yield 'Dimensions' => [
+            self::buildDimensions(),
+            Dimensions::fromArray(...),
+            ['uom' => 42, 'height' => 'not-a-number', 'length' => 'not-a-number', 'width' => 'not-a-number'],
+        ];
+        yield 'Locker' => [
+            self::buildLocker(),
+            Locker::fromArray(...),
+            ['name' => 42, 'lockerID' => 'not-a-number', 'postNumber' => 42, 'city' => 42, 'postalCode' => 42],
+        ];
+        yield 'PostOffice' => [
+            self::buildPostOffice(),
+            PostOffice::fromArray(...),
+            ['name' => 42, 'retailID' => 'not-a-number', 'city' => 42, 'postalCode' => 42],
+        ];
+        yield 'POBox' => [
+            self::buildPOBox(),
+            POBox::fromArray(...),
+            ['name1' => 42, 'poBoxID' => 'not-a-number', 'city' => 42, 'postalCode' => 42],
+        ];
+        yield 'ShipmentDetails' => [
+            self::buildShipmentDetails(),
+            ShipmentDetails::fromArray(...),
+            ['weight' => 'not-an-object'],
+        ];
+        yield 'ShipmentOrderRequest' => [
+            self::buildShipmentOrderRequest(),
+            ShipmentOrderRequest::fromArray(...),
+            ['profile' => 42, 'shipments' => 'not-an-object'],
+        ];
+        yield 'Shipper' => [
+            self::buildShipper(),
+            Shipper::fromArray(...),
+            ['name1' => 42, 'addressStreet' => 42, 'city' => 42, 'country' => 42],
+        ];
+        yield 'ShipperReference' => [
+            self::buildShipperReference(),
+            ShipperReference::fromArray(...),
+            ['shipperRef' => 42],
+        ];
+        yield 'VASCashOnDelivery' => [
+            self::buildVASCashOnDelivery(),
+            VASCashOnDelivery::fromArray(...),
+            ['transferNote1' => 42],
+        ];
         yield 'VASDhlRetoure' => [self::buildVASDhlRetoure(), VASDhlRetoure::fromArray(...), ['billingNumber' => 42]];
-        yield 'VASIdentCheck' => [self::buildVASIdentCheck(), VASIdentCheck::fromArray(...), ['firstName' => 42, 'lastName' => 42]];
+        yield 'VASIdentCheck' => [
+            self::buildVASIdentCheck(),
+            VASIdentCheck::fromArray(...),
+            ['firstName' => 42, 'lastName' => 42],
+        ];
         yield 'Value' => [self::buildValue(), Value::fromArray(...), ['currency' => 42, 'value' => 'not-a-number']];
         yield 'Weight' => [self::buildWeight(), Weight::fromArray(...), ['uom' => 42, 'value' => 'not-a-number']];
     }

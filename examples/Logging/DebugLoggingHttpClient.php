@@ -54,7 +54,13 @@ final readonly class DebugLoggingHttpClient implements ClientInterface
     private const string REDACTED = '***';
 
     /** Header names whose value is never logged, compared lowercased. */
-    private const array REDACTED_HEADERS = ['authorization', 'cookie', 'dhl-api-key', 'proxy-authorization', 'set-cookie'];
+    private const array REDACTED_HEADERS = [
+        'authorization',
+        'cookie',
+        'dhl-api-key',
+        'proxy-authorization',
+        'set-cookie',
+    ];
 
     /** Query parameter and form field names whose value is never logged, compared lowercased. */
     private const array REDACTED_PARAMETERS = ['access_token', 'client_secret', 'password', 'refresh_token', 'token'];

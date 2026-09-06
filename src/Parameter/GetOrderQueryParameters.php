@@ -29,31 +29,82 @@ final class GetOrderQueryParameters
      */
     private GetOrderDocFormat $docFormat = GetOrderDocFormat::PDF;
     /**
-     * Legacy name **labelResponseType**. Shipping labels and further shipment documents can be: * __include__: included as base64 encoded data in the response (default) * __URL__: provided as URL reference. Default is include the base64 encoded labels.
+     * Legacy name **labelResponseType**. Shipping labels and further shipment documents can be:
+     * * __include__: included as base64 encoded data in the response (default)
+     * * __URL__: provided as URL reference. Default is include the base64 encoded labels.
      */
     private GetOrderIncludeDocs $includeDocs = GetOrderIncludeDocs::include;
     /**
-     * If set, label and return label for one shipment will be printed as single PDF document with possibly multiple pages. Else, those two labels come as separate documents. The option does not affect customs documents and COD labels.
+     * If set, label and return label for one shipment will be printed as single PDF document with
+     * possibly multiple pages. Else, those two labels come as separate documents. The option does
+     * not affect customs documents and COD labels.
      */
     private bool $combine = true;
     /**
+     * **Defines** the print medium for the shipping label. The different option vary from standard
+     * papersizes DIN A4 and DIN A5 to specific label print formats.Â .
+     *
+     * Specific laser print formats using DIN A5 blanks are:
+     *
+     * * 910-300-600(-oz) (105 x 205mm)
+     * * 910-300-300(-oz) (105 x 148mm)
+     *
+     * Specific laser print formats **not** using a DIN A5 blank:
+     *
+     * * 910-300-610 (105 x 208mm)
+     * * 100x70mm
+     *
+     * Specific thermal print formats:
+     *
+     * * 910-300-600 (103 x 199mm)
+     * * 910-300-400 (103 x 150mm)
+     * * 100x70mm
+     *
+     * Please use the different formats as follows. If you do not set the parameter the settings of
+     * DHL costumer portal account will be used as default.
+     *
      * @var Option<GetOrderPrintFormat>
-     *                                  **Defines** the print medium for the shipping label. The different option vary from standard papersizes DIN A4 and DIN A5 to specific label print formats.  Specific laser print formats using DIN A5 blanks are: * 910-300-600(-oz) (105 x 205mm) * 910-300-300(-oz) (105 x 148mm) Specific laser print formats **not** using a DIN A5 blank: * 910-300-610 (105 x 208mm) * 100x70mm Specific thermal print formats: * 910-300-600 (103 x 199mm) * 910-300-400 (103 x 150mm) * 100x70mm Please use the different formats as follows. If you do not set the parameter the settings of DHL costumer portal account will be used as default.
      */
     private Option $printFormat;
     /**
+     * **Defines** the print medium for the return shipping label. This parameter is only usable, if
+     * you do not use **combined printing**. The different option vary from standard papersizes DIN
+     * A4 and DIN A5 to specific label print formats.Â .
+     *
+     * Specific laser print formats using DIN A5 blanks are:
+     *
+     * * 910-300-600(-oz) (105 x 205mm)
+     * * 910-300-300(-oz) (105 x 148mm)
+     *
+     * Specific laser print formats **not** using a DIN A5 blank:
+     *
+     * * 910-300-610 (105 x 208mm)
+     * * 100x70mm
+     *
+     * Specific thermal print formats:
+     *
+     * * 910-300-600 (103 x 199mm)
+     * * 910-300-400 (103 x 150mm)
+     * * 100x70mm
+     *
+     * Please use the different formats as follows. If you do not set the parameter the settings of
+     * DHL costumer portal account will be used as default.
+     *
      * @var Option<GetOrderRetourePrintFormat>
-     *                                         **Defines** the print medium for the return shipping label. This parameter is only usable, if you do not use **combined printing**. The different option vary from standard papersizes DIN A4 and DIN A5 to specific label print formats.  Specific laser print formats using DIN A5 blanks are: * 910-300-600(-oz) (105 x 205mm) * 910-300-300(-oz) (105 x 148mm) Specific laser print formats **not** using a DIN A5 blank: * 910-300-610 (105 x 208mm) * 100x70mm Specific thermal print formats: * 910-300-600 (103 x 199mm) * 910-300-400 (103 x 150mm) * 100x70mm Please use the different formats as follows. If you do not set the parameter the settings of DHL costumer portal account will be used as default.
      */
     private Option $retourePrintFormat;
     /**
+     * Defines whether the DHL Logo should be included on the generated label. **Does not affect
+     * return labels**.If not provided, default from user profile will be used.
+     *
      * @var Option<bool>
-     *                   Defines whether the DHL Logo should be included on the generated label. **Does not affect return labels**.If not provided, default from user profile will be used.
      */
     private Option $printDhlLogo;
     /**
+     * Defines whether the DHL Logo should be included on the generated **return/retoure** label.
+     * Does not affect non-return labels. If not provided, default from user profile will be used.
+     *
      * @var Option<bool>
-     *                   Defines whether the DHL Logo should be included on the generated **return/retoure** label. Does not affect non-return labels. If not provided, default from user profile will be used.
      */
     private Option $printDhlLogoRetoure;
 
@@ -175,13 +226,21 @@ final class GetOrderQueryParameters
             $parameters[] = new QueryParameter('printFormat', new ScalarValue($this->printFormat->get()->value), false);
         }
         if ($this->retourePrintFormat->isDefined()) {
-            $parameters[] = new QueryParameter('retourePrintFormat', new ScalarValue($this->retourePrintFormat->get()->value), false);
+            $parameters[] = new QueryParameter(
+                'retourePrintFormat',
+                new ScalarValue($this->retourePrintFormat->get()->value),
+                false,
+            );
         }
         if ($this->printDhlLogo->isDefined()) {
             $parameters[] = new QueryParameter('printDhlLogo', new ScalarValue($this->printDhlLogo->get()), false);
         }
         if ($this->printDhlLogoRetoure->isDefined()) {
-            $parameters[] = new QueryParameter('printDhlLogoRetoure', new ScalarValue($this->printDhlLogoRetoure->get()), false);
+            $parameters[] = new QueryParameter(
+                'printDhlLogoRetoure',
+                new ScalarValue($this->printDhlLogoRetoure->get()),
+                false,
+            );
         }
 
         return new QueryParameters(...$parameters);

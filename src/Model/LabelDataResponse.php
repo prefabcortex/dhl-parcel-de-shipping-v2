@@ -57,7 +57,10 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
     }
 
     /**
-     * If the request contains a multi element array (e.g. multiple shipments), then the order of the items in the response corresponds to the order of the items in the request. For consistency, if the request contains only one item then the response contains a single element array.
+     * If the request contains a multi element array (e.g. multiple shipments), then the order of
+     * the items in the response corresponds to the order of the items in the request. For
+     * consistency, if the request contains only one item then the response contains a single
+     * element array.
      *
      * @return Option<list<ResponseItem>>
      */
@@ -90,7 +93,9 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
         if (array_key_exists('status', $data)) {
             $statusRaw = $data['status'];
             if (!is_array($statusRaw)) {
-                throw new MalformedDataException(sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)),
+                );
             }
             /** @var array<string, mixed> $statusRawTyped */
             $statusRawTyped = $statusRaw;
@@ -100,11 +105,15 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
         if (array_key_exists('items', $data)) {
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
-                throw new MalformedDataException(sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)),
+                );
             }
             $items = Some::create(array_map(static function (mixed $value): ResponseItem {
                 if (!is_array($value)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value)),
+                    );
                 }
                 /** @var array<string, mixed> $valueTyped */
                 $valueTyped = $value;

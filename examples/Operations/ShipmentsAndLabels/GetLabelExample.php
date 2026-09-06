@@ -20,7 +20,10 @@ use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
 final class GetLabelExample
 {
     /**
-     * Public download URL for shipment labels and documents. The URL is provided in the response of the POST /orders or GET /orders resources. The document is identified via the token query parameter. There is no additional authorization, the resource URL can be shared. Please protect the URL as needed. The call returns a PDF label.
+     * Public download URL for shipment labels and documents. The URL is provided in the response of
+     * the POST /orders or GET /orders resources. The document is identified via the token query
+     * parameter. There is no additional authorization, the resource URL can be shared. Please
+     * protect the URL as needed. The call returns a PDF label.
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *
@@ -40,13 +43,13 @@ final class GetLabelExample
      */
     public static function getLabel(
         Client $client,
-        GetLabelQueryParameters $queryParameters
+        GetLabelQueryParameters $queryParameters,
     ): string {
         $accept = [GetLabelAccept::application_pdf, GetLabelAccept::application_problem_json];
 
         return $client->shipmentsAndLabels()->getLabel(
             $queryParameters,
-            $accept
+            $accept,
         );
     }
 }

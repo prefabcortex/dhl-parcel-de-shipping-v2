@@ -35,14 +35,27 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
      * @param Option<list<ShipmentNoToSheetNo>> $items
      * @param array<int|string, mixed>          $additionalProperties
      */
-    public function __construct(private Option $status, private Option $manifestDate, private Option $manifest, private Option $sheetNo, private Option $items, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $status,
+        private Option $manifestDate,
+        private Option $manifest,
+        private Option $sheetNo,
+        private Option $items,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
     public static function create(array $additionalProperties = []): self
     {
-        return new self(None::create(), None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+        return new self(
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
@@ -57,7 +70,14 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
 
     public function withStatus(RequestStatus $status): self
     {
-        return new self(Some::create($status), $this->manifestDate, $this->manifest, $this->sheetNo, $this->items, $this->additionalProperties);
+        return new self(
+            Some::create($status),
+            $this->manifestDate,
+            $this->manifest,
+            $this->sheetNo,
+            $this->items,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -68,7 +88,14 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
 
     public function withManifestDate(string $manifestDate): self
     {
-        return new self($this->status, Some::create($manifestDate), $this->manifest, $this->sheetNo, $this->items, $this->additionalProperties);
+        return new self(
+            $this->status,
+            Some::create($manifestDate),
+            $this->manifest,
+            $this->sheetNo,
+            $this->items,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<list<Document>> */
@@ -80,7 +107,14 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
     /** @param list<Document> $manifest */
     public function withManifest(array $manifest): self
     {
-        return new self($this->status, $this->manifestDate, Some::create($manifest), $this->sheetNo, $this->items, $this->additionalProperties);
+        return new self(
+            $this->status,
+            $this->manifestDate,
+            Some::create($manifest),
+            $this->sheetNo,
+            $this->items,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<list<BillingNoToSheetNo>> */
@@ -92,7 +126,14 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
     /** @param list<BillingNoToSheetNo> $sheetNo */
     public function withSheetNo(array $sheetNo): self
     {
-        return new self($this->status, $this->manifestDate, $this->manifest, Some::create($sheetNo), $this->items, $this->additionalProperties);
+        return new self(
+            $this->status,
+            $this->manifestDate,
+            $this->manifest,
+            Some::create($sheetNo),
+            $this->items,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<list<ShipmentNoToSheetNo>> */
@@ -104,7 +145,14 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
     /** @param list<ShipmentNoToSheetNo> $items */
     public function withItems(array $items): self
     {
-        return new self($this->status, $this->manifestDate, $this->manifest, $this->sheetNo, Some::create($items), $this->additionalProperties);
+        return new self(
+            $this->status,
+            $this->manifestDate,
+            $this->manifest,
+            $this->sheetNo,
+            Some::create($items),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -128,7 +176,9 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('status', $data)) {
             $statusRaw = $data['status'];
             if (!is_array($statusRaw)) {
-                throw new MalformedDataException(sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "status" must be object, got %s.', get_debug_type($statusRaw)),
+                );
             }
             /** @var array<string, mixed> $statusRawTyped */
             $statusRawTyped = $statusRaw;
@@ -138,7 +188,9 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('manifestDate', $data)) {
             $manifestDateRaw = $data['manifestDate'];
             if (!is_string($manifestDateRaw)) {
-                throw new MalformedDataException(sprintf('Property "manifestDate" must be string, got %s.', get_debug_type($manifestDateRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "manifestDate" must be string, got %s.', get_debug_type($manifestDateRaw)),
+                );
             }
             $manifestDate = Some::create($manifestDateRaw);
             unset($data['manifestDate']);
@@ -146,11 +198,15 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('manifest', $data)) {
             $manifestRaw = $data['manifest'];
             if (!(is_array($manifestRaw) && array_is_list($manifestRaw))) {
-                throw new MalformedDataException(sprintf('Property "manifest" must be array, got %s.', get_debug_type($manifestRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "manifest" must be array, got %s.', get_debug_type($manifestRaw)),
+                );
             }
             $manifest = Some::create(array_map(static function (mixed $value): Document {
                 if (!is_array($value)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value)),
+                    );
                 }
                 /** @var array<string, mixed> $valueTyped */
                 $valueTyped = $value;
@@ -162,11 +218,15 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('sheetNo', $data)) {
             $sheetNoRaw = $data['sheetNo'];
             if (!(is_array($sheetNoRaw) && array_is_list($sheetNoRaw))) {
-                throw new MalformedDataException(sprintf('Property "sheetNo" must be array, got %s.', get_debug_type($sheetNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "sheetNo" must be array, got %s.', get_debug_type($sheetNoRaw)),
+                );
             }
             $sheetNo = Some::create(array_map(static function (mixed $value_1): BillingNoToSheetNo {
                 if (!is_array($value_1)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value_1)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value_1)),
+                    );
                 }
                 /** @var array<string, mixed> $value_1Typed */
                 $value_1Typed = $value_1;
@@ -178,11 +238,15 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
         if (array_key_exists('items', $data)) {
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
-                throw new MalformedDataException(sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)),
+                );
             }
             $items = Some::create(array_map(static function (mixed $value_2): ShipmentNoToSheetNo {
                 if (!is_array($value_2)) {
-                    throw new MalformedDataException(sprintf('Array item must be object, got %s.', get_debug_type($value_2)));
+                    throw new MalformedDataException(
+                        sprintf('Array item must be object, got %s.', get_debug_type($value_2)),
+                    );
                 }
                 /** @var array<string, mixed> $value_2Typed */
                 $value_2Typed = $value_2;

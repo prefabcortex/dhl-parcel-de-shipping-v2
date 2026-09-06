@@ -17,8 +17,11 @@ use Psr\Http\Message\ResponseInterface;
 
 final class GetOrderBadRequestException extends BadRequestException
 {
-    public function __construct(private readonly LabelDataResponse $labelDataResponse, private readonly ResponseInterface $response, private readonly string $rawResponse)
-    {
+    public function __construct(
+        private readonly LabelDataResponse $labelDataResponse,
+        private readonly ResponseInterface $response,
+        private readonly string $rawResponse,
+    ) {
         parent::__construct(ErrorMessage::describe($rawResponse, 'Bad Request'));
     }
 

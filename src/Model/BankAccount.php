@@ -29,8 +29,13 @@ final readonly class BankAccount implements SelfNormalizingModel
      * @param Option<string>           $bic
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $accountHolder, private string $iban, private Option $bankName, private Option $bic, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $accountHolder,
+        private string $iban,
+        private Option $bankName,
+        private Option $bic,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -57,7 +62,13 @@ final readonly class BankAccount implements SelfNormalizingModel
 
     public function withBankName(string $bankName): self
     {
-        return new self($this->accountHolder, $this->iban, Some::create($bankName), $this->bic, $this->additionalProperties);
+        return new self(
+            $this->accountHolder,
+            $this->iban,
+            Some::create($bankName),
+            $this->bic,
+            $this->additionalProperties,
+        );
     }
 
     public function getIban(): string
@@ -78,7 +89,13 @@ final readonly class BankAccount implements SelfNormalizingModel
 
     public function withBic(string $bic): self
     {
-        return new self($this->accountHolder, $this->iban, $this->bankName, Some::create($bic), $this->additionalProperties);
+        return new self(
+            $this->accountHolder,
+            $this->iban,
+            $this->bankName,
+            Some::create($bic),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -101,7 +118,9 @@ final readonly class BankAccount implements SelfNormalizingModel
         if (array_key_exists('accountHolder', $data)) {
             $accountHolderRaw = $data['accountHolder'];
             if (!is_string($accountHolderRaw)) {
-                throw new MalformedDataException(sprintf('Property "accountHolder" must be string, got %s.', get_debug_type($accountHolderRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "accountHolder" must be string, got %s.', get_debug_type($accountHolderRaw)),
+                );
             }
             $accountHolder = $accountHolderRaw;
             unset($data['accountHolder']);
@@ -109,7 +128,9 @@ final readonly class BankAccount implements SelfNormalizingModel
         if (array_key_exists('bankName', $data)) {
             $bankNameRaw = $data['bankName'];
             if (!is_string($bankNameRaw)) {
-                throw new MalformedDataException(sprintf('Property "bankName" must be string, got %s.', get_debug_type($bankNameRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "bankName" must be string, got %s.', get_debug_type($bankNameRaw)),
+                );
             }
             $bankName = Some::create($bankNameRaw);
             unset($data['bankName']);
@@ -117,7 +138,9 @@ final readonly class BankAccount implements SelfNormalizingModel
         if (array_key_exists('iban', $data)) {
             $ibanRaw = $data['iban'];
             if (!is_string($ibanRaw)) {
-                throw new MalformedDataException(sprintf('Property "iban" must be string, got %s.', get_debug_type($ibanRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "iban" must be string, got %s.', get_debug_type($ibanRaw)),
+                );
             }
             $iban = $ibanRaw;
             unset($data['iban']);
@@ -125,7 +148,9 @@ final readonly class BankAccount implements SelfNormalizingModel
         if (array_key_exists('bic', $data)) {
             $bicRaw = $data['bic'];
             if (!is_string($bicRaw)) {
-                throw new MalformedDataException(sprintf('Property "bic" must be string, got %s.', get_debug_type($bicRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "bic" must be string, got %s.', get_debug_type($bicRaw)),
+                );
             }
             $bic = Some::create($bicRaw);
             unset($data['bic']);

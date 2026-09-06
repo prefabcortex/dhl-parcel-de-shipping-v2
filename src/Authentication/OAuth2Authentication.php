@@ -19,10 +19,8 @@ use function sprintf;
 
 final readonly class OAuth2Authentication implements Authenticator
 {
-    public function __construct(
-        #[SensitiveParameter]
-        private string $token
-    ) {
+    public function __construct(#[SensitiveParameter] private string $token)
+    {
     }
 
     /** @throws InvalidArgumentException */

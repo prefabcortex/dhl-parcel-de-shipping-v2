@@ -23,7 +23,11 @@ use Prefabcortex\DhlParcelDeShippingV2\Validation\ValidationException;
 final class OrdersAccountDeleteExample
 {
     /**
-     * Delete one or more shipments created earlier. Deletion of shipments is only possible prior to them being manifested (closed out, 'Tagesabschluss'). The call will return HTTP 200 (single shipment) or 207 on success, with individual status elements for each shipment. Individual status elements are HTTP 200, 400. 400 will be returned when shipment does not exist (or was already deleted).
+     * Delete one or more shipments created earlier. Deletion of shipments is only possible prior to
+     * them being manifested (closed out, 'Tagesabschluss'). The call will return HTTP 200 (single
+     * shipment) or 207 on success, with individual status elements for each shipment. Individual
+     * status elements are HTTP 200, 400. 400 will be returned when shipment does not exist (or was
+     * already deleted).
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *
@@ -46,14 +50,14 @@ final class OrdersAccountDeleteExample
     public static function ordersAccountDelete(
         Client $client,
         OrdersAccountDeleteQueryParameters $queryParameters,
-        OrdersAccountDeleteHeaderParameters $headerParameters
+        OrdersAccountDeleteHeaderParameters $headerParameters,
     ): LabelDataResponse {
         $accept = [OrdersAccountDeleteAccept::application_json, OrdersAccountDeleteAccept::application_problem_json];
 
         return $client->shipmentsAndLabels()->ordersAccountDelete(
             $queryParameters,
             $headerParameters,
-            $accept
+            $accept,
         );
     }
 }

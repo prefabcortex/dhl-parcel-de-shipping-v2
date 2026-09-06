@@ -30,8 +30,12 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
      * @param Option<string>           $validationState
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private Option $property, private Option $validationMessage, private Option $validationState, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $property,
+        private Option $validationMessage,
+        private Option $validationState,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -52,7 +56,12 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
 
     public function withProperty(string $property): self
     {
-        return new self(Some::create($property), $this->validationMessage, $this->validationState, $this->additionalProperties);
+        return new self(
+            Some::create($property),
+            $this->validationMessage,
+            $this->validationState,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -67,7 +76,12 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
 
     public function withValidationMessage(string $validationMessage): self
     {
-        return new self($this->property, Some::create($validationMessage), $this->validationState, $this->additionalProperties);
+        return new self(
+            $this->property,
+            Some::create($validationMessage),
+            $this->validationState,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -82,7 +96,12 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
 
     public function withValidationState(string $validationState): self
     {
-        return new self($this->property, $this->validationMessage, Some::create($validationState), $this->additionalProperties);
+        return new self(
+            $this->property,
+            $this->validationMessage,
+            Some::create($validationState),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -104,7 +123,9 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
         if (array_key_exists('property', $data)) {
             $propertyRaw = $data['property'];
             if (!is_string($propertyRaw)) {
-                throw new MalformedDataException(sprintf('Property "property" must be string, got %s.', get_debug_type($propertyRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "property" must be string, got %s.', get_debug_type($propertyRaw)),
+                );
             }
             $property = Some::create($propertyRaw);
             unset($data['property']);
@@ -112,7 +133,12 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
         if (array_key_exists('validationMessage', $data)) {
             $validationMessageRaw = $data['validationMessage'];
             if (!is_string($validationMessageRaw)) {
-                throw new MalformedDataException(sprintf('Property "validationMessage" must be string, got %s.', get_debug_type($validationMessageRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "validationMessage" must be string, got %s.',
+                        get_debug_type($validationMessageRaw),
+                    ),
+                );
             }
             $validationMessage = Some::create($validationMessageRaw);
             unset($data['validationMessage']);
@@ -120,7 +146,9 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
         if (array_key_exists('validationState', $data)) {
             $validationStateRaw = $data['validationState'];
             if (!is_string($validationStateRaw)) {
-                throw new MalformedDataException(sprintf('Property "validationState" must be string, got %s.', get_debug_type($validationStateRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "validationState" must be string, got %s.', get_debug_type($validationStateRaw)),
+                );
             }
             $validationState = Some::create($validationStateRaw);
             unset($data['validationState']);

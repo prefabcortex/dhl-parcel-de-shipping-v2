@@ -21,12 +21,15 @@ use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
 final class GetManifestsQueryParameters
 {
     /**
-     * Legacy name **labelResponseType**. Shipping labels and further shipment documents can be: * __include__: included as base64 encoded data in the response (default) * __URL__: provided as URL reference. Default is include the base64 encoded labels.
+     * Legacy name **labelResponseType**. Shipping labels and further shipment documents can be:
+     * * __include__: included as base64 encoded data in the response (default)
+     * * __URL__: provided as URL reference. Default is include the base64 encoded labels.
      */
     private GetManifestsIncludeDocs $includeDocs = GetManifestsIncludeDocs::include;
     /**
+     * Customer billingNumber number.
+     *
      * @var Option<string>
-     *                     Customer billingNumber number
      */
     private Option $billingNumber;
     /** @var Option<string> */

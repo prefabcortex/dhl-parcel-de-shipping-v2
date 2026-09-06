@@ -37,13 +37,44 @@ final class PostOfficeConstraint implements ConstraintProviderInterface
         return [
             new NotNull(),
             new Collection([
-                'name' => new Required([new Length(null, 1), new NotBlank(null, null, null), new Length(null, null, 50), new Type(['string']), new NotNull()]),
-                'retailID' => new Required([new LessThanOrEqual(999.0), new GreaterThanOrEqual(401.0), new Type(['integer']), new NotNull()]),
-                'postNumber' => new Optional([new Length(null, 3), new NotBlank(null, null, null), new Length(null, null, 10), new Regex('#^[0-9]{6,10}$#'), new Type(['string']), new NotNull()]),
-                'email' => new Optional([new Length(null, 3), new NotBlank(null, null, null), new Length(null, null, 80), new Type(['string']), new NotNull()]),
+                'name' => new Required([
+                    new Length(null, 1),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 50),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
+                'retailID' => new Required([
+                    new LessThanOrEqual(999.0),
+                    new GreaterThanOrEqual(401.0),
+                    new Type(['integer']),
+                    new NotNull(),
+                ]),
+                'postNumber' => new Optional([
+                    new Length(null, 3),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 10),
+                    new Regex('#^[0-9]{6,10}$#'),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
+                'email' => new Optional([
+                    new Length(null, 3),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 80),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'city' => new Required([new Length(null, null, 80), new Type(['string']), new NotNull()]),
                 'country' => new Optional([...CountryConstraint::constraints()]),
-                'postalCode' => new Required([new Length(null, 3), new NotBlank(null, null, null), new Length(null, null, 10), new Regex('#^[0-9A-Za-z]+([ -]?[0-9A-Za-z]+)*$#'), new Type(['string']), new NotNull()]),
+                'postalCode' => new Required([
+                    new Length(null, 3),
+                    new NotBlank(null, null, null),
+                    new Length(null, null, 10),
+                    new Regex('#^[0-9A-Za-z]+([ -]?[0-9A-Za-z]+)*$#'),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

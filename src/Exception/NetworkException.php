@@ -34,7 +34,11 @@ final class NetworkException extends RuntimeException implements TransportExcept
 {
     public function __construct(private readonly RequestInterface $request, ClientExceptionInterface $previous)
     {
-        parent::__construct(sprintf('The request to %s could not be sent: %s', $request->getUri(), $previous->getMessage()), 0, $previous);
+        parent::__construct(
+            sprintf('The request to %s could not be sent: %s', $request->getUri(), $previous->getMessage()),
+            0,
+            $previous,
+        );
     }
 
     #[Override]

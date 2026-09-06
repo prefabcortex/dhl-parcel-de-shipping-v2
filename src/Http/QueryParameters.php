@@ -17,8 +17,8 @@ use function implode;
  * The query parameters of one operation, in spec order.
  *
  * Built by a generated parameter object from its own typed properties, so the collection carries
- * each parameter's name, shape and `allowReserved` flag together instead of an
- * `array<string, mixed>` that serialization would have to re-interpret.
+ * each parameter's name, shape and `allowReserved` flag together instead of an `array<string,
+ * mixed>` that serialization would have to re-interpret.
  *
  * @internal plumbing of the generated package, not part of its public contract: only the
  *                    generated operations and client touch this, and it may change in any release
@@ -30,8 +30,8 @@ final readonly class QueryParameters
 
     /**
      * Variadic rather than an `array` plus a docblock: the element type is then a real type hint
-     * that PHP enforces — and that the runtime reachability scan can see, so `QueryParameter`
-     * ships with the packages that use this one instead of being a name only a comment mentions.
+     * that PHP enforces — and that the runtime reachability scan can see, so `QueryParameter` ships
+     * with the packages that use this one instead of being a name only a comment mentions.
      */
     public function __construct(QueryParameter ...$parameters)
     {
@@ -46,9 +46,9 @@ final readonly class QueryParameters
     /**
      * Joins every parameter's pairs with `&`.
      *
-     * A parameter that renders to nothing — an empty list or map — contributes no pairs at all,
-     * so it cannot leave a separator behind. The previous representation produced a blank entry
-     * here, which surfaced as a leading or trailing `&`, i.e. an extra empty parameter.
+     * A parameter that renders to nothing — an empty list or map — contributes no pairs at all, so
+     * it cannot leave a separator behind. The previous representation produced a blank entry here,
+     * which surfaced as a leading or trailing `&`, i.e. an extra empty parameter.
      */
     public function encode(): string
     {
@@ -71,7 +71,9 @@ final readonly class QueryParameters
     {
         $parameters = [];
         foreach ($this->parameters as $parameter) {
-            $parameters[] = $name === $parameter->name ? $parameter->withValue($transformer->transform($parameter->value)) : $parameter;
+            $parameters[] = $name === $parameter->name ? $parameter->withValue(
+                $transformer->transform($parameter->value),
+            ) : $parameter;
         }
 
         return new self(...$parameters);

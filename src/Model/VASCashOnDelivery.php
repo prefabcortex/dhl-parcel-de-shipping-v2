@@ -32,14 +32,27 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
      * @param Option<string>           $transferNote2
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private string $transferNote1, private Option $amount, private Option $bankAccount, private Option $accountReference, private Option $transferNote2, private array $additionalProperties)
-    {
+    public function __construct(
+        private string $transferNote1,
+        private Option $amount,
+        private Option $bankAccount,
+        private Option $accountReference,
+        private Option $transferNote2,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
     public static function create(string $transferNote1, array $additionalProperties = []): self
     {
-        return new self($transferNote1, None::create(), None::create(), None::create(), None::create(), $additionalProperties);
+        return new self(
+            $transferNote1,
+            None::create(),
+            None::create(),
+            None::create(),
+            None::create(),
+            $additionalProperties,
+        );
     }
 
     /**
@@ -54,7 +67,14 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
 
     public function withAmount(Value $amount): self
     {
-        return new self($this->transferNote1, Some::create($amount), $this->bankAccount, $this->accountReference, $this->transferNote2, $this->additionalProperties);
+        return new self(
+            $this->transferNote1,
+            Some::create($amount),
+            $this->bankAccount,
+            $this->accountReference,
+            $this->transferNote2,
+            $this->additionalProperties,
+        );
     }
 
     /**
@@ -69,11 +89,21 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
 
     public function withBankAccount(BankAccount $bankAccount): self
     {
-        return new self($this->transferNote1, $this->amount, Some::create($bankAccount), $this->accountReference, $this->transferNote2, $this->additionalProperties);
+        return new self(
+            $this->transferNote1,
+            $this->amount,
+            Some::create($bankAccount),
+            $this->accountReference,
+            $this->transferNote2,
+            $this->additionalProperties,
+        );
     }
 
     /**
-     * Reference to bank account details. Account references are maintained in customer settings in Post & DHL business customer portal under Ship -> Settings -> Cash on delivery. Please note, that the default account reference is used if the provided account reference does not exist in your customer settings!
+     * Reference to bank account details. Account references are maintained in customer settings in
+     * Post & DHL business customer portal under Ship -> Settings -> Cash on delivery. Please note,
+     * that the default account reference is used if the provided account reference does not exist
+     * in your customer settings!
      *
      * @return Option<string>
      */
@@ -84,7 +114,14 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
 
     public function withAccountReference(string $accountReference): self
     {
-        return new self($this->transferNote1, $this->amount, $this->bankAccount, Some::create($accountReference), $this->transferNote2, $this->additionalProperties);
+        return new self(
+            $this->transferNote1,
+            $this->amount,
+            $this->bankAccount,
+            Some::create($accountReference),
+            $this->transferNote2,
+            $this->additionalProperties,
+        );
     }
 
     public function getTransferNote1(): string
@@ -94,7 +131,14 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
 
     public function withTransferNote1(string $transferNote1): self
     {
-        return new self($transferNote1, $this->amount, $this->bankAccount, $this->accountReference, $this->transferNote2, $this->additionalProperties);
+        return new self(
+            $transferNote1,
+            $this->amount,
+            $this->bankAccount,
+            $this->accountReference,
+            $this->transferNote2,
+            $this->additionalProperties,
+        );
     }
 
     /** @return Option<string> */
@@ -105,7 +149,14 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
 
     public function withTransferNote2(string $transferNote2): self
     {
-        return new self($this->transferNote1, $this->amount, $this->bankAccount, $this->accountReference, Some::create($transferNote2), $this->additionalProperties);
+        return new self(
+            $this->transferNote1,
+            $this->amount,
+            $this->bankAccount,
+            $this->accountReference,
+            Some::create($transferNote2),
+            $this->additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */
@@ -129,7 +180,9 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
         if (array_key_exists('amount', $data)) {
             $amountRaw = $data['amount'];
             if (!is_array($amountRaw)) {
-                throw new MalformedDataException(sprintf('Property "amount" must be object, got %s.', get_debug_type($amountRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "amount" must be object, got %s.', get_debug_type($amountRaw)),
+                );
             }
             /** @var array<string, mixed> $amountRawTyped */
             $amountRawTyped = $amountRaw;
@@ -139,7 +192,9 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
         if (array_key_exists('bankAccount', $data)) {
             $bankAccountRaw = $data['bankAccount'];
             if (!is_array($bankAccountRaw)) {
-                throw new MalformedDataException(sprintf('Property "bankAccount" must be object, got %s.', get_debug_type($bankAccountRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "bankAccount" must be object, got %s.', get_debug_type($bankAccountRaw)),
+                );
             }
             /** @var array<string, mixed> $bankAccountRawTyped */
             $bankAccountRawTyped = $bankAccountRaw;
@@ -149,7 +204,12 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
         if (array_key_exists('accountReference', $data)) {
             $accountReferenceRaw = $data['accountReference'];
             if (!is_string($accountReferenceRaw)) {
-                throw new MalformedDataException(sprintf('Property "accountReference" must be string, got %s.', get_debug_type($accountReferenceRaw)));
+                throw new MalformedDataException(
+                    sprintf(
+                        'Property "accountReference" must be string, got %s.',
+                        get_debug_type($accountReferenceRaw),
+                    ),
+                );
             }
             $accountReference = Some::create($accountReferenceRaw);
             unset($data['accountReference']);
@@ -157,7 +217,9 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
         if (array_key_exists('transferNote1', $data)) {
             $transferNote1Raw = $data['transferNote1'];
             if (!is_string($transferNote1Raw)) {
-                throw new MalformedDataException(sprintf('Property "transferNote1" must be string, got %s.', get_debug_type($transferNote1Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "transferNote1" must be string, got %s.', get_debug_type($transferNote1Raw)),
+                );
             }
             $transferNote1 = $transferNote1Raw;
             unset($data['transferNote1']);
@@ -165,7 +227,9 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
         if (array_key_exists('transferNote2', $data)) {
             $transferNote2Raw = $data['transferNote2'];
             if (!is_string($transferNote2Raw)) {
-                throw new MalformedDataException(sprintf('Property "transferNote2" must be string, got %s.', get_debug_type($transferNote2Raw)));
+                throw new MalformedDataException(
+                    sprintf('Property "transferNote2" must be string, got %s.', get_debug_type($transferNote2Raw)),
+                );
             }
             $transferNote2 = Some::create($transferNote2Raw);
             unset($data['transferNote2']);
@@ -175,7 +239,14 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
             throw new MalformedDataException('Required property "transferNote1" is missing from the document.');
         }
 
-        return new self($transferNote1, $amount, $bankAccount, $accountReference, $transferNote2, $additionalProperties);
+        return new self(
+            $transferNote1,
+            $amount,
+            $bankAccount,
+            $accountReference,
+            $transferNote2,
+            $additionalProperties,
+        );
     }
 
     /** @return array<int|string, mixed> */

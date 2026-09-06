@@ -33,7 +33,8 @@ final readonly class ShipperReference implements SelfNormalizingModel
     }
 
     /**
-     * Reference string to the shipper data configured in GKP(GeschÃ¤ftskundenportal - Business Costumer Portal).
+     * Reference string to the shipper data configured in GKP(GeschÃ¤ftskundenportal - Business
+     * Costumer Portal).
      */
     public function getShipperRef(): string
     {
@@ -62,7 +63,9 @@ final readonly class ShipperReference implements SelfNormalizingModel
         if (array_key_exists('shipperRef', $data)) {
             $shipperRefRaw = $data['shipperRef'];
             if (!is_string($shipperRefRaw)) {
-                throw new MalformedDataException(sprintf('Property "shipperRef" must be string, got %s.', get_debug_type($shipperRefRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "shipperRef" must be string, got %s.', get_debug_type($shipperRefRaw)),
+                );
             }
             $shipperRef = $shipperRefRaw;
             unset($data['shipperRef']);

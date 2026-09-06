@@ -29,8 +29,11 @@ final readonly class BillingNoToSheetNo implements SelfNormalizingModel
      * @param Option<string>           $sheetNo
      * @param array<int|string, mixed> $additionalProperties
      */
-    public function __construct(private Option $billingNumber, private Option $sheetNo, private array $additionalProperties)
-    {
+    public function __construct(
+        private Option $billingNumber,
+        private Option $sheetNo,
+        private array $additionalProperties,
+    ) {
     }
 
     /** @param array<int|string, mixed> $additionalProperties */
@@ -79,7 +82,9 @@ final readonly class BillingNoToSheetNo implements SelfNormalizingModel
         if (array_key_exists('billingNumber', $data)) {
             $billingNumberRaw = $data['billingNumber'];
             if (!is_string($billingNumberRaw)) {
-                throw new MalformedDataException(sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "billingNumber" must be string, got %s.', get_debug_type($billingNumberRaw)),
+                );
             }
             $billingNumber = Some::create($billingNumberRaw);
             unset($data['billingNumber']);
@@ -87,7 +92,9 @@ final readonly class BillingNoToSheetNo implements SelfNormalizingModel
         if (array_key_exists('sheetNo', $data)) {
             $sheetNoRaw = $data['sheetNo'];
             if (!is_string($sheetNoRaw)) {
-                throw new MalformedDataException(sprintf('Property "sheetNo" must be string, got %s.', get_debug_type($sheetNoRaw)));
+                throw new MalformedDataException(
+                    sprintf('Property "sheetNo" must be string, got %s.', get_debug_type($sheetNoRaw)),
+                );
             }
             $sheetNo = Some::create($sheetNoRaw);
             unset($data['sheetNo']);

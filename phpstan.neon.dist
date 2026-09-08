@@ -1,0 +1,16 @@
+# Static analysis for this package.
+#
+# Level 10 is PHPStan's strictest, and it is a measurement rather than an aspiration: the
+# generator that wrote these files is held to it, and the reference packages built from the DHL,
+# FedEx and UPS descriptions each analyse clean at this level with no baseline. If a run of this
+# file reports errors, the finding belongs upstream in the generator, not in a baseline here —
+# the next generation replaces every file it would cover.
+#
+# Copy this to `phpstan.neon` to change anything. That file wins over this one and is kept out of
+# the repository, so an adjustment survives the regeneration that overwrites everything else.
+parameters:
+    level: 10
+    paths:
+        - src
+        - examples
+        - tests

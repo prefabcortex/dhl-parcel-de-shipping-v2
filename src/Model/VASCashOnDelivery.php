@@ -253,16 +253,28 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $amountOption = $this->amount;
         if ($amountOption->isDefined()) {
             $amount = $amountOption->get();
-            $dataArray['amount'] = $amount->toArray();
+            $dataArray['amount'] = $normalizationTarget->model($amount);
         }
         $bankAccountOption = $this->bankAccount;
         if ($bankAccountOption->isDefined()) {
             $bankAccount = $bankAccountOption->get();
-            $dataArray['bankAccount'] = $bankAccount->toArray();
+            $dataArray['bankAccount'] = $normalizationTarget->model($bankAccount);
         }
         $accountReferenceOption = $this->accountReference;
         if ($accountReferenceOption->isDefined()) {

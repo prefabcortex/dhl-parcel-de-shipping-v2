@@ -22,10 +22,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see ContactAddress
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see ContactAddress} has to satisfy.
  */
 final class ContactAddressConstraint implements ConstraintProviderInterface
 {

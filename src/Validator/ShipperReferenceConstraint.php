@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see ShipperReference
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see ShipperReference} has to satisfy.
  */
 final class ShipperReferenceConstraint implements ConstraintProviderInterface
 {

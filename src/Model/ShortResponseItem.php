@@ -115,13 +115,25 @@ final readonly class ShortResponseItem implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $shipmentNoOption = $this->shipmentNo;
         if ($shipmentNoOption->isDefined()) {
             $shipmentNo = $shipmentNoOption->get();
             $dataArray['shipmentNo'] = $shipmentNo;
         }
-        $dataArray['sstatus'] = $this->sstatus->toArray();
+        $dataArray['sstatus'] = $normalizationTarget->model($this->sstatus);
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 
         return $dataArray;

@@ -663,7 +663,7 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)),
+                    sprintf('Property "items" must be list, got %s.', get_debug_type($itemsRaw)),
                 );
             }
             $items = array_map(static function (mixed $value): Commodity {
@@ -712,6 +712,18 @@ final readonly class CustomsDetails implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $invoiceNoOption = $this->invoiceNo;
         if ($invoiceNoOption->isDefined()) {
@@ -749,7 +761,7 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             $mRN = $mRNOption->get();
             $dataArray['MRN'] = $mRN;
         }
-        $dataArray['postalCharges'] = $this->postalCharges->toArray();
+        $dataArray['postalCharges'] = $normalizationTarget->model($this->postalCharges);
         $officeOfOriginOption = $this->officeOfOrigin;
         if ($officeOfOriginOption->isDefined()) {
             $officeOfOrigin = $officeOfOriginOption->get();
@@ -767,7 +779,7 @@ final readonly class CustomsDetails implements SelfNormalizingModel
         }
         $values = [];
         foreach ($this->items as $value) {
-            $values[] = $value->toArray();
+            $values[] = $normalizationTarget->model($value);
         }
         $dataArray['items'] = $values;
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());

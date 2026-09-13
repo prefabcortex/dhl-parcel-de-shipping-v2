@@ -530,4 +530,10 @@ final readonly class Shipper implements SelfNormalizingModel
 
         return $dataArray;
     }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->toArray();
+    }
 }

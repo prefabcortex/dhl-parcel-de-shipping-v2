@@ -13,7 +13,12 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Http;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
+use function array_map;
 use function array_merge;
+use function implode;
+use function is_array;
+use function is_bool;
+use function rawurlencode;
 
 /**
  * @internal plumbing of the generated package, not part of its public contract: only the
@@ -73,6 +78,43 @@ trait BaseOperationTrait
     final public function getHeaders(array $baseHeaders = []): array
     {
         return array_merge($this->getExtraHeaders(), $baseHeaders, $this->getHeaderParameters()->toHeaderMap());
+    }
+
+    /**
+     * A path parameter as it goes into the path — OpenAPI's `simple` style, percent-encoded.
+     *
+     * The generated `getUri()` used to put the value in as it was: a `/` in an identifier added a
+     * path segment, a `?` started the query string, `../` climbed out of the resource the operation
+     * addresses. Every character outside RFC 3986's unreserved set is encoded now; a list is joined
+     * with commas, each element encoded on its own, and a boolean is written as the word.
+     *
+     * @param string|int|float|bool|array<array-key, string|int|float|bool> $value
+     */
+    final protected static function pathValue(string|int|float|bool|array $value): string
+    {
+        if (is_array($value)) {
+            return implode(
+                ',',
+                array_map(static fn (string|int|float|bool $item): string => self::pathValue($item), $value),
+            );
+        }
+
+        return rawurlencode(self::textValue($value));
+    }
+
+    /**
+     * A scalar as the text of a request body — the same rendering a path parameter gets, without
+     * the percent-encoding a path needs and a body does not.
+     *
+     * A description that says `text/plain` and `type: integer` hands the operation an `int`, and
+     * `Payload` carries a string or a stream. The two used to meet with nothing in between: the
+     * `int` went straight into the constructor and raised a `TypeError` — the same way a `resource`
+     * once did, for the same reason. A boolean is written as the word rather than as PHP's `"1"`
+     * and `""`, where the second is indistinguishable from no body at all.
+     */
+    final protected static function textValue(string|int|float|bool $value): string
+    {
+        return is_bool($value) ? $value ? 'true' : 'false' : (string) $value;
     }
 
     /**

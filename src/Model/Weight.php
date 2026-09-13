@@ -118,4 +118,10 @@ final readonly class Weight implements SelfNormalizingModel
 
         return $dataArray;
     }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->toArray();
+    }
 }

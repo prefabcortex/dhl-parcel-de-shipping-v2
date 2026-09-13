@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use function array_map;
 
 /**
- * @see VASVisualCheckOfAge
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see VASVisualCheckOfAge} has to satisfy.
  */
 final class VASVisualCheckOfAgeConstraint implements ConstraintProviderInterface
 {

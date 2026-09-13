@@ -127,7 +127,7 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
             $shipmentNumbersRaw = $data['shipmentNumbers'];
             if (!(is_array($shipmentNumbersRaw) && array_is_list($shipmentNumbersRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "shipmentNumbers" must be array, got %s.', get_debug_type($shipmentNumbersRaw)),
+                    sprintf('Property "shipmentNumbers" must be list, got %s.', get_debug_type($shipmentNumbersRaw)),
                 );
             }
             $shipmentNumbers = Some::create(array_map(static function (mixed $value): string {
@@ -182,5 +182,11 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 
         return $dataArray;
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->toArray();
     }
 }

@@ -18,10 +18,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see ValidationMessageItem
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see ValidationMessageItem} has to satisfy.
  */
 final class ValidationMessageItemConstraint implements ConstraintProviderInterface
 {

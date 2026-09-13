@@ -167,9 +167,10 @@ The middle row is deliberately conservative: the check finds breaks, not additio
 anything that changed without breaking is treated as a minor.
 
 Symbols marked `@internal` are excluded from all of this. They are the package's
-plumbing — the transport classes under `Http/` and `Operation/`, the generated
-validation rules, the `to…Parameters()` conversions — and they may change in any
-release. Everything else is the contract.
+plumbing — the transport classes under `Http/` and `Operation/`, the `to…Parameters()`
+conversions — and they may change in any release. Everything else is the contract,
+including what code outside the package implements or calls: the validation rules and
+the types a `custom-query-resolver` works with.
 
 In CI, check out with `fetch-depth: 0`. Without the tags the tool has nothing to
 compare against.

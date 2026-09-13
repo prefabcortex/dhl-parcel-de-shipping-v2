@@ -13,7 +13,8 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Http;
 /**
  * The value of a single query or header parameter, in the shape OpenAPI allows one to take: a
  * scalar, a list, or a string-keyed map — see {@see ScalarValue}, {@see ListValue} and {@see
- * MapValue}, which are the only implementations.
+ * MapValue}. The package's other implementations are those shapes already encoded for a particular
+ * `style`, and are its own business.
  *
  * The point of the type is to carry what the generator already knows all the way into the emitted
  * code. A generated parameter object builds these directly from its own typed properties, so
@@ -21,8 +22,7 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Http;
  * assertion, and no `match (true)` over `is_int`/`is_bool`/`is_string`. Each shape simply knows how
  * to render itself.
  *
- * @internal plumbing of the generated package, not part of its public contract: only the
- *                    generated operations and client touch this, and it may change in any release
+ * Part of the package's public contract: a {@see QueryParameterTransformer} takes and returns it.
  */
 interface ParameterValue
 {

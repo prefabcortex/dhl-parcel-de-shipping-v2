@@ -22,10 +22,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see VASDhlRetoure
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see VASDhlRetoure} has to satisfy.
  */
 final class VASDhlRetoureConstraint implements ConstraintProviderInterface
 {
@@ -35,7 +32,12 @@ final class VASDhlRetoureConstraint implements ConstraintProviderInterface
         return [
             new NotNull(),
             new Collection([
-                'billingNumber' => new Required([new Regex('#\w{10}\d{2}\w{2}#'), new Type(['string']), new NotNull()]),
+                'billingNumber' => new Required([
+                    new Regex('#\w{10}\d{2}\w{2}#'),
+                    new NotBlank(null, null, null),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'refNo' => new Optional([
                     new Length(null, 6),
                     new NotBlank(null, null, null),

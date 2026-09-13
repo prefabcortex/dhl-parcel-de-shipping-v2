@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use function array_map;
 
 /**
- * @see ValueCurrency
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see ValueCurrency} has to satisfy.
  */
 final class ValueCurrencyConstraint implements ConstraintProviderInterface
 {

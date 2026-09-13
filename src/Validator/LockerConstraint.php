@@ -24,10 +24,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see Locker
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see Locker} has to satisfy.
  */
 final class LockerConstraint implements ConstraintProviderInterface
 {
@@ -50,7 +47,12 @@ final class LockerConstraint implements ConstraintProviderInterface
                     new Type(['integer']),
                     new NotNull(),
                 ]),
-                'postNumber' => new Required([new Regex('#^[0-9]{6,10}$#'), new Type(['string']), new NotNull()]),
+                'postNumber' => new Required([
+                    new Regex('#^[0-9]{6,10}$#'),
+                    new NotBlank(null, null, null),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'city' => new Required([new Length(null, null, 40), new Type(['string']), new NotNull()]),
                 'country' => new Optional([...CountryConstraint::constraints()]),
                 'postalCode' => new Required([

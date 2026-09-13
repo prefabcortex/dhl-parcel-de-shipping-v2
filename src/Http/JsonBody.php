@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Prefabcortex\DhlParcelDeShippingV2\Http;
 
+use BackedEnum;
 use JsonException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
 
@@ -25,6 +26,7 @@ use function json_encode;
 use function sprintf;
 use function strlen;
 use function substr;
+use function trim;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -131,6 +133,182 @@ final class JsonBody
     }
 
     /**
+     * Reads a JSON array of strings — `type: array` whose `items` say `type: string`.
+     *
+     * The element type is checked here, not left to the caller: the operation declares `string[]`,
+     * and {@see self::toList()} alone would hand it whatever the array held.
+     *
+     * @return list<string>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toStringList(string $json): array
+    {
+        $strings = [];
+        foreach (self::toList($json) as $element) {
+            if (!is_string($element)) {
+                throw self::elementMismatch('strings', $element, $json);
+            }
+            $strings[] = $element;
+        }
+
+        return $strings;
+    }
+
+    /**
+     * Reads a JSON array of integers.
+     *
+     * @return list<int>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toIntList(string $json): array
+    {
+        $integers = [];
+        foreach (self::toList($json) as $element) {
+            if (!is_int($element)) {
+                throw self::elementMismatch('integers', $element, $json);
+            }
+            $integers[] = $element;
+        }
+
+        return $integers;
+    }
+
+    /**
+     * Reads a JSON array of numbers, widening each integer the way {@see self::toFloat()} does.
+     *
+     * @return list<float>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toFloatList(string $json): array
+    {
+        $numbers = [];
+        foreach (self::toList($json) as $element) {
+            if (!is_float($element) && !is_int($element)) {
+                throw self::elementMismatch('numbers', $element, $json);
+            }
+            $numbers[] = (float) $element;
+        }
+
+        return $numbers;
+    }
+
+    /**
+     * Reads a JSON array of booleans.
+     *
+     * @return list<bool>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toBoolList(string $json): array
+    {
+        $booleans = [];
+        foreach (self::toList($json) as $element) {
+            if (!is_bool($element)) {
+                throw self::elementMismatch('booleans', $element, $json);
+            }
+            $booleans[] = $element;
+        }
+
+        return $booleans;
+    }
+
+    /**
+     * Reads a body that is one case of a string-backed enum.
+     *
+     * An enum schema is generated as a backed enum, not as a model — there is no `fromArray()` to
+     * hand it to. The operations used to do exactly that, and every enum response ended in a call
+     * to a method the enum does not have.
+     *
+     * @template T of BackedEnum
+     *
+     * @param class-string<T> $enum
+     *
+     * @return T
+     *
+     * @throws MalformedDataException
+     */
+    public static function toStringEnum(string $json, string $enum): BackedEnum
+    {
+        return self::caseOf($enum, self::toString($json), $json);
+    }
+
+    /**
+     * Reads a body that is one case of an int-backed enum.
+     *
+     * @template T of BackedEnum
+     *
+     * @param class-string<T> $enum
+     *
+     * @return T
+     *
+     * @throws MalformedDataException
+     */
+    public static function toIntEnum(string $json, string $enum): BackedEnum
+    {
+        return self::caseOf($enum, self::toInt($json), $json);
+    }
+
+    /**
+     * Reads a JSON array whose elements are cases of a string-backed enum.
+     *
+     * @template T of BackedEnum
+     *
+     * @param class-string<T> $enum
+     *
+     * @return list<T>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toStringEnumList(string $json, string $enum): array
+    {
+        $cases = [];
+        foreach (self::toStringList($json) as $value) {
+            $cases[] = self::caseOf($enum, $value, $json);
+        }
+
+        return $cases;
+    }
+
+    /**
+     * Reads a JSON array whose elements are cases of an int-backed enum.
+     *
+     * @template T of BackedEnum
+     *
+     * @param class-string<T> $enum
+     *
+     * @return list<T>
+     *
+     * @throws MalformedDataException
+     */
+    public static function toIntEnumList(string $json, string $enum): array
+    {
+        $cases = [];
+        foreach (self::toIntList($json) as $value) {
+            $cases[] = self::caseOf($enum, $value, $json);
+        }
+
+        return $cases;
+    }
+
+    /**
+     * Whether the body is the JSON literal `null`.
+     *
+     * Every reader here rejects it — see {@see self::decode()} — because for most schemas `null` is
+     * not a value. A schema that allows it (`nullable: true`, `type: [integer, null]`) asks this
+     * first, so the one answer it has in addition is not reported as a malformed body.
+     *
+     * Only JSON's own four whitespace characters are trimmed: `trim()`'s default set also strips
+     * NUL and vertical tab, and a body padded with those is not JSON.
+     */
+    public static function isNull(string $json): bool
+    {
+        return 'null' === trim($json, " \t\n\r");
+    }
+
+    /**
      * Reads a `type: string` body: JSON's own quoting, undone.
      *
      * @throws MalformedDataException
@@ -225,11 +403,15 @@ final class JsonBody
      * cannot cross the boundary — and because a `JsonException` answers to nothing a consumer was
      * told to catch.
      *
-     * @param string|int|float|bool|array<int|string, mixed> $value
+     * A model is handed over as itself rather than as its `toArray()`: `json_encode()` asks it for
+     * its JSON form, which writes an empty object as `{}` where the array became `[]`. An enum
+     * encodes as its value, a map cast to an object as an object, empty or not.
+     *
+     * @param string|int|float|bool|array<int|string, mixed>|object $value
      *
      * @throws MalformedDataException
      */
-    public static function encode(string|int|float|bool|array $value): string
+    public static function encode(string|int|float|bool|array|object $value): string
     {
         try {
             // Positional, as everywhere else here: named arguments are out project-wide.
@@ -293,6 +475,48 @@ final class JsonBody
                 self::excerpt($json),
             ),
         );
+    }
+
+    /**
+     * The list arrived, one of its elements is the wrong type.
+     */
+    private static function elementMismatch(
+        string $expectedElements,
+        mixed $element,
+        string $json,
+    ): MalformedDataException {
+        return new MalformedDataException(
+            sprintf(
+                'Expected a JSON array of %s in the response body, got an element of type %s: %s',
+                $expectedElements,
+                get_debug_type($element),
+                self::excerpt($json),
+            ),
+        );
+    }
+
+    /**
+     * The case of `$enum` that `$value` names.
+     *
+     * @template T of BackedEnum
+     *
+     * @param class-string<T> $enum
+     *
+     * @return T
+     *
+     * @throws MalformedDataException
+     */
+    private static function caseOf(string $enum, string|int $value, string $json): BackedEnum
+    {
+        return $enum::tryFrom($value)
+            ?? throw new MalformedDataException(
+                sprintf(
+                    'Expected a case of %s in the response body, got %s: %s',
+                    $enum,
+                    is_string($value) ? '"' . $value . '"' : (string) $value,
+                    self::excerpt($json),
+                ),
+            );
     }
 
     /**

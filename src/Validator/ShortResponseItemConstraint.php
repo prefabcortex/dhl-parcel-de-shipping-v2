@@ -20,10 +20,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see ShortResponseItem
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see ShortResponseItem} has to satisfy.
  */
 final class ShortResponseItemConstraint implements ConstraintProviderInterface
 {

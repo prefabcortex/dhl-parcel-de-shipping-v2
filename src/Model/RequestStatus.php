@@ -252,4 +252,10 @@ final readonly class RequestStatus implements SelfNormalizingModel
 
         return $dataArray;
     }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->toArray();
+    }
 }

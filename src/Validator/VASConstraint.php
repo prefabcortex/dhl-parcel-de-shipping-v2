@@ -14,16 +14,14 @@ use Override;
 use Prefabcortex\DhlParcelDeShippingV2\Model\VAS;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see VAS
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see VAS} has to satisfy.
  */
 final class VASConstraint implements ConstraintProviderInterface
 {
@@ -51,6 +49,7 @@ final class VASConstraint implements ConstraintProviderInterface
                 'cashOnDelivery' => new Optional([new NotNull(), ...VASCashOnDeliveryConstraint::constraints()]),
                 'individualSenderRequirement' => new Optional([
                     new Regex('#[a-zA-Z0-9]{2}#'),
+                    new NotBlank(null, null, null),
                     new Type(['string']),
                     new NotNull(),
                 ]),

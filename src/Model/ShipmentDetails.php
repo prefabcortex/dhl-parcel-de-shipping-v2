@@ -119,13 +119,25 @@ final readonly class ShipmentDetails implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $dimOption = $this->dim;
         if ($dimOption->isDefined()) {
             $dim = $dimOption->get();
-            $dataArray['dim'] = $dim->toArray();
+            $dataArray['dim'] = $normalizationTarget->model($dim);
         }
-        $dataArray['weight'] = $this->weight->toArray();
+        $dataArray['weight'] = $normalizationTarget->model($this->weight);
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 
         return $dataArray;

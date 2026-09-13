@@ -199,7 +199,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $manifestRaw = $data['manifest'];
             if (!(is_array($manifestRaw) && array_is_list($manifestRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "manifest" must be array, got %s.', get_debug_type($manifestRaw)),
+                    sprintf('Property "manifest" must be list, got %s.', get_debug_type($manifestRaw)),
                 );
             }
             $manifest = Some::create(array_map(static function (mixed $value): Document {
@@ -219,7 +219,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $sheetNoRaw = $data['sheetNo'];
             if (!(is_array($sheetNoRaw) && array_is_list($sheetNoRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "sheetNo" must be array, got %s.', get_debug_type($sheetNoRaw)),
+                    sprintf('Property "sheetNo" must be list, got %s.', get_debug_type($sheetNoRaw)),
                 );
             }
             $sheetNo = Some::create(array_map(static function (mixed $value_1): BillingNoToSheetNo {
@@ -239,7 +239,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)),
+                    sprintf('Property "items" must be list, got %s.', get_debug_type($itemsRaw)),
                 );
             }
             $items = Some::create(array_map(static function (mixed $value_2): ShipmentNoToSheetNo {
@@ -264,11 +264,23 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $statusOption = $this->status;
         if ($statusOption->isDefined()) {
             $status = $statusOption->get();
-            $dataArray['status'] = $status->toArray();
+            $dataArray['status'] = $normalizationTarget->model($status);
         }
         $manifestDateOption = $this->manifestDate;
         if ($manifestDateOption->isDefined()) {
@@ -280,7 +292,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $manifest = $manifestOption->get();
             $values = [];
             foreach ($manifest as $value) {
-                $values[] = $value->toArray();
+                $values[] = $normalizationTarget->model($value);
             }
             $dataArray['manifest'] = $values;
         }
@@ -289,7 +301,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $sheetNo = $sheetNoOption->get();
             $values_1 = [];
             foreach ($sheetNo as $value_1) {
-                $values_1[] = $value_1->toArray();
+                $values_1[] = $normalizationTarget->model($value_1);
             }
             $dataArray['sheetNo'] = $values_1;
         }
@@ -298,7 +310,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $items = $itemsOption->get();
             $values_2 = [];
             foreach ($items as $value_2) {
-                $values_2[] = $value_2->toArray();
+                $values_2[] = $normalizationTarget->model($value_2);
             }
             $dataArray['items'] = $values_2;
         }

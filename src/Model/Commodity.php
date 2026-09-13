@@ -307,6 +307,18 @@ final readonly class Commodity implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $dataArray['itemDescription'] = $this->itemDescription;
         $countryOfOriginOption = $this->countryOfOrigin;
@@ -320,8 +332,8 @@ final readonly class Commodity implements SelfNormalizingModel
             $dataArray['hsCode'] = $hsCode;
         }
         $dataArray['packagedQuantity'] = $this->packagedQuantity;
-        $dataArray['itemValue'] = $this->itemValue->toArray();
-        $dataArray['itemWeight'] = $this->itemWeight->toArray();
+        $dataArray['itemValue'] = $normalizationTarget->model($this->itemValue);
+        $dataArray['itemWeight'] = $normalizationTarget->model($this->itemWeight);
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 
         return $dataArray;

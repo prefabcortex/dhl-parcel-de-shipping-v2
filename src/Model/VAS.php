@@ -932,11 +932,11 @@ final readonly class VAS implements SelfNormalizingModel
             $preferredDayRaw = $data['preferredDay'];
             if (!is_string($preferredDayRaw)) {
                 throw new MalformedDataException(
-                    sprintf('Property "preferredDay" must be object, got %s.', get_debug_type($preferredDayRaw)),
+                    sprintf('Property "preferredDay" must be string, got %s.', get_debug_type($preferredDayRaw)),
                 );
             }
             $date = DateTime::createFromFormat('Y-m-d', $preferredDayRaw);
-            if ($date === false) {
+            if (false === $date || false !== DateTime::getLastErrors()) {
                 throw new MalformedDataException('Invalid date format, expected: Y-m-d');
             }
             $preferredDay = Some::create($date->setTime(0, 0, 0));
@@ -1103,6 +1103,18 @@ final readonly class VAS implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $preferredNeighbourOption = $this->preferredNeighbour;
         if ($preferredNeighbourOption->isDefined()) {
@@ -1127,7 +1139,7 @@ final readonly class VAS implements SelfNormalizingModel
         $identCheckOption = $this->identCheck;
         if ($identCheckOption->isDefined()) {
             $identCheck = $identCheckOption->get();
-            $dataArray['identCheck'] = $identCheck->toArray();
+            $dataArray['identCheck'] = $normalizationTarget->model($identCheck);
         }
         $signedForByRecipientOption = $this->signedForByRecipient;
         if ($signedForByRecipientOption->isDefined()) {
@@ -1152,7 +1164,7 @@ final readonly class VAS implements SelfNormalizingModel
         $additionalInsuranceOption = $this->additionalInsurance;
         if ($additionalInsuranceOption->isDefined()) {
             $additionalInsurance = $additionalInsuranceOption->get();
-            $dataArray['additionalInsurance'] = $additionalInsurance->toArray();
+            $dataArray['additionalInsurance'] = $normalizationTarget->model($additionalInsurance);
         }
         $bulkyGoodsOption = $this->bulkyGoods;
         if ($bulkyGoodsOption->isDefined()) {
@@ -1162,7 +1174,7 @@ final readonly class VAS implements SelfNormalizingModel
         $cashOnDeliveryOption = $this->cashOnDelivery;
         if ($cashOnDeliveryOption->isDefined()) {
             $cashOnDelivery = $cashOnDeliveryOption->get();
-            $dataArray['cashOnDelivery'] = $cashOnDelivery->toArray();
+            $dataArray['cashOnDelivery'] = $normalizationTarget->model($cashOnDelivery);
         }
         $individualSenderRequirementOption = $this->individualSenderRequirement;
         if ($individualSenderRequirementOption->isDefined()) {
@@ -1192,7 +1204,7 @@ final readonly class VAS implements SelfNormalizingModel
         $dhlRetoureOption = $this->dhlRetoure;
         if ($dhlRetoureOption->isDefined()) {
             $dhlRetoure = $dhlRetoureOption->get();
-            $dataArray['dhlRetoure'] = $dhlRetoure->toArray();
+            $dataArray['dhlRetoure'] = $normalizationTarget->model($dhlRetoure);
         }
         $postalDeliveryDutyPaidOption = $this->postalDeliveryDutyPaid;
         if ($postalDeliveryDutyPaidOption->isDefined()) {

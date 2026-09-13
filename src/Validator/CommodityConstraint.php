@@ -21,10 +21,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see Commodity
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see Commodity} has to satisfy.
  */
 final class CommodityConstraint implements ConstraintProviderInterface
 {

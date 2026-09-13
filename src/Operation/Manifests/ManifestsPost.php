@@ -136,7 +136,7 @@ final class ManifestsPost implements Operation
         $data = $this->body->toArray();
         $this->validate($data, ShipmentManifestingRequestConstraint::constraints());
 
-        return new Payload(['Content-Type' => ['application/json']], JsonBody::encode($data));
+        return new Payload(['Content-Type' => ['application/json']], JsonBody::encode($this->body));
     }
 
     /** @return array<string, list<string>> */

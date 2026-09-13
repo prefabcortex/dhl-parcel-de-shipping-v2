@@ -106,7 +106,7 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "items" must be array, got %s.', get_debug_type($itemsRaw)),
+                    sprintf('Property "items" must be list, got %s.', get_debug_type($itemsRaw)),
                 );
             }
             $items = Some::create(array_map(static function (mixed $value): ResponseItem {
@@ -131,18 +131,30 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $statusOption = $this->status;
         if ($statusOption->isDefined()) {
             $status = $statusOption->get();
-            $dataArray['status'] = $status->toArray();
+            $dataArray['status'] = $normalizationTarget->model($status);
         }
         $itemsOption = $this->items;
         if ($itemsOption->isDefined()) {
             $items = $itemsOption->get();
             $values = [];
             foreach ($items as $value) {
-                $values[] = $value->toArray();
+                $values[] = $normalizationTarget->model($value);
             }
             $dataArray['items'] = $values;
         }

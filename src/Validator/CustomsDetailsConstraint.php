@@ -22,10 +22,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see CustomsDetails
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see CustomsDetails} has to satisfy.
  */
 final class CustomsDetailsConstraint implements ConstraintProviderInterface
 {

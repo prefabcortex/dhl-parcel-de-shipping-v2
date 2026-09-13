@@ -14,8 +14,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @internal plumbing of the generated package, not part of its public contract: only the
- *                    generated operations and client touch this, and it may change in any release
+ * Part of the package's public contract: a caller validating data against a model's rules uses it,
+ * with the model's `…Constraint::constraints()` — the operations use it the same way.
  */
 trait ValidatorTrait
 {

@@ -162,11 +162,11 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
             $dateOfBirthRaw = $data['dateOfBirth'];
             if (!is_string($dateOfBirthRaw)) {
                 throw new MalformedDataException(
-                    sprintf('Property "dateOfBirth" must be object, got %s.', get_debug_type($dateOfBirthRaw)),
+                    sprintf('Property "dateOfBirth" must be string, got %s.', get_debug_type($dateOfBirthRaw)),
                 );
             }
             $date = DateTime::createFromFormat('Y-m-d', $dateOfBirthRaw);
-            if ($date === false) {
+            if (false === $date || false !== DateTime::getLastErrors()) {
                 throw new MalformedDataException('Invalid date format, expected: Y-m-d');
             }
             $dateOfBirth = Some::create($date->setTime(0, 0, 0));
@@ -218,5 +218,11 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 
         return $dataArray;
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->toArray();
     }
 }

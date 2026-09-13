@@ -21,10 +21,7 @@ use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see Shipment
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see Shipment} has to satisfy.
  */
 final class ShipmentConstraint implements ConstraintProviderInterface
 {
@@ -35,7 +32,12 @@ final class ShipmentConstraint implements ConstraintProviderInterface
             new NotNull(),
             new Collection([
                 'product' => new Optional([...ProductConstraint::constraints()]),
-                'billingNumber' => new Optional([new Regex('#\w{10}\d{2}\w{2}#'), new Type(['string']), new NotNull()]),
+                'billingNumber' => new Optional([
+                    new Regex('#\w{10}\d{2}\w{2}#'),
+                    new NotBlank(null, null, null),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
                 'refNo' => new Optional([
                     new Length(null, 8),
                     new NotBlank(null, null, null),

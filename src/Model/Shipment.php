@@ -495,11 +495,11 @@ final readonly class Shipment implements SelfNormalizingModel
             $shipDateRaw = $data['shipDate'];
             if (!is_string($shipDateRaw)) {
                 throw new MalformedDataException(
-                    sprintf('Property "shipDate" must be object, got %s.', get_debug_type($shipDateRaw)),
+                    sprintf('Property "shipDate" must be string, got %s.', get_debug_type($shipDateRaw)),
                 );
             }
             $date = DateTime::createFromFormat('Y-m-d', $shipDateRaw);
-            if ($date === false) {
+            if (false === $date || false !== DateTime::getLastErrors()) {
                 throw new MalformedDataException('Invalid date format, expected: Y-m-d');
             }
             $shipDate = Some::create($date->setTime(0, 0, 0));
@@ -507,7 +507,9 @@ final readonly class Shipment implements SelfNormalizingModel
         }
         if (array_key_exists('shipper', $data)) {
             if (!is_array($data['shipper'])) {
-                throw new MalformedDataException('Value did not match any of the expected types.');
+                throw new MalformedDataException(
+                    'Property "shipper" matched none of the expected shapes: Shipper, ShipperReference.',
+                );
             }
             /** @var array<string, mixed> $shipperTyped */
             $shipperTyped = $data['shipper'];
@@ -527,14 +529,16 @@ final readonly class Shipment implements SelfNormalizingModel
             } elseif (array_key_exists('shipperRef', $shipperTyped)) {
                 $value = ShipperReference::fromArray($shipperTyped);
             } else {
-                throw new MalformedDataException('Value did not match any of the expected types.');
+                throw new MalformedDataException(
+                    'Property "shipper" matched none of the expected shapes: Shipper, ShipperReference.',
+                );
             }
             $shipper = Some::create($value);
             unset($data['shipper']);
         }
         if (array_key_exists('consignee', $data)) {
             if (!is_array($data['consignee'])) {
-                throw new MalformedDataException('Value did not match any of the expected types.');
+                throw new MalformedDataException('Property "consignee" matched none of the expected shapes: ContactAddress, Locker, PostOffice, POBox.');
             }
             /** @var array<string, mixed> $consigneeTyped */
             $consigneeTyped = $data['consignee'];
@@ -574,7 +578,7 @@ final readonly class Shipment implements SelfNormalizingModel
             ) {
                 $value_1 = POBox::fromArray($consigneeTyped);
             } else {
-                throw new MalformedDataException('Value did not match any of the expected types.');
+                throw new MalformedDataException('Property "consignee" matched none of the expected shapes: ContactAddress, Locker, PostOffice, POBox.');
             }
             $consignee = Some::create($value_1);
             unset($data['consignee']);
@@ -637,6 +641,18 @@ final readonly class Shipment implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $productOption = $this->product;
         if ($productOption->isDefined()) {
@@ -671,29 +687,29 @@ final readonly class Shipment implements SelfNormalizingModel
         $shipperOption = $this->shipper;
         if ($shipperOption->isDefined()) {
             $shipper = $shipperOption->get();
-            $value = $shipper->toArray();
+            $value = $normalizationTarget->model($shipper);
             $dataArray['shipper'] = $value;
         }
         $consigneeOption = $this->consignee;
         if ($consigneeOption->isDefined()) {
             $consignee = $consigneeOption->get();
-            $value_1 = $consignee->toArray();
+            $value_1 = $normalizationTarget->model($consignee);
             $dataArray['consignee'] = $value_1;
         }
         $detailsOption = $this->details;
         if ($detailsOption->isDefined()) {
             $details = $detailsOption->get();
-            $dataArray['details'] = $details->toArray();
+            $dataArray['details'] = $normalizationTarget->model($details);
         }
         $servicesOption = $this->services;
         if ($servicesOption->isDefined()) {
             $services = $servicesOption->get();
-            $dataArray['services'] = $services->toArray();
+            $dataArray['services'] = $normalizationTarget->model($services);
         }
         $customsOption = $this->customs;
         if ($customsOption->isDefined()) {
             $customs = $customsOption->get();
-            $dataArray['customs'] = $customs->toArray();
+            $dataArray['customs'] = $normalizationTarget->model($customs);
         }
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 

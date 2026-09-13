@@ -23,10 +23,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Uuid;
 
 /**
- * @see ResponseItem
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see ResponseItem} has to satisfy.
  */
 final class ResponseItemConstraint implements ConstraintProviderInterface
 {

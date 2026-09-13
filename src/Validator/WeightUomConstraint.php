@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use function array_map;
 
 /**
- * @see WeightUom
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see WeightUom} has to satisfy.
  */
 final class WeightUomConstraint implements ConstraintProviderInterface
 {

@@ -283,4 +283,10 @@ final readonly class Document implements SelfNormalizingModel
 
         return $dataArray;
     }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->toArray();
+    }
 }

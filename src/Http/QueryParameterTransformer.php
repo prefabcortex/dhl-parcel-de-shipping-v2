@@ -18,8 +18,8 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Http;
  * implementation states the shape it produces instead of leaving it to be re-derived: returning
  * `new ScalarValue('true')` or `ListValue::ofScalars([...])` is checked at the boundary.
  *
- * @internal plumbing of the generated package, not part of its public contract: only the
- *                    generated operations and client touch this, and it may change in any release
+ * Part of the package's public contract: it is what a `custom-query-resolver` implements, so a
+ * change to it breaks code this package does not own — which is what the BC check has to see.
  */
 interface QueryParameterTransformer
 {

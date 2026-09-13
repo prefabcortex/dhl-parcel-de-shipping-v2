@@ -13,8 +13,8 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Validator;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @internal plumbing of the generated package, not part of its public contract: only the
- *                    generated operations and client touch this, and it may change in any release
+ * Part of the package's public contract: every generated `…Constraint` class implements it, and its
+ * `constraints()` is how a caller gets the rules of a model to validate data against.
  */
 interface ConstraintProviderInterface
 {

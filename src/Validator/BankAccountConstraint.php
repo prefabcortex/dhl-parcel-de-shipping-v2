@@ -14,6 +14,7 @@ use Override;
 use Prefabcortex\DhlParcelDeShippingV2\Model\BankAccount;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -21,10 +22,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see BankAccount
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see BankAccount} has to satisfy.
  */
 final class BankAccountConstraint implements ConstraintProviderInterface
 {
@@ -38,10 +36,16 @@ final class BankAccountConstraint implements ConstraintProviderInterface
                 'bankName' => new Optional([new Length(null, null, 80), new Type(['string']), new NotNull()]),
                 'iban' => new Required([
                     new Regex('#[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}#'),
+                    new NotBlank(null, null, null),
                     new Type(['string']),
                     new NotNull(),
                 ]),
-                'bic' => new Optional([new Regex('#[a-zA-Z0-9]{8,11}#'), new Type(['string']), new NotNull()]),
+                'bic' => new Optional([
+                    new Regex('#[a-zA-Z0-9]{8,11}#'),
+                    new NotBlank(null, null, null),
+                    new Type(['string']),
+                    new NotNull(),
+                ]),
             ], null, null, true),
         ];
     }

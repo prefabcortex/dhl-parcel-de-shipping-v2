@@ -198,6 +198,18 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $dataArray['billingNumber'] = $this->billingNumber;
         $refNoOption = $this->refNo;
@@ -208,7 +220,7 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
         $returnAddressOption = $this->returnAddress;
         if ($returnAddressOption->isDefined()) {
             $returnAddress = $returnAddressOption->get();
-            $dataArray['returnAddress'] = $returnAddress->toArray();
+            $dataArray['returnAddress'] = $normalizationTarget->model($returnAddress);
         }
         $goGreenPlusOption = $this->goGreenPlus;
         if ($goGreenPlusOption->isDefined()) {

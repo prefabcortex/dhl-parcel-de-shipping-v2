@@ -109,16 +109,28 @@ final readonly class ServiceInformation implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $ampOption = $this->amp;
         if ($ampOption->isDefined()) {
             $amp = $ampOption->get();
-            $dataArray['amp'] = $amp->toArray();
+            $dataArray['amp'] = $normalizationTarget->model($amp);
         }
         $backendOption = $this->backend;
         if ($backendOption->isDefined()) {
             $backend = $backendOption->get();
-            $dataArray['backend'] = $backend->toArray();
+            $dataArray['backend'] = $normalizationTarget->model($backend);
         }
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 

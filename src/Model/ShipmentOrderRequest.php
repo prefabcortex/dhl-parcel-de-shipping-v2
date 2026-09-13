@@ -96,7 +96,7 @@ final readonly class ShipmentOrderRequest implements SelfNormalizingModel
             $shipmentsRaw = $data['shipments'];
             if (!(is_array($shipmentsRaw) && array_is_list($shipmentsRaw))) {
                 throw new MalformedDataException(
-                    sprintf('Property "shipments" must be array, got %s.', get_debug_type($shipmentsRaw)),
+                    sprintf('Property "shipments" must be list, got %s.', get_debug_type($shipmentsRaw)),
                 );
             }
             $shipments = array_map(static function (mixed $value): Shipment {
@@ -127,11 +127,23 @@ final readonly class ShipmentOrderRequest implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $dataArray['profile'] = $this->profile;
         $values = [];
         foreach ($this->shipments as $value) {
-            $values[] = $value->toArray();
+            $values[] = $normalizationTarget->model($value);
         }
         $dataArray['shipments'] = $values;
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());

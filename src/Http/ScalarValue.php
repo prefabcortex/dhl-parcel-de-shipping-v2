@@ -22,8 +22,7 @@ use function strtr;
  * The native union is the whole point: a generated parameter object passes its typed property
  * straight in, and PHP itself rejects anything that has no wire representation.
  *
- * @internal plumbing of the generated package, not part of its public contract: only the
- *                    generated operations and client touch this, and it may change in any release
+ * Part of the package's public contract: a {@see QueryParameterTransformer} reads and builds it.
  */
 final readonly class ScalarValue implements ParameterValue
 {
@@ -64,7 +63,16 @@ final readonly class ScalarValue implements ParameterValue
     #[Override]
     public function toQueryPairs(string $name, bool $allowReserved): array
     {
-        return [rawurlencode($name) . '=' . self::encode($this->toWireString(), $allowReserved)];
+        return [rawurlencode($name) . '=' . $this->toEncodedValue($allowReserved)];
+    }
+
+    /**
+     * The value alone, percent-encoded for a query string — the part a non-exploded style strings
+     * together with the others behind one name.
+     */
+    public function toEncodedValue(bool $allowReserved): string
+    {
+        return self::encode($this->toWireString(), $allowReserved);
     }
 
     #[Override]

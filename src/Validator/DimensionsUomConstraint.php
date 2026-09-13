@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use function array_map;
 
 /**
- * @see DimensionsUom
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see DimensionsUom} has to satisfy.
  */
 final class DimensionsUomConstraint implements ConstraintProviderInterface
 {

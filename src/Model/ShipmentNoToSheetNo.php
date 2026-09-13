@@ -139,6 +139,18 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $shipmentNoOption = $this->shipmentNo;
         if ($shipmentNoOption->isDefined()) {
@@ -153,7 +165,7 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
         $sstatusOption = $this->sstatus;
         if ($sstatusOption->isDefined()) {
             $sstatus = $sstatusOption->get();
-            $dataArray['sstatus'] = $sstatus->toArray();
+            $dataArray['sstatus'] = $normalizationTarget->model($sstatus);
         }
         $dataArray = array_replace($dataArray, $this->getAdditionalProperties());
 

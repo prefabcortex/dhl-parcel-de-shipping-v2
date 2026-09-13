@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see LabelDataResponse
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see LabelDataResponse} has to satisfy.
  */
 final class LabelDataResponseConstraint implements ConstraintProviderInterface
 {

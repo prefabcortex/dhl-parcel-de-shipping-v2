@@ -18,10 +18,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @see Dimensions
- *
- * @internal validation rules for the model above, not part of this package's public
- *                      contract: they may change in any release
+ * The rules a document for {@see Dimensions} has to satisfy.
  */
 final class DimensionsConstraint implements ConstraintProviderInterface
 {

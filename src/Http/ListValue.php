@@ -22,8 +22,7 @@ use function array_values;
  * repeated once per element (`tags=a&tags=b`) rather than PHP's `tags[0]=a` bracket notation, which
  * real APIs reject.
  *
- * @internal plumbing of the generated package, not part of its public contract: only the
- *                    generated operations and client touch this, and it may change in any release
+ * Part of the package's public contract: a {@see QueryParameterTransformer} reads and builds it.
  */
 final readonly class ListValue implements ParameterValue
 {

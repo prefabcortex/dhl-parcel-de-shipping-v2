@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace Prefabcortex\DhlParcelDeShippingV2\Model;
 
+use JsonSerializable;
+use Override;
+
 /**
  * A model that carries its own JSON representation instead of delegating it to an external
  * normalizer.
@@ -21,8 +24,16 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Model;
  * client's models take the data alone. Declaring either one here would make the interface a lie
  * about the other.
  */
-interface SelfNormalizingModel
+interface SelfNormalizingModel extends JsonSerializable
 {
+    /**
+     * The same document as JSON: a `stdClass` wherever the description has an object, so that one
+     * which is empty — a model none of whose properties is set, a map without entries — encodes as
+     * `{}` rather than the `[]` an empty PHP array becomes.
+     */
+    #[Override]
+    public function jsonSerialize(): object;
+
     /**
      * The document this model came from, as a plain array.
      *

@@ -559,7 +559,7 @@ final readonly class ResponseItem implements SelfNormalizingModel
             if (!(is_array($validationMessagesRaw) && array_is_list($validationMessagesRaw))) {
                 throw new MalformedDataException(
                     sprintf(
-                        'Property "validationMessages" must be array, got %s.',
+                        'Property "validationMessages" must be list, got %s.',
                         get_debug_type($validationMessagesRaw),
                     ),
                 );
@@ -613,6 +613,18 @@ final readonly class ResponseItem implements SelfNormalizingModel
     #[Override]
     public function toArray(): array
     {
+        return $this->normalize(NormalizationTarget::PhpArray);
+    }
+
+    #[Override]
+    public function jsonSerialize(): object
+    {
+        return (object) $this->normalize(NormalizationTarget::Json);
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalize(NormalizationTarget $normalizationTarget): array
+    {
         $dataArray = [];
         $shipmentNoOption = $this->shipmentNo;
         if ($shipmentNoOption->isDefined()) {
@@ -634,7 +646,7 @@ final readonly class ResponseItem implements SelfNormalizingModel
             $returnShipmentNo = $returnShipmentNoOption->get();
             $dataArray['returnShipmentNo'] = $returnShipmentNo;
         }
-        $dataArray['sstatus'] = $this->sstatus->toArray();
+        $dataArray['sstatus'] = $normalizationTarget->model($this->sstatus);
         $shipmentRefNoOption = $this->shipmentRefNo;
         if ($shipmentRefNoOption->isDefined()) {
             $shipmentRefNo = $shipmentRefNoOption->get();
@@ -643,29 +655,29 @@ final readonly class ResponseItem implements SelfNormalizingModel
         $labelOption = $this->label;
         if ($labelOption->isDefined()) {
             $label = $labelOption->get();
-            $dataArray['label'] = $label->toArray();
+            $dataArray['label'] = $normalizationTarget->model($label);
         }
         $returnLabelOption = $this->returnLabel;
         if ($returnLabelOption->isDefined()) {
             $returnLabel = $returnLabelOption->get();
-            $dataArray['returnLabel'] = $returnLabel->toArray();
+            $dataArray['returnLabel'] = $normalizationTarget->model($returnLabel);
         }
         $customsDocOption = $this->customsDoc;
         if ($customsDocOption->isDefined()) {
             $customsDoc = $customsDocOption->get();
-            $dataArray['customsDoc'] = $customsDoc->toArray();
+            $dataArray['customsDoc'] = $normalizationTarget->model($customsDoc);
         }
         $codLabelOption = $this->codLabel;
         if ($codLabelOption->isDefined()) {
             $codLabel = $codLabelOption->get();
-            $dataArray['codLabel'] = $codLabel->toArray();
+            $dataArray['codLabel'] = $normalizationTarget->model($codLabel);
         }
         $validationMessagesOption = $this->validationMessages;
         if ($validationMessagesOption->isDefined()) {
             $validationMessages = $validationMessagesOption->get();
             $values = [];
             foreach ($validationMessages as $value) {
-                $values[] = $value->toArray();
+                $values[] = $normalizationTarget->model($value);
             }
             $dataArray['validationMessages'] = $values;
         }

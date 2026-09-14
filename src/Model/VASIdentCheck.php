@@ -158,7 +158,7 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
             $lastName = $lastNameRaw;
             unset($data['lastName']);
         }
-        if (array_key_exists('dateOfBirth', $data)) {
+        if (array_key_exists('dateOfBirth', $data) && $data['dateOfBirth'] !== null) {
             $dateOfBirthRaw = $data['dateOfBirth'];
             if (!is_string($dateOfBirthRaw)) {
                 throw new MalformedDataException(
@@ -171,8 +171,10 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
             }
             $dateOfBirth = Some::create($date->setTime(0, 0, 0));
             unset($data['dateOfBirth']);
+        } elseif (array_key_exists('dateOfBirth', $data)) {
+            unset($data['dateOfBirth']);
         }
-        if (array_key_exists('minimumAge', $data)) {
+        if (array_key_exists('minimumAge', $data) && $data['minimumAge'] !== null) {
             $minimumAgeRaw = $data['minimumAge'];
             if (!is_string($minimumAgeRaw)) {
                 throw new MalformedDataException(
@@ -185,6 +187,8 @@ final readonly class VASIdentCheck implements SelfNormalizingModel
                         sprintf('"%s" is not a valid VASIdentCheckMinimumAge.', $minimumAgeRaw),
                     ),
             );
+            unset($data['minimumAge']);
+        } elseif (array_key_exists('minimumAge', $data)) {
             unset($data['minimumAge']);
         }
         $additionalProperties = $data;

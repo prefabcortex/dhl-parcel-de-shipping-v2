@@ -12,10 +12,12 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Operation\Manifests;
 
 use Override;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedResponseException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\ManifestsPostBadRequestException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\ManifestsPostInternalServerErrorException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\ManifestsPostTooManyRequestsException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\ManifestsPostUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ResponseValidationException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
 use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
@@ -25,6 +27,7 @@ use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
 use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
 use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
 use Prefabcortex\DhlParcelDeShippingV2\Model\ManifestsPostAccept;
 use Prefabcortex\DhlParcelDeShippingV2\Model\MultipleManifestResponse;
@@ -179,41 +182,52 @@ final class ManifestsPost implements Operation
     protected function transformResponseBody(
         ResponseInterface $response,
         ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
     ): MultipleManifestResponse {
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
         if (207 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, MultipleManifestResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, MultipleManifestResponseConstraint::constraints());
+            }
 
             return MultipleManifestResponse::fromArray($typedData);
         }
         if (400 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
             throw new ManifestsPostBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
         }
         if (401 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new ManifestsPostUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (429 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new ManifestsPostTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (500 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new ManifestsPostInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
         }
         throw new UnexpectedStatusCodeException($response, $body);
     }
 
     /**
-     * @throws ValidationException
-     * @throws MalformedDataException
+     * @throws ResponseValidationException
+     * @throws MalformedResponseException
      * @throws ManifestsPostBadRequestException
      * @throws ManifestsPostUnauthorizedException
      * @throws ManifestsPostTooManyRequestsException
@@ -221,11 +235,19 @@ final class ManifestsPost implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    public function parseResponse(ResponseInterface $response): MultipleManifestResponse
-    {
+    public function parseResponse(
+        ResponseInterface $response,
+        ResponseValidation $responseValidation,
+    ): MultipleManifestResponse {
         $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
-
-        return $this->transformResponseBody($response, $contentType);
+        $body = (string) $response->getBody();
+        try {
+            return $this->transformResponseBody($response, $contentType, $body, $responseValidation);
+        } catch (ValidationException $exception) {
+            throw new ResponseValidationException($exception->getViolationList(), $response, $body);
+        } catch (MalformedDataException $exception) {
+            throw new MalformedResponseException($exception, $response, $body);
+        }
     }
 
     /** @return list<list<string>> */

@@ -438,7 +438,7 @@ final readonly class ResponseItem implements SelfNormalizingModel
         $codLabel = None::create();
         $validationMessages = None::create();
         $uuid = None::create();
-        if (array_key_exists('shipmentNo', $data)) {
+        if (array_key_exists('shipmentNo', $data) && $data['shipmentNo'] !== null) {
             $shipmentNoRaw = $data['shipmentNo'];
             if (!is_string($shipmentNoRaw)) {
                 throw new MalformedDataException(
@@ -447,8 +447,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             }
             $shipmentNo = Some::create($shipmentNoRaw);
             unset($data['shipmentNo']);
+        } elseif (array_key_exists('shipmentNo', $data)) {
+            unset($data['shipmentNo']);
         }
-        if (array_key_exists('routingCode', $data)) {
+        if (array_key_exists('routingCode', $data) && $data['routingCode'] !== null) {
             $routingCodeRaw = $data['routingCode'];
             if (!is_string($routingCodeRaw)) {
                 throw new MalformedDataException(
@@ -457,8 +459,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             }
             $routingCode = Some::create($routingCodeRaw);
             unset($data['routingCode']);
+        } elseif (array_key_exists('routingCode', $data)) {
+            unset($data['routingCode']);
         }
-        if (array_key_exists('returnRoutingCode', $data)) {
+        if (array_key_exists('returnRoutingCode', $data) && $data['returnRoutingCode'] !== null) {
             $returnRoutingCodeRaw = $data['returnRoutingCode'];
             if (!is_string($returnRoutingCodeRaw)) {
                 throw new MalformedDataException(
@@ -470,8 +474,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             }
             $returnRoutingCode = Some::create($returnRoutingCodeRaw);
             unset($data['returnRoutingCode']);
+        } elseif (array_key_exists('returnRoutingCode', $data)) {
+            unset($data['returnRoutingCode']);
         }
-        if (array_key_exists('returnShipmentNo', $data)) {
+        if (array_key_exists('returnShipmentNo', $data) && $data['returnShipmentNo'] !== null) {
             $returnShipmentNoRaw = $data['returnShipmentNo'];
             if (!is_string($returnShipmentNoRaw)) {
                 throw new MalformedDataException(
@@ -482,6 +488,8 @@ final readonly class ResponseItem implements SelfNormalizingModel
                 );
             }
             $returnShipmentNo = Some::create($returnShipmentNoRaw);
+            unset($data['returnShipmentNo']);
+        } elseif (array_key_exists('returnShipmentNo', $data)) {
             unset($data['returnShipmentNo']);
         }
         if (array_key_exists('sstatus', $data)) {
@@ -496,7 +504,7 @@ final readonly class ResponseItem implements SelfNormalizingModel
             $sstatus = RequestStatus::fromArray($sstatusRawTyped);
             unset($data['sstatus']);
         }
-        if (array_key_exists('shipmentRefNo', $data)) {
+        if (array_key_exists('shipmentRefNo', $data) && $data['shipmentRefNo'] !== null) {
             $shipmentRefNoRaw = $data['shipmentRefNo'];
             if (!is_string($shipmentRefNoRaw)) {
                 throw new MalformedDataException(
@@ -505,8 +513,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             }
             $shipmentRefNo = Some::create($shipmentRefNoRaw);
             unset($data['shipmentRefNo']);
+        } elseif (array_key_exists('shipmentRefNo', $data)) {
+            unset($data['shipmentRefNo']);
         }
-        if (array_key_exists('label', $data)) {
+        if (array_key_exists('label', $data) && $data['label'] !== null) {
             $labelRaw = $data['label'];
             if (!is_array($labelRaw)) {
                 throw new MalformedDataException(
@@ -517,8 +527,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             $labelRawTyped = $labelRaw;
             $label = Some::create(Document::fromArray($labelRawTyped));
             unset($data['label']);
+        } elseif (array_key_exists('label', $data)) {
+            unset($data['label']);
         }
-        if (array_key_exists('returnLabel', $data)) {
+        if (array_key_exists('returnLabel', $data) && $data['returnLabel'] !== null) {
             $returnLabelRaw = $data['returnLabel'];
             if (!is_array($returnLabelRaw)) {
                 throw new MalformedDataException(
@@ -529,8 +541,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             $returnLabelRawTyped = $returnLabelRaw;
             $returnLabel = Some::create(Document::fromArray($returnLabelRawTyped));
             unset($data['returnLabel']);
+        } elseif (array_key_exists('returnLabel', $data)) {
+            unset($data['returnLabel']);
         }
-        if (array_key_exists('customsDoc', $data)) {
+        if (array_key_exists('customsDoc', $data) && $data['customsDoc'] !== null) {
             $customsDocRaw = $data['customsDoc'];
             if (!is_array($customsDocRaw)) {
                 throw new MalformedDataException(
@@ -541,8 +555,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             $customsDocRawTyped = $customsDocRaw;
             $customsDoc = Some::create(Document::fromArray($customsDocRawTyped));
             unset($data['customsDoc']);
+        } elseif (array_key_exists('customsDoc', $data)) {
+            unset($data['customsDoc']);
         }
-        if (array_key_exists('codLabel', $data)) {
+        if (array_key_exists('codLabel', $data) && $data['codLabel'] !== null) {
             $codLabelRaw = $data['codLabel'];
             if (!is_array($codLabelRaw)) {
                 throw new MalformedDataException(
@@ -553,8 +569,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
             $codLabelRawTyped = $codLabelRaw;
             $codLabel = Some::create(Document::fromArray($codLabelRawTyped));
             unset($data['codLabel']);
+        } elseif (array_key_exists('codLabel', $data)) {
+            unset($data['codLabel']);
         }
-        if (array_key_exists('validationMessages', $data)) {
+        if (array_key_exists('validationMessages', $data) && $data['validationMessages'] !== null) {
             $validationMessagesRaw = $data['validationMessages'];
             if (!(is_array($validationMessagesRaw) && array_is_list($validationMessagesRaw))) {
                 throw new MalformedDataException(
@@ -576,8 +594,10 @@ final readonly class ResponseItem implements SelfNormalizingModel
                 return ValidationMessageItem::fromArray($valueTyped);
             }, $validationMessagesRaw));
             unset($data['validationMessages']);
+        } elseif (array_key_exists('validationMessages', $data)) {
+            unset($data['validationMessages']);
         }
-        if (array_key_exists('uuid', $data)) {
+        if (array_key_exists('uuid', $data) && $data['uuid'] !== null) {
             $uuidRaw = $data['uuid'];
             if (!is_string($uuidRaw)) {
                 throw new MalformedDataException(
@@ -585,6 +605,8 @@ final readonly class ResponseItem implements SelfNormalizingModel
                 );
             }
             $uuid = Some::create($uuidRaw);
+            unset($data['uuid']);
+        } elseif (array_key_exists('uuid', $data)) {
             unset($data['uuid']);
         }
         $additionalProperties = $data;

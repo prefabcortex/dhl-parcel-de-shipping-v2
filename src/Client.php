@@ -103,6 +103,7 @@ final class Client
             $factory,
             $factory,
             new AuthenticatorRegistry(array_values($authenticators)),
+            $config->responseValidation,
         );
     }
 

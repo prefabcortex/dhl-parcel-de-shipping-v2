@@ -184,7 +184,7 @@ final readonly class Document implements SelfNormalizingModel
         $url = None::create();
         $fileFormat = None::create();
         $printFormat = None::create();
-        if (array_key_exists('b64', $data)) {
+        if (array_key_exists('b64', $data) && $data['b64'] !== null) {
             $b64Raw = $data['b64'];
             if (!is_string($b64Raw)) {
                 throw new MalformedDataException(
@@ -193,8 +193,10 @@ final readonly class Document implements SelfNormalizingModel
             }
             $b64 = Some::create($b64Raw);
             unset($data['b64']);
+        } elseif (array_key_exists('b64', $data)) {
+            unset($data['b64']);
         }
-        if (array_key_exists('zpl2', $data)) {
+        if (array_key_exists('zpl2', $data) && $data['zpl2'] !== null) {
             $zpl2Raw = $data['zpl2'];
             if (!is_string($zpl2Raw)) {
                 throw new MalformedDataException(
@@ -203,8 +205,10 @@ final readonly class Document implements SelfNormalizingModel
             }
             $zpl2 = Some::create($zpl2Raw);
             unset($data['zpl2']);
+        } elseif (array_key_exists('zpl2', $data)) {
+            unset($data['zpl2']);
         }
-        if (array_key_exists('url', $data)) {
+        if (array_key_exists('url', $data) && $data['url'] !== null) {
             $urlRaw = $data['url'];
             if (!is_string($urlRaw)) {
                 throw new MalformedDataException(
@@ -213,8 +217,10 @@ final readonly class Document implements SelfNormalizingModel
             }
             $url = Some::create($urlRaw);
             unset($data['url']);
+        } elseif (array_key_exists('url', $data)) {
+            unset($data['url']);
         }
-        if (array_key_exists('fileFormat', $data)) {
+        if (array_key_exists('fileFormat', $data) && $data['fileFormat'] !== null) {
             $fileFormatRaw = $data['fileFormat'];
             if (!is_string($fileFormatRaw)) {
                 throw new MalformedDataException(
@@ -228,8 +234,10 @@ final readonly class Document implements SelfNormalizingModel
                     ),
             );
             unset($data['fileFormat']);
+        } elseif (array_key_exists('fileFormat', $data)) {
+            unset($data['fileFormat']);
         }
-        if (array_key_exists('printFormat', $data)) {
+        if (array_key_exists('printFormat', $data) && $data['printFormat'] !== null) {
             $printFormatRaw = $data['printFormat'];
             if (!is_string($printFormatRaw)) {
                 throw new MalformedDataException(
@@ -242,6 +250,8 @@ final readonly class Document implements SelfNormalizingModel
                         sprintf('"%s" is not a valid DocumentPrintFormat.', $printFormatRaw),
                     ),
             );
+            unset($data['printFormat']);
+        } elseif (array_key_exists('printFormat', $data)) {
             unset($data['printFormat']);
         }
         $additionalProperties = $data;

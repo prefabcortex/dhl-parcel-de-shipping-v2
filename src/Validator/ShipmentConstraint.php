@@ -33,7 +33,7 @@ final class ShipmentConstraint implements ConstraintProviderInterface
             new Collection([
                 'product' => new Optional([...ProductConstraint::constraints()]),
                 'billingNumber' => new Optional([
-                    new Regex('#\w{10}\d{2}\w{2}#'),
+                    new Regex('#\w{10}\d{2}\w{2}#Du'),
                     new NotBlank(null, null, null),
                     new Type(['string']),
                     new NotNull(),

@@ -24,7 +24,7 @@ use function getenv;
  * See examples/Auth/ for a credentialed one, or Client::create() to sign requests yourself.
  *
  *   $config = ClientConfig::production()->withHttpClient(getDebugLoggingHttpClient($httpClient));
- *   $client = Client::create($config); // or Client::withBasicAuth(..., $config), see examples/Auth/
+ *   $client = Client::create($config); // or Client::withBasicAuth($username, $password, $config), see examples/Auth/
  *
  * Swap `new StderrLogger()` below for Monolog or any other psr/log
  * implementation to send these logs somewhere other than STDERR.

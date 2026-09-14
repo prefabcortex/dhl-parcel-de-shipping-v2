@@ -76,7 +76,7 @@ final readonly class ServiceInformation implements SelfNormalizingModel
     {
         $amp = None::create();
         $backend = None::create();
-        if (array_key_exists('amp', $data)) {
+        if (array_key_exists('amp', $data) && $data['amp'] !== null) {
             $ampRaw = $data['amp'];
             if (!is_array($ampRaw)) {
                 throw new MalformedDataException(
@@ -87,8 +87,10 @@ final readonly class ServiceInformation implements SelfNormalizingModel
             $ampRawTyped = $ampRaw;
             $amp = Some::create(ServiceInformationAmp::fromArray($ampRawTyped));
             unset($data['amp']);
+        } elseif (array_key_exists('amp', $data)) {
+            unset($data['amp']);
         }
-        if (array_key_exists('backend', $data)) {
+        if (array_key_exists('backend', $data) && $data['backend'] !== null) {
             $backendRaw = $data['backend'];
             if (!is_array($backendRaw)) {
                 throw new MalformedDataException(
@@ -98,6 +100,8 @@ final readonly class ServiceInformation implements SelfNormalizingModel
             /** @var array<string, mixed> $backendRawTyped */
             $backendRawTyped = $backendRaw;
             $backend = Some::create(ServiceInformationBackend::fromArray($backendRawTyped));
+            unset($data['backend']);
+        } elseif (array_key_exists('backend', $data)) {
             unset($data['backend']);
         }
         $additionalProperties = $data;

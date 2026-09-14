@@ -79,7 +79,7 @@ final readonly class BillingNoToSheetNo implements SelfNormalizingModel
     {
         $billingNumber = None::create();
         $sheetNo = None::create();
-        if (array_key_exists('billingNumber', $data)) {
+        if (array_key_exists('billingNumber', $data) && $data['billingNumber'] !== null) {
             $billingNumberRaw = $data['billingNumber'];
             if (!is_string($billingNumberRaw)) {
                 throw new MalformedDataException(
@@ -88,8 +88,10 @@ final readonly class BillingNoToSheetNo implements SelfNormalizingModel
             }
             $billingNumber = Some::create($billingNumberRaw);
             unset($data['billingNumber']);
+        } elseif (array_key_exists('billingNumber', $data)) {
+            unset($data['billingNumber']);
         }
-        if (array_key_exists('sheetNo', $data)) {
+        if (array_key_exists('sheetNo', $data) && $data['sheetNo'] !== null) {
             $sheetNoRaw = $data['sheetNo'];
             if (!is_string($sheetNoRaw)) {
                 throw new MalformedDataException(
@@ -97,6 +99,8 @@ final readonly class BillingNoToSheetNo implements SelfNormalizingModel
                 );
             }
             $sheetNo = Some::create($sheetNoRaw);
+            unset($data['sheetNo']);
+        } elseif (array_key_exists('sheetNo', $data)) {
             unset($data['sheetNo']);
         }
         $additionalProperties = $data;

@@ -238,7 +238,7 @@ final readonly class Locker implements SelfNormalizingModel
             $city = $cityRaw;
             unset($data['city']);
         }
-        if (array_key_exists('country', $data)) {
+        if (array_key_exists('country', $data) && $data['country'] !== null) {
             $countryRaw = $data['country'];
             if (!is_string($countryRaw)) {
                 throw new MalformedDataException(
@@ -249,6 +249,8 @@ final readonly class Locker implements SelfNormalizingModel
                 Country::tryFrom($countryRaw)
                     ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)),
             );
+            unset($data['country']);
+        } elseif (array_key_exists('country', $data)) {
             unset($data['country']);
         }
         if (array_key_exists('postalCode', $data)) {

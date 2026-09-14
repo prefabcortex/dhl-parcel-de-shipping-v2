@@ -31,6 +31,10 @@ use UnexpectedValueException;
  *
  * The generator's own parsing keeps throwing the SPL type directly. A broken specification document
  * is not a package's error surface, and nothing catches it as one.
+ *
+ * In a package with API operations, a response one of them cannot read does not leave it as this
+ * class: the operation raises `MalformedResponseException` in its place, which also hands back the
+ * response that arrived.
  */
 final class MalformedDataException extends UnexpectedValueException implements ApiException
 {

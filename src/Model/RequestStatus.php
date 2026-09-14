@@ -185,7 +185,7 @@ final readonly class RequestStatus implements SelfNormalizingModel
             $statusCode = $statusCodeRaw;
             unset($data['statusCode']);
         }
-        if (array_key_exists('status', $data)) {
+        if (array_key_exists('status', $data) && $data['status'] !== null) {
             $statusRaw = $data['status'];
             if (!is_int($statusRaw)) {
                 throw new MalformedDataException(
@@ -194,8 +194,10 @@ final readonly class RequestStatus implements SelfNormalizingModel
             }
             $status = Some::create($statusRaw);
             unset($data['status']);
+        } elseif (array_key_exists('status', $data)) {
+            unset($data['status']);
         }
-        if (array_key_exists('instance', $data)) {
+        if (array_key_exists('instance', $data) && $data['instance'] !== null) {
             $instanceRaw = $data['instance'];
             if (!is_string($instanceRaw)) {
                 throw new MalformedDataException(
@@ -204,8 +206,10 @@ final readonly class RequestStatus implements SelfNormalizingModel
             }
             $instance = Some::create($instanceRaw);
             unset($data['instance']);
+        } elseif (array_key_exists('instance', $data)) {
+            unset($data['instance']);
         }
-        if (array_key_exists('detail', $data)) {
+        if (array_key_exists('detail', $data) && $data['detail'] !== null) {
             $detailRaw = $data['detail'];
             if (!is_string($detailRaw)) {
                 throw new MalformedDataException(
@@ -213,6 +217,8 @@ final readonly class RequestStatus implements SelfNormalizingModel
                 );
             }
             $detail = Some::create($detailRaw);
+            unset($data['detail']);
+        } elseif (array_key_exists('detail', $data)) {
             unset($data['detail']);
         }
         $additionalProperties = $data;

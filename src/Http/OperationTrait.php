@@ -18,9 +18,14 @@ use Psr\Http\Message\ResponseInterface;
  */
 trait OperationTrait
 {
-    abstract protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): mixed;
+    abstract protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
+    ): mixed;
 
     // Generated per operation (not implemented here) so its @throws tag can list
     // the exact exceptions that operation's transformResponseBody() throws.
-    abstract public function parseResponse(ResponseInterface $response): mixed;
+    abstract public function parseResponse(ResponseInterface $response, ResponseValidation $responseValidation): mixed;
 }

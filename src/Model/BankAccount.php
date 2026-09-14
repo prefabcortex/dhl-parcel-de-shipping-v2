@@ -125,7 +125,7 @@ final readonly class BankAccount implements SelfNormalizingModel
             $accountHolder = $accountHolderRaw;
             unset($data['accountHolder']);
         }
-        if (array_key_exists('bankName', $data)) {
+        if (array_key_exists('bankName', $data) && $data['bankName'] !== null) {
             $bankNameRaw = $data['bankName'];
             if (!is_string($bankNameRaw)) {
                 throw new MalformedDataException(
@@ -133,6 +133,8 @@ final readonly class BankAccount implements SelfNormalizingModel
                 );
             }
             $bankName = Some::create($bankNameRaw);
+            unset($data['bankName']);
+        } elseif (array_key_exists('bankName', $data)) {
             unset($data['bankName']);
         }
         if (array_key_exists('iban', $data)) {
@@ -145,7 +147,7 @@ final readonly class BankAccount implements SelfNormalizingModel
             $iban = $ibanRaw;
             unset($data['iban']);
         }
-        if (array_key_exists('bic', $data)) {
+        if (array_key_exists('bic', $data) && $data['bic'] !== null) {
             $bicRaw = $data['bic'];
             if (!is_string($bicRaw)) {
                 throw new MalformedDataException(
@@ -153,6 +155,8 @@ final readonly class BankAccount implements SelfNormalizingModel
                 );
             }
             $bic = Some::create($bicRaw);
+            unset($data['bic']);
+        } elseif (array_key_exists('bic', $data)) {
             unset($data['bic']);
         }
         $additionalProperties = $data;

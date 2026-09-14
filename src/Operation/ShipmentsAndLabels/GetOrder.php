@@ -17,6 +17,8 @@ use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderNotFoundException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderTooManyRequestsException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\GetOrderUnauthorizedException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedResponseException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ResponseValidationException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
 use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
@@ -26,6 +28,7 @@ use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
 use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
 use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Model\GetOrderAccept;
 use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
 use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
@@ -144,53 +147,70 @@ final class GetOrder implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): LabelDataResponse
-    {
+    protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
+    ): LabelDataResponse {
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
         if (200 === $status && $contentType->is('application/json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
 
             return LabelDataResponse::fromArray($typedData);
         }
         if (207 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
 
             return LabelDataResponse::fromArray($typedData);
         }
         if (400 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
             throw new GetOrderBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
         }
         if (401 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetOrderUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (404 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetOrderNotFoundException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (429 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetOrderTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (500 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetOrderInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
         }
         throw new UnexpectedStatusCodeException($response, $body);
     }
 
     /**
-     * @throws ValidationException
-     * @throws MalformedDataException
+     * @throws ResponseValidationException
+     * @throws MalformedResponseException
      * @throws GetOrderBadRequestException
      * @throws GetOrderUnauthorizedException
      * @throws GetOrderNotFoundException
@@ -199,11 +219,19 @@ final class GetOrder implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    public function parseResponse(ResponseInterface $response): LabelDataResponse
-    {
+    public function parseResponse(
+        ResponseInterface $response,
+        ResponseValidation $responseValidation,
+    ): LabelDataResponse {
         $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
-
-        return $this->transformResponseBody($response, $contentType);
+        $body = (string) $response->getBody();
+        try {
+            return $this->transformResponseBody($response, $contentType, $body, $responseValidation);
+        } catch (ValidationException $exception) {
+            throw new ResponseValidationException($exception->getViolationList(), $response, $body);
+        } catch (MalformedDataException $exception) {
+            throw new MalformedResponseException($exception, $response, $body);
+        }
     }
 
     /** @return list<list<string>> */

@@ -36,11 +36,11 @@ Every link below points at a file under `examples/` to read and copy from.
 
 ### Authentication
 
-- **BasicAuth** (HTTP Basic): `Client::withBasicAuth(..., $config)` — see [`examples/Auth/BasicAuth.php`](examples/Auth/BasicAuth.php)
-- **ApiKey** (API key): `Client::withApiKey(..., $config)` — see [`examples/Auth/ApiKey.php`](examples/Auth/ApiKey.php)
-- **OAuth2** (OAuth2): `Client::withOAuth(..., $config)` — see [`examples/Auth/OAuth2.php`](examples/Auth/OAuth2.php)
+- **BasicAuth** (HTTP Basic): `Client::withBasicAuth($username, $password, $config)` — see [`examples/Auth/BasicAuth.php`](examples/Auth/BasicAuth.php)
+- **ApiKey** (API key): `Client::withApiKey($apiKey, $config)` — see [`examples/Auth/ApiKey.php`](examples/Auth/ApiKey.php)
+- **OAuth2** (OAuth2): `Client::withOAuth($token, $config)` — see [`examples/Auth/OAuth2.php`](examples/Auth/OAuth2.php)
 
-For a scheme this package generates no authenticator for, or a signature the description cannot express, implement `Authentication\Authenticator` and pass it to `Client::withAuthenticators($config, ...)`.
+For a scheme this package generates no authenticator for, or a signature the description cannot express, implement `Authentication\Authenticator` and pass it to `Client::withAuthenticators($config, ...$authenticators)`.
 
 ### Operations
 
@@ -90,6 +90,42 @@ properties and fills every optional one in as absent; each `with…()` takes the
 and wraps it for you, and returns a new model rather than changing this one. Query and
 header parameter objects work the same way with `set…()`. There is no reason to write
 `Some::create()` or `None::create()` yourself.
+
+## Response validation
+
+The API description says what the API *should* send. By default every response is held
+to it: each constraint the description declares — a maximum length, a pattern, a range,
+the values an enum allows, a property that must not be `null` — is checked before the
+response is read, and a response that breaks one raises `ResponseValidationException`.
+That way a difference between the API and its description shows up the first time it
+happens, not somewhere further down your code.
+
+Sometimes the API is the one that does not keep to its description. When it is, and you
+need to go on using it until its provider fixes that, read responses without these
+checks:
+
+```php
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
+
+$config = $config->withResponseValidation(ResponseValidation::Lax);
+```
+
+| The response carries                        | `Strict` (default)            | `Lax`                        |
+|---------------------------------------------|-------------------------------|------------------------------|
+| a text too long, a pattern or range not met | `ResponseValidationException` | read as it is                |
+| `null` in an optional property              | `ResponseValidationException` | read as absent               |
+| a value its model cannot hold               | `ResponseValidationException` | `MalformedResponseException` |
+
+A value its model cannot hold — a wrong type, a missing required property, an enum value
+the model has no case for — stays an error either way, because a typed model has nowhere
+to put it. Requests
+are not affected by the setting — what you send is always checked in full before it
+leaves.
+
+Both exceptions are `ResponseException`s, so `getResponse()` and `getRawResponse()` hand
+back what arrived. Mind what that means: **the request reached the API**, and whatever it
+asked for may have happened — a shipment created, an order placed. Do not simply send it
+again; read the raw response first.
 
 ## Error handling
 

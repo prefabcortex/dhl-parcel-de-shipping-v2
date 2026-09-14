@@ -16,6 +16,8 @@ use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersInternalServerError
 use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersTooManyRequestsException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\CreateOrdersUnauthorizedException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedResponseException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ResponseValidationException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
 use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
@@ -25,6 +27,7 @@ use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
 use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
 use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Model\CreateOrdersAccept;
 use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
 use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
@@ -170,10 +173,13 @@ final class CreateOrders implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): LabelDataResponse
-    {
+    protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
+    ): LabelDataResponse {
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
         // 200: Success response for requests with a single shipment.
         // 207: Response for requests taking multiple input elements
         if (
@@ -181,36 +187,46 @@ final class CreateOrders implements Operation
             && $contentType->isAnyOf(['application/json', 'application/problem+json'])
         ) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
 
             return LabelDataResponse::fromArray($typedData);
         }
         if (400 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
             throw new CreateOrdersBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
         }
         if (401 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new CreateOrdersUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (429 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new CreateOrdersTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (500 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new CreateOrdersInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
         }
         throw new UnexpectedStatusCodeException($response, $body);
     }
 
     /**
-     * @throws ValidationException
-     * @throws MalformedDataException
+     * @throws ResponseValidationException
+     * @throws MalformedResponseException
      * @throws CreateOrdersBadRequestException
      * @throws CreateOrdersUnauthorizedException
      * @throws CreateOrdersTooManyRequestsException
@@ -218,11 +234,19 @@ final class CreateOrders implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    public function parseResponse(ResponseInterface $response): LabelDataResponse
-    {
+    public function parseResponse(
+        ResponseInterface $response,
+        ResponseValidation $responseValidation,
+    ): LabelDataResponse {
         $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
-
-        return $this->transformResponseBody($response, $contentType);
+        $body = (string) $response->getBody();
+        try {
+            return $this->transformResponseBody($response, $contentType, $body, $responseValidation);
+        } catch (ValidationException $exception) {
+            throw new ResponseValidationException($exception->getViolationList(), $response, $body);
+        } catch (MalformedDataException $exception) {
+            throw new MalformedResponseException($exception, $response, $body);
+        }
     }
 
     /** @return list<list<string>> */

@@ -173,7 +173,7 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
         $manifest = None::create();
         $sheetNo = None::create();
         $items = None::create();
-        if (array_key_exists('status', $data)) {
+        if (array_key_exists('status', $data) && $data['status'] !== null) {
             $statusRaw = $data['status'];
             if (!is_array($statusRaw)) {
                 throw new MalformedDataException(
@@ -184,8 +184,10 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             $statusRawTyped = $statusRaw;
             $status = Some::create(RequestStatus::fromArray($statusRawTyped));
             unset($data['status']);
+        } elseif (array_key_exists('status', $data)) {
+            unset($data['status']);
         }
-        if (array_key_exists('manifestDate', $data)) {
+        if (array_key_exists('manifestDate', $data) && $data['manifestDate'] !== null) {
             $manifestDateRaw = $data['manifestDate'];
             if (!is_string($manifestDateRaw)) {
                 throw new MalformedDataException(
@@ -194,8 +196,10 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
             }
             $manifestDate = Some::create($manifestDateRaw);
             unset($data['manifestDate']);
+        } elseif (array_key_exists('manifestDate', $data)) {
+            unset($data['manifestDate']);
         }
-        if (array_key_exists('manifest', $data)) {
+        if (array_key_exists('manifest', $data) && $data['manifest'] !== null) {
             $manifestRaw = $data['manifest'];
             if (!(is_array($manifestRaw) && array_is_list($manifestRaw))) {
                 throw new MalformedDataException(
@@ -214,8 +218,10 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
                 return Document::fromArray($valueTyped);
             }, $manifestRaw));
             unset($data['manifest']);
+        } elseif (array_key_exists('manifest', $data)) {
+            unset($data['manifest']);
         }
-        if (array_key_exists('sheetNo', $data)) {
+        if (array_key_exists('sheetNo', $data) && $data['sheetNo'] !== null) {
             $sheetNoRaw = $data['sheetNo'];
             if (!(is_array($sheetNoRaw) && array_is_list($sheetNoRaw))) {
                 throw new MalformedDataException(
@@ -234,8 +240,10 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
                 return BillingNoToSheetNo::fromArray($value_1Typed);
             }, $sheetNoRaw));
             unset($data['sheetNo']);
+        } elseif (array_key_exists('sheetNo', $data)) {
+            unset($data['sheetNo']);
         }
-        if (array_key_exists('items', $data)) {
+        if (array_key_exists('items', $data) && $data['items'] !== null) {
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
                 throw new MalformedDataException(
@@ -253,6 +261,8 @@ final readonly class SingleManifestResponse implements SelfNormalizingModel
 
                 return ShipmentNoToSheetNo::fromArray($value_2Typed);
             }, $itemsRaw));
+            unset($data['items']);
+        } elseif (array_key_exists('items', $data)) {
             unset($data['items']);
         }
         $additionalProperties = $data;

@@ -48,10 +48,14 @@ trait ClientTrait
     protected RequestFactoryInterface $requestFactory;
     protected StreamFactoryInterface $streamFactory;
     protected AuthenticatorRegistry $authenticatorRegistry;
+    protected ResponseValidation $responseValidation;
 
     /**
-     * @param string $baseUri where the described API lives, e.g.
-     *                        `https://api-eu.dhl.com/parcel/de/shipping/v2`
+     * @param string             $baseUri            where the described API lives, e.g.
+     *                                               `https://api-eu.dhl.com/parcel/de/shipping/v2`
+     * @param ResponseValidation $responseValidation how closely every response is held to its
+     *                                               description, handed to each operation that
+     *                                               reads one
      *
      * @throws UnsupportedValueException when the base URI carries no scheme and host, and could
      *                                   therefore never address a server
@@ -62,6 +66,7 @@ trait ClientTrait
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         AuthenticatorRegistry $authenticatorRegistry,
+        ResponseValidation $responseValidation,
     ) {
         // Checked once here rather than per request: a base URI that names no host produces a
         // relative request URI, and a PSR-18 client answers that with an exception naming the
@@ -77,6 +82,7 @@ trait ClientTrait
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
         $this->authenticatorRegistry = $authenticatorRegistry;
+        $this->responseValidation = $responseValidation;
     }
 
     /**
@@ -101,7 +107,7 @@ trait ClientTrait
      */
     final public function executeOperation(Operation $operation): mixed
     {
-        return $operation->parseResponse($this->processOperation($operation));
+        return $operation->parseResponse($this->processOperation($operation), $this->responseValidation);
     }
 
     /**

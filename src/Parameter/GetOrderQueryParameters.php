@@ -42,7 +42,7 @@ final class GetOrderQueryParameters
     private bool $combine = true;
     /**
      * **Defines** the print medium for the shipping label. The different option vary from standard
-     * papersizes DIN A4 and DIN A5 to specific label print formats.Â .
+     * papersizes DIN A4 and DIN A5 to specific label print formats.
      *
      * Specific laser print formats using DIN A5 blanks are:
      *
@@ -69,7 +69,7 @@ final class GetOrderQueryParameters
     /**
      * **Defines** the print medium for the return shipping label. This parameter is only usable, if
      * you do not use **combined printing**. The different option vary from standard papersizes DIN
-     * A4 and DIN A5 to specific label print formats.Â .
+     * A4 and DIN A5 to specific label print formats.
      *
      * Specific laser print formats using DIN A5 blanks are:
      *

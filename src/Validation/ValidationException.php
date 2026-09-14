@@ -17,18 +17,18 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use function sprintf;
 
 /**
- * A document — a request body on its way out, a response body on its way in — that does not satisfy
- * the constraints its schema declares.
+ * A document that does not satisfy the constraints its schema declares — out of an operation, a
+ * request body checked before it is sent.
  *
- * Carries {@see ApiException} because it is thrown straight out of `transformResponseBody()`, on
- * the same path and in the same `@throws` list as the operation exceptions beside it. Without the
- * marker the one catch the README documents let it through, which made a failed response check —
- * one of the two most likely ways a call goes wrong — the case a consumer following the
- * documentation was least prepared for.
+ * Carries {@see ApiException} because it leaves an operation on the same path and in the same
+ * `@throws` list as the operation exceptions beside it. Without the marker the one catch the README
+ * documents let it through.
  *
- * It carries no response accessors and so is not a `ResponseException`: the violation list is the
- * finer answer to the same question, and half of the throw sites are on the request side, where
- * there is no response at all.
+ * It carries no response accessors and so is not a `ResponseException`: where it is raised there is
+ * no response. A *response* that breaks its constraints used to raise this too, and so looked
+ * exactly like a request that never left — while the request had arrived and done what it asked
+ * for. That case is `ResponseValidationException` now, a sibling rather than a subclass on purpose:
+ * a catch of this class must keep meaning "nothing was sent".
  */
 final class ValidationException extends RuntimeException implements ApiException
 {

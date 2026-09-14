@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Prefabcortex\DhlParcelDeShippingV2;
 
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Optional\None;
 use Prefabcortex\DhlParcelDeShippingV2\Optional\Option;
 use Prefabcortex\DhlParcelDeShippingV2\Optional\Some;
@@ -20,12 +21,14 @@ final readonly class ClientConfig
     public string $baseUrl;
     /** @var Option<ClientInterface> */
     public Option $httpClient;
+    public ResponseValidation $responseValidation;
 
     /** @param Option<ClientInterface> $httpClient */
-    private function __construct(string $baseUrl, Option $httpClient)
+    private function __construct(string $baseUrl, Option $httpClient, ResponseValidation $responseValidation)
     {
         $this->baseUrl = $baseUrl;
         $this->httpClient = $httpClient;
+        $this->responseValidation = $responseValidation;
     }
 
     /**
@@ -36,26 +39,47 @@ final readonly class ClientConfig
      */
     public static function forBaseUrl(string $baseUrl): self
     {
-        return new self($baseUrl, None::create());
+        return new self($baseUrl, None::create(), ResponseValidation::Strict);
     }
 
     public static function production(): self
     {
-        return new self('https://api-eu.dhl.com/parcel/de/shipping/v2', None::create());
+        return new self('https://api-eu.dhl.com/parcel/de/shipping/v2', None::create(), ResponseValidation::Strict);
     }
 
     public static function sandbox(): self
     {
-        return new self('https://api-sandbox.dhl.com/parcel/de/shipping/v2', None::create());
+        return new self(
+            'https://api-sandbox.dhl.com/parcel/de/shipping/v2',
+            None::create(),
+            ResponseValidation::Strict,
+        );
     }
 
     public function withBaseUrl(string $baseUrl): self
     {
-        return new self($baseUrl, $this->httpClient);
+        return new self($baseUrl, $this->httpClient, $this->responseValidation);
     }
 
     public function withHttpClient(ClientInterface $httpClient): self
     {
-        return new self($this->baseUrl, Some::create($httpClient));
+        return new self($this->baseUrl, Some::create($httpClient), $this->responseValidation);
+    }
+
+    /**
+     * How closely responses are held to the API description. `Strict` is the default.
+     *
+     * Strict checks every response against every constraint the description declares, so a response
+     * the API should not have sent fails loudly, as `ResponseValidationException`. If the API does
+     * not keep to its own description — a text longer than its declared maximum, a `null` where a
+     * value was promised — `Lax` reads such responses anyway, until its provider fixes them. What a
+     * typed model needs in order to exist (the type of a property, a required property, a known
+     * enum value) is still checked either way.
+     *
+     * Requests are always checked in full before they are sent.
+     */
+    public function withResponseValidation(ResponseValidation $responseValidation): self
+    {
+        return new self($this->baseUrl, $this->httpClient, $responseValidation);
     }
 }

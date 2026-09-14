@@ -83,7 +83,7 @@ final readonly class ShipmentDetails implements SelfNormalizingModel
     {
         $dim = None::create();
         $weight = null;
-        if (array_key_exists('dim', $data)) {
+        if (array_key_exists('dim', $data) && $data['dim'] !== null) {
             $dimRaw = $data['dim'];
             if (!is_array($dimRaw)) {
                 throw new MalformedDataException(
@@ -93,6 +93,8 @@ final readonly class ShipmentDetails implements SelfNormalizingModel
             /** @var array<string, mixed> $dimRawTyped */
             $dimRawTyped = $dimRaw;
             $dim = Some::create(Dimensions::fromArray($dimRawTyped));
+            unset($data['dim']);
+        } elseif (array_key_exists('dim', $data)) {
             unset($data['dim']);
         }
         if (array_key_exists('weight', $data)) {

@@ -33,7 +33,7 @@ final class VASDhlRetoureConstraint implements ConstraintProviderInterface
             new NotNull(),
             new Collection([
                 'billingNumber' => new Required([
-                    new Regex('#\w{10}\d{2}\w{2}#'),
+                    new Regex('#\w{10}\d{2}\w{2}#Du'),
                     new NotBlank(null, null, null),
                     new Type(['string']),
                     new NotNull(),

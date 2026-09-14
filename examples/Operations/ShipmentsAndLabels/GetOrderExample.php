@@ -44,9 +44,9 @@ final class GetOrderExample
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *
-     *   $client = Client::withBasicAuth(...); // withApiKey/withOAuth also available, see examples/Auth/
-     *   $queryParameters = new GetOrderQueryParameters(...);
-     *   $headerParameters = new GetOrderHeaderParameters(...);
+     *   $client = Client::withBasicAuth($username, $password, $config); // withApiKey/withOAuth also available, see examples/Auth/
+     *   $queryParameters = new GetOrderQueryParameters($shipment);
+     *   $headerParameters = new GetOrderHeaderParameters();
      *   GetOrderExample::getOrder($client, $queryParameters, $headerParameters);
      *
      * @throws ApiException

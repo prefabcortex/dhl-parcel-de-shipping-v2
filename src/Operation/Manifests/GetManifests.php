@@ -17,6 +17,8 @@ use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsNotFoundException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsTooManyRequestsException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\GetManifestsUnauthorizedException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedResponseException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ResponseValidationException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
 use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
@@ -26,6 +28,7 @@ use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
 use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
 use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Model\GetManifestsAccept;
 use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
 use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
@@ -142,46 +145,59 @@ final class GetManifests implements Operation
     protected function transformResponseBody(
         ResponseInterface $response,
         ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
     ): SingleManifestResponse {
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
         if (200 === $status && $contentType->isAnyOf(['application/json', 'application/problem+json'])) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, SingleManifestResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, SingleManifestResponseConstraint::constraints());
+            }
 
             return SingleManifestResponse::fromArray($typedData);
         }
         if (400 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
             throw new GetManifestsBadRequestException(LabelDataResponse::fromArray($typedData), $response, $body);
         }
         if (401 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetManifestsUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (404 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetManifestsNotFoundException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (429 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetManifestsTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (500 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new GetManifestsInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
         }
         throw new UnexpectedStatusCodeException($response, $body);
     }
 
     /**
-     * @throws ValidationException
-     * @throws MalformedDataException
+     * @throws ResponseValidationException
+     * @throws MalformedResponseException
      * @throws GetManifestsBadRequestException
      * @throws GetManifestsUnauthorizedException
      * @throws GetManifestsNotFoundException
@@ -190,11 +206,19 @@ final class GetManifests implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    public function parseResponse(ResponseInterface $response): SingleManifestResponse
-    {
+    public function parseResponse(
+        ResponseInterface $response,
+        ResponseValidation $responseValidation,
+    ): SingleManifestResponse {
         $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
-
-        return $this->transformResponseBody($response, $contentType);
+        $body = (string) $response->getBody();
+        try {
+            return $this->transformResponseBody($response, $contentType, $body, $responseValidation);
+        } catch (ValidationException $exception) {
+            throw new ResponseValidationException($exception->getViolationList(), $response, $body);
+        } catch (MalformedDataException $exception) {
+            throw new MalformedResponseException($exception, $response, $body);
+        }
     }
 
     /** @return list<list<string>> */

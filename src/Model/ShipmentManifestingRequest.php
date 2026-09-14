@@ -123,7 +123,7 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
             $profile = $profileRaw;
             unset($data['profile']);
         }
-        if (array_key_exists('shipmentNumbers', $data)) {
+        if (array_key_exists('shipmentNumbers', $data) && $data['shipmentNumbers'] !== null) {
             $shipmentNumbersRaw = $data['shipmentNumbers'];
             if (!(is_array($shipmentNumbersRaw) && array_is_list($shipmentNumbersRaw))) {
                 throw new MalformedDataException(
@@ -140,8 +140,10 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
                 return $value;
             }, $shipmentNumbersRaw));
             unset($data['shipmentNumbers']);
+        } elseif (array_key_exists('shipmentNumbers', $data)) {
+            unset($data['shipmentNumbers']);
         }
-        if (array_key_exists('billingNumber', $data)) {
+        if (array_key_exists('billingNumber', $data) && $data['billingNumber'] !== null) {
             $billingNumberRaw = $data['billingNumber'];
             if (!is_string($billingNumberRaw)) {
                 throw new MalformedDataException(
@@ -149,6 +151,8 @@ final readonly class ShipmentManifestingRequest implements SelfNormalizingModel
                 );
             }
             $billingNumber = Some::create($billingNumberRaw);
+            unset($data['billingNumber']);
+        } elseif (array_key_exists('billingNumber', $data)) {
             unset($data['billingNumber']);
         }
         $additionalProperties = $data;

@@ -514,7 +514,7 @@ final readonly class CustomsDetails implements SelfNormalizingModel
         $shipperCustomsRef = None::create();
         $consigneeCustomsRef = None::create();
         $items = null;
-        if (array_key_exists('invoiceNo', $data)) {
+        if (array_key_exists('invoiceNo', $data) && $data['invoiceNo'] !== null) {
             $invoiceNoRaw = $data['invoiceNo'];
             if (!is_string($invoiceNoRaw)) {
                 throw new MalformedDataException(
@@ -522,6 +522,8 @@ final readonly class CustomsDetails implements SelfNormalizingModel
                 );
             }
             $invoiceNo = Some::create($invoiceNoRaw);
+            unset($data['invoiceNo']);
+        } elseif (array_key_exists('invoiceNo', $data)) {
             unset($data['invoiceNo']);
         }
         if (array_key_exists('exportType', $data)) {
@@ -537,7 +539,7 @@ final readonly class CustomsDetails implements SelfNormalizingModel
                 );
             unset($data['exportType']);
         }
-        if (array_key_exists('exportDescription', $data)) {
+        if (array_key_exists('exportDescription', $data) && $data['exportDescription'] !== null) {
             $exportDescriptionRaw = $data['exportDescription'];
             if (!is_string($exportDescriptionRaw)) {
                 throw new MalformedDataException(
@@ -549,8 +551,10 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             }
             $exportDescription = Some::create($exportDescriptionRaw);
             unset($data['exportDescription']);
+        } elseif (array_key_exists('exportDescription', $data)) {
+            unset($data['exportDescription']);
         }
-        if (array_key_exists('shippingConditions', $data)) {
+        if (array_key_exists('shippingConditions', $data) && $data['shippingConditions'] !== null) {
             $shippingConditionsRaw = $data['shippingConditions'];
             if (!is_string($shippingConditionsRaw)) {
                 throw new MalformedDataException(
@@ -567,8 +571,10 @@ final readonly class CustomsDetails implements SelfNormalizingModel
                     ),
             );
             unset($data['shippingConditions']);
+        } elseif (array_key_exists('shippingConditions', $data)) {
+            unset($data['shippingConditions']);
         }
-        if (array_key_exists('permitNo', $data)) {
+        if (array_key_exists('permitNo', $data) && $data['permitNo'] !== null) {
             $permitNoRaw = $data['permitNo'];
             if (!is_string($permitNoRaw)) {
                 throw new MalformedDataException(
@@ -577,8 +583,10 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             }
             $permitNo = Some::create($permitNoRaw);
             unset($data['permitNo']);
+        } elseif (array_key_exists('permitNo', $data)) {
+            unset($data['permitNo']);
         }
-        if (array_key_exists('attestationNo', $data)) {
+        if (array_key_exists('attestationNo', $data) && $data['attestationNo'] !== null) {
             $attestationNoRaw = $data['attestationNo'];
             if (!is_string($attestationNoRaw)) {
                 throw new MalformedDataException(
@@ -587,8 +595,13 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             }
             $attestationNo = Some::create($attestationNoRaw);
             unset($data['attestationNo']);
+        } elseif (array_key_exists('attestationNo', $data)) {
+            unset($data['attestationNo']);
         }
-        if (array_key_exists('hasElectronicExportNotification', $data)) {
+        if (
+            array_key_exists('hasElectronicExportNotification', $data)
+            && $data['hasElectronicExportNotification'] !== null
+        ) {
             $hasElectronicExportNotificationRaw = $data['hasElectronicExportNotification'];
             if (!is_bool($hasElectronicExportNotificationRaw)) {
                 throw new MalformedDataException(
@@ -600,8 +613,10 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             }
             $hasElectronicExportNotification = Some::create($hasElectronicExportNotificationRaw);
             unset($data['hasElectronicExportNotification']);
+        } elseif (array_key_exists('hasElectronicExportNotification', $data)) {
+            unset($data['hasElectronicExportNotification']);
         }
-        if (array_key_exists('MRN', $data)) {
+        if (array_key_exists('MRN', $data) && $data['MRN'] !== null) {
             $mRNRaw = $data['MRN'];
             if (!is_string($mRNRaw)) {
                 throw new MalformedDataException(
@@ -609,6 +624,8 @@ final readonly class CustomsDetails implements SelfNormalizingModel
                 );
             }
             $mRN = Some::create($mRNRaw);
+            unset($data['MRN']);
+        } elseif (array_key_exists('MRN', $data)) {
             unset($data['MRN']);
         }
         if (array_key_exists('postalCharges', $data)) {
@@ -623,7 +640,7 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             $postalCharges = Value::fromArray($postalChargesRawTyped);
             unset($data['postalCharges']);
         }
-        if (array_key_exists('officeOfOrigin', $data)) {
+        if (array_key_exists('officeOfOrigin', $data) && $data['officeOfOrigin'] !== null) {
             $officeOfOriginRaw = $data['officeOfOrigin'];
             if (!is_string($officeOfOriginRaw)) {
                 throw new MalformedDataException(
@@ -632,8 +649,10 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             }
             $officeOfOrigin = Some::create($officeOfOriginRaw);
             unset($data['officeOfOrigin']);
+        } elseif (array_key_exists('officeOfOrigin', $data)) {
+            unset($data['officeOfOrigin']);
         }
-        if (array_key_exists('shipperCustomsRef', $data)) {
+        if (array_key_exists('shipperCustomsRef', $data) && $data['shipperCustomsRef'] !== null) {
             $shipperCustomsRefRaw = $data['shipperCustomsRef'];
             if (!is_string($shipperCustomsRefRaw)) {
                 throw new MalformedDataException(
@@ -645,8 +664,10 @@ final readonly class CustomsDetails implements SelfNormalizingModel
             }
             $shipperCustomsRef = Some::create($shipperCustomsRefRaw);
             unset($data['shipperCustomsRef']);
+        } elseif (array_key_exists('shipperCustomsRef', $data)) {
+            unset($data['shipperCustomsRef']);
         }
-        if (array_key_exists('consigneeCustomsRef', $data)) {
+        if (array_key_exists('consigneeCustomsRef', $data) && $data['consigneeCustomsRef'] !== null) {
             $consigneeCustomsRefRaw = $data['consigneeCustomsRef'];
             if (!is_string($consigneeCustomsRefRaw)) {
                 throw new MalformedDataException(
@@ -657,6 +678,8 @@ final readonly class CustomsDetails implements SelfNormalizingModel
                 );
             }
             $consigneeCustomsRef = Some::create($consigneeCustomsRefRaw);
+            unset($data['consigneeCustomsRef']);
+        } elseif (array_key_exists('consigneeCustomsRef', $data)) {
             unset($data['consigneeCustomsRef']);
         }
         if (array_key_exists('items', $data)) {

@@ -75,9 +75,13 @@ interface Operation
     /**
      * Parse and transform a PSR7 Response into a different object.
      *
+     * @param ResponseValidation $responseValidation how closely the response is held to the
+     *                                               constraints of its description, as the
+     *                                               client was configured
+     *
      * @return TReturn
      *
      * @throws ApiException
      */
-    public function parseResponse(ResponseInterface $response): mixed;
+    public function parseResponse(ResponseInterface $response, ResponseValidation $responseValidation): mixed;
 }

@@ -67,7 +67,7 @@ final class POBoxConstraint implements ConstraintProviderInterface
                     new Length(null, 3),
                     new NotBlank(null, null, null),
                     new Length(null, null, 10),
-                    new Regex('#^[0-9A-Za-z]+([ -]?[0-9A-Za-z]+)*$#'),
+                    new Regex('#^[0-9A-Za-z]+([ -]?[0-9A-Za-z]+)*$#Du'),
                     new Type(['string']),
                     new NotNull(),
                 ]),

@@ -221,7 +221,7 @@ final readonly class Commodity implements SelfNormalizingModel
             $itemDescription = $itemDescriptionRaw;
             unset($data['itemDescription']);
         }
-        if (array_key_exists('countryOfOrigin', $data)) {
+        if (array_key_exists('countryOfOrigin', $data) && $data['countryOfOrigin'] !== null) {
             $countryOfOriginRaw = $data['countryOfOrigin'];
             if (!is_string($countryOfOriginRaw)) {
                 throw new MalformedDataException(
@@ -233,8 +233,10 @@ final readonly class Commodity implements SelfNormalizingModel
                     ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryOfOriginRaw)),
             );
             unset($data['countryOfOrigin']);
+        } elseif (array_key_exists('countryOfOrigin', $data)) {
+            unset($data['countryOfOrigin']);
         }
-        if (array_key_exists('hsCode', $data)) {
+        if (array_key_exists('hsCode', $data) && $data['hsCode'] !== null) {
             $hsCodeRaw = $data['hsCode'];
             if (!is_string($hsCodeRaw)) {
                 throw new MalformedDataException(
@@ -242,6 +244,8 @@ final readonly class Commodity implements SelfNormalizingModel
                 );
             }
             $hsCode = Some::create($hsCodeRaw);
+            unset($data['hsCode']);
+        } elseif (array_key_exists('hsCode', $data)) {
             unset($data['hsCode']);
         }
         if (array_key_exists('packagedQuantity', $data)) {

@@ -38,8 +38,17 @@ trait BaseOperationTrait
     /**
      * Transforms the raw HTTP response body into this operation's declared return type. Generated
      * overrides always emit an inheritdoc tag here, so this description must stay non-empty.
+     *
+     * `$body` is the response body as text, read once by `parseResponse()`: the exception that
+     * carries a response which could not be read needs the bytes, and a stream that cannot seek
+     * would hand them over only the first time.
      */
-    abstract protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): mixed;
+    abstract protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
+    ): mixed;
 
     /** @return array<string, list<string>> */
     protected function getExtraHeaders(): array

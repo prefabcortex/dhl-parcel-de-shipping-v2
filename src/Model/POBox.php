@@ -289,7 +289,7 @@ final readonly class POBox implements SelfNormalizingModel
             $name1 = $name1Raw;
             unset($data['name1']);
         }
-        if (array_key_exists('name2', $data)) {
+        if (array_key_exists('name2', $data) && $data['name2'] !== null) {
             $name2Raw = $data['name2'];
             if (!is_string($name2Raw)) {
                 throw new MalformedDataException(
@@ -298,8 +298,10 @@ final readonly class POBox implements SelfNormalizingModel
             }
             $name2 = Some::create($name2Raw);
             unset($data['name2']);
+        } elseif (array_key_exists('name2', $data)) {
+            unset($data['name2']);
         }
-        if (array_key_exists('name3', $data)) {
+        if (array_key_exists('name3', $data) && $data['name3'] !== null) {
             $name3Raw = $data['name3'];
             if (!is_string($name3Raw)) {
                 throw new MalformedDataException(
@@ -307,6 +309,8 @@ final readonly class POBox implements SelfNormalizingModel
                 );
             }
             $name3 = Some::create($name3Raw);
+            unset($data['name3']);
+        } elseif (array_key_exists('name3', $data)) {
             unset($data['name3']);
         }
         if (array_key_exists('poBoxID', $data)) {
@@ -319,7 +323,7 @@ final readonly class POBox implements SelfNormalizingModel
             $poBoxID = $poBoxIDRaw;
             unset($data['poBoxID']);
         }
-        if (array_key_exists('email', $data)) {
+        if (array_key_exists('email', $data) && $data['email'] !== null) {
             $emailRaw = $data['email'];
             if (!is_string($emailRaw)) {
                 throw new MalformedDataException(
@@ -327,6 +331,8 @@ final readonly class POBox implements SelfNormalizingModel
                 );
             }
             $email = Some::create($emailRaw);
+            unset($data['email']);
+        } elseif (array_key_exists('email', $data)) {
             unset($data['email']);
         }
         if (array_key_exists('city', $data)) {
@@ -339,7 +345,7 @@ final readonly class POBox implements SelfNormalizingModel
             $city = $cityRaw;
             unset($data['city']);
         }
-        if (array_key_exists('country', $data)) {
+        if (array_key_exists('country', $data) && $data['country'] !== null) {
             $countryRaw = $data['country'];
             if (!is_string($countryRaw)) {
                 throw new MalformedDataException(
@@ -350,6 +356,8 @@ final readonly class POBox implements SelfNormalizingModel
                 Country::tryFrom($countryRaw)
                     ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)),
             );
+            unset($data['country']);
+        } elseif (array_key_exists('country', $data)) {
             unset($data['country']);
         }
         if (array_key_exists('postalCode', $data)) {

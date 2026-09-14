@@ -834,7 +834,7 @@ final readonly class VAS implements SelfNormalizingModel
         $goGreenPlus = None::create();
         $dhlRetoure = None::create();
         $postalDeliveryDutyPaid = None::create();
-        if (array_key_exists('preferredNeighbour', $data)) {
+        if (array_key_exists('preferredNeighbour', $data) && $data['preferredNeighbour'] !== null) {
             $preferredNeighbourRaw = $data['preferredNeighbour'];
             if (!is_string($preferredNeighbourRaw)) {
                 throw new MalformedDataException(
@@ -846,8 +846,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $preferredNeighbour = Some::create($preferredNeighbourRaw);
             unset($data['preferredNeighbour']);
+        } elseif (array_key_exists('preferredNeighbour', $data)) {
+            unset($data['preferredNeighbour']);
         }
-        if (array_key_exists('preferredLocation', $data)) {
+        if (array_key_exists('preferredLocation', $data) && $data['preferredLocation'] !== null) {
             $preferredLocationRaw = $data['preferredLocation'];
             if (!is_string($preferredLocationRaw)) {
                 throw new MalformedDataException(
@@ -859,8 +861,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $preferredLocation = Some::create($preferredLocationRaw);
             unset($data['preferredLocation']);
+        } elseif (array_key_exists('preferredLocation', $data)) {
+            unset($data['preferredLocation']);
         }
-        if (array_key_exists('visualCheckOfAge', $data)) {
+        if (array_key_exists('visualCheckOfAge', $data) && $data['visualCheckOfAge'] !== null) {
             $visualCheckOfAgeRaw = $data['visualCheckOfAge'];
             if (!is_string($visualCheckOfAgeRaw)) {
                 throw new MalformedDataException(
@@ -877,8 +881,10 @@ final readonly class VAS implements SelfNormalizingModel
                     ),
             );
             unset($data['visualCheckOfAge']);
+        } elseif (array_key_exists('visualCheckOfAge', $data)) {
+            unset($data['visualCheckOfAge']);
         }
-        if (array_key_exists('namedPersonOnly', $data)) {
+        if (array_key_exists('namedPersonOnly', $data) && $data['namedPersonOnly'] !== null) {
             $namedPersonOnlyRaw = $data['namedPersonOnly'];
             if (!is_bool($namedPersonOnlyRaw)) {
                 throw new MalformedDataException(
@@ -887,8 +893,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $namedPersonOnly = Some::create($namedPersonOnlyRaw);
             unset($data['namedPersonOnly']);
+        } elseif (array_key_exists('namedPersonOnly', $data)) {
+            unset($data['namedPersonOnly']);
         }
-        if (array_key_exists('identCheck', $data)) {
+        if (array_key_exists('identCheck', $data) && $data['identCheck'] !== null) {
             $identCheckRaw = $data['identCheck'];
             if (!is_array($identCheckRaw)) {
                 throw new MalformedDataException(
@@ -899,8 +907,10 @@ final readonly class VAS implements SelfNormalizingModel
             $identCheckRawTyped = $identCheckRaw;
             $identCheck = Some::create(VASIdentCheck::fromArray($identCheckRawTyped));
             unset($data['identCheck']);
+        } elseif (array_key_exists('identCheck', $data)) {
+            unset($data['identCheck']);
         }
-        if (array_key_exists('signedForByRecipient', $data)) {
+        if (array_key_exists('signedForByRecipient', $data) && $data['signedForByRecipient'] !== null) {
             $signedForByRecipientRaw = $data['signedForByRecipient'];
             if (!is_bool($signedForByRecipientRaw)) {
                 throw new MalformedDataException(
@@ -912,8 +922,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $signedForByRecipient = Some::create($signedForByRecipientRaw);
             unset($data['signedForByRecipient']);
+        } elseif (array_key_exists('signedForByRecipient', $data)) {
+            unset($data['signedForByRecipient']);
         }
-        if (array_key_exists('endorsement', $data)) {
+        if (array_key_exists('endorsement', $data) && $data['endorsement'] !== null) {
             $endorsementRaw = $data['endorsement'];
             if (!is_string($endorsementRaw)) {
                 throw new MalformedDataException(
@@ -927,8 +939,10 @@ final readonly class VAS implements SelfNormalizingModel
                     ),
             );
             unset($data['endorsement']);
+        } elseif (array_key_exists('endorsement', $data)) {
+            unset($data['endorsement']);
         }
-        if (array_key_exists('preferredDay', $data)) {
+        if (array_key_exists('preferredDay', $data) && $data['preferredDay'] !== null) {
             $preferredDayRaw = $data['preferredDay'];
             if (!is_string($preferredDayRaw)) {
                 throw new MalformedDataException(
@@ -941,8 +955,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $preferredDay = Some::create($date->setTime(0, 0, 0));
             unset($data['preferredDay']);
+        } elseif (array_key_exists('preferredDay', $data)) {
+            unset($data['preferredDay']);
         }
-        if (array_key_exists('noNeighbourDelivery', $data)) {
+        if (array_key_exists('noNeighbourDelivery', $data) && $data['noNeighbourDelivery'] !== null) {
             $noNeighbourDeliveryRaw = $data['noNeighbourDelivery'];
             if (!is_bool($noNeighbourDeliveryRaw)) {
                 throw new MalformedDataException(
@@ -954,8 +970,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $noNeighbourDelivery = Some::create($noNeighbourDeliveryRaw);
             unset($data['noNeighbourDelivery']);
+        } elseif (array_key_exists('noNeighbourDelivery', $data)) {
+            unset($data['noNeighbourDelivery']);
         }
-        if (array_key_exists('additionalInsurance', $data)) {
+        if (array_key_exists('additionalInsurance', $data) && $data['additionalInsurance'] !== null) {
             $additionalInsuranceRaw = $data['additionalInsurance'];
             if (!is_array($additionalInsuranceRaw)) {
                 throw new MalformedDataException(
@@ -969,8 +987,10 @@ final readonly class VAS implements SelfNormalizingModel
             $additionalInsuranceRawTyped = $additionalInsuranceRaw;
             $additionalInsurance = Some::create(Value::fromArray($additionalInsuranceRawTyped));
             unset($data['additionalInsurance']);
+        } elseif (array_key_exists('additionalInsurance', $data)) {
+            unset($data['additionalInsurance']);
         }
-        if (array_key_exists('bulkyGoods', $data)) {
+        if (array_key_exists('bulkyGoods', $data) && $data['bulkyGoods'] !== null) {
             $bulkyGoodsRaw = $data['bulkyGoods'];
             if (!is_bool($bulkyGoodsRaw)) {
                 throw new MalformedDataException(
@@ -979,8 +999,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $bulkyGoods = Some::create($bulkyGoodsRaw);
             unset($data['bulkyGoods']);
+        } elseif (array_key_exists('bulkyGoods', $data)) {
+            unset($data['bulkyGoods']);
         }
-        if (array_key_exists('cashOnDelivery', $data)) {
+        if (array_key_exists('cashOnDelivery', $data) && $data['cashOnDelivery'] !== null) {
             $cashOnDeliveryRaw = $data['cashOnDelivery'];
             if (!is_array($cashOnDeliveryRaw)) {
                 throw new MalformedDataException(
@@ -991,8 +1013,10 @@ final readonly class VAS implements SelfNormalizingModel
             $cashOnDeliveryRawTyped = $cashOnDeliveryRaw;
             $cashOnDelivery = Some::create(VASCashOnDelivery::fromArray($cashOnDeliveryRawTyped));
             unset($data['cashOnDelivery']);
+        } elseif (array_key_exists('cashOnDelivery', $data)) {
+            unset($data['cashOnDelivery']);
         }
-        if (array_key_exists('individualSenderRequirement', $data)) {
+        if (array_key_exists('individualSenderRequirement', $data) && $data['individualSenderRequirement'] !== null) {
             $individualSenderRequirementRaw = $data['individualSenderRequirement'];
             if (!is_string($individualSenderRequirementRaw)) {
                 throw new MalformedDataException(
@@ -1004,8 +1028,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $individualSenderRequirement = Some::create($individualSenderRequirementRaw);
             unset($data['individualSenderRequirement']);
+        } elseif (array_key_exists('individualSenderRequirement', $data)) {
+            unset($data['individualSenderRequirement']);
         }
-        if (array_key_exists('premium', $data)) {
+        if (array_key_exists('premium', $data) && $data['premium'] !== null) {
             $premiumRaw = $data['premium'];
             if (!is_bool($premiumRaw)) {
                 throw new MalformedDataException(
@@ -1014,8 +1040,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $premium = Some::create($premiumRaw);
             unset($data['premium']);
+        } elseif (array_key_exists('premium', $data)) {
+            unset($data['premium']);
         }
-        if (array_key_exists('closestDropPoint', $data)) {
+        if (array_key_exists('closestDropPoint', $data) && $data['closestDropPoint'] !== null) {
             $closestDropPointRaw = $data['closestDropPoint'];
             if (!is_bool($closestDropPointRaw)) {
                 throw new MalformedDataException(
@@ -1024,8 +1052,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $closestDropPoint = Some::create($closestDropPointRaw);
             unset($data['closestDropPoint']);
+        } elseif (array_key_exists('closestDropPoint', $data)) {
+            unset($data['closestDropPoint']);
         }
-        if (array_key_exists('parcelOutletRouting', $data)) {
+        if (array_key_exists('parcelOutletRouting', $data) && $data['parcelOutletRouting'] !== null) {
             $parcelOutletRoutingRaw = $data['parcelOutletRouting'];
             if (!is_string($parcelOutletRoutingRaw)) {
                 throw new MalformedDataException(
@@ -1037,8 +1067,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $parcelOutletRouting = Some::create($parcelOutletRoutingRaw);
             unset($data['parcelOutletRouting']);
+        } elseif (array_key_exists('parcelOutletRouting', $data)) {
+            unset($data['parcelOutletRouting']);
         }
-        if (array_key_exists('goGreenPlus', $data)) {
+        if (array_key_exists('goGreenPlus', $data) && $data['goGreenPlus'] !== null) {
             $goGreenPlusRaw = $data['goGreenPlus'];
             if (!is_bool($goGreenPlusRaw)) {
                 throw new MalformedDataException(
@@ -1047,8 +1079,10 @@ final readonly class VAS implements SelfNormalizingModel
             }
             $goGreenPlus = Some::create($goGreenPlusRaw);
             unset($data['goGreenPlus']);
+        } elseif (array_key_exists('goGreenPlus', $data)) {
+            unset($data['goGreenPlus']);
         }
-        if (array_key_exists('dhlRetoure', $data)) {
+        if (array_key_exists('dhlRetoure', $data) && $data['dhlRetoure'] !== null) {
             $dhlRetoureRaw = $data['dhlRetoure'];
             if (!is_array($dhlRetoureRaw)) {
                 throw new MalformedDataException(
@@ -1059,8 +1093,10 @@ final readonly class VAS implements SelfNormalizingModel
             $dhlRetoureRawTyped = $dhlRetoureRaw;
             $dhlRetoure = Some::create(VASDhlRetoure::fromArray($dhlRetoureRawTyped));
             unset($data['dhlRetoure']);
+        } elseif (array_key_exists('dhlRetoure', $data)) {
+            unset($data['dhlRetoure']);
         }
-        if (array_key_exists('postalDeliveryDutyPaid', $data)) {
+        if (array_key_exists('postalDeliveryDutyPaid', $data) && $data['postalDeliveryDutyPaid'] !== null) {
             $postalDeliveryDutyPaidRaw = $data['postalDeliveryDutyPaid'];
             if (!is_bool($postalDeliveryDutyPaidRaw)) {
                 throw new MalformedDataException(
@@ -1071,6 +1107,8 @@ final readonly class VAS implements SelfNormalizingModel
                 );
             }
             $postalDeliveryDutyPaid = Some::create($postalDeliveryDutyPaidRaw);
+            unset($data['postalDeliveryDutyPaid']);
+        } elseif (array_key_exists('postalDeliveryDutyPaid', $data)) {
             unset($data['postalDeliveryDutyPaid']);
         }
         $additionalProperties = $data;

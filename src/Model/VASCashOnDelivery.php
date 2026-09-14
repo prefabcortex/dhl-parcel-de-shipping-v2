@@ -177,7 +177,7 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
         $accountReference = None::create();
         $transferNote1 = null;
         $transferNote2 = None::create();
-        if (array_key_exists('amount', $data)) {
+        if (array_key_exists('amount', $data) && $data['amount'] !== null) {
             $amountRaw = $data['amount'];
             if (!is_array($amountRaw)) {
                 throw new MalformedDataException(
@@ -188,8 +188,10 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
             $amountRawTyped = $amountRaw;
             $amount = Some::create(Value::fromArray($amountRawTyped));
             unset($data['amount']);
+        } elseif (array_key_exists('amount', $data)) {
+            unset($data['amount']);
         }
-        if (array_key_exists('bankAccount', $data)) {
+        if (array_key_exists('bankAccount', $data) && $data['bankAccount'] !== null) {
             $bankAccountRaw = $data['bankAccount'];
             if (!is_array($bankAccountRaw)) {
                 throw new MalformedDataException(
@@ -200,8 +202,10 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
             $bankAccountRawTyped = $bankAccountRaw;
             $bankAccount = Some::create(BankAccount::fromArray($bankAccountRawTyped));
             unset($data['bankAccount']);
+        } elseif (array_key_exists('bankAccount', $data)) {
+            unset($data['bankAccount']);
         }
-        if (array_key_exists('accountReference', $data)) {
+        if (array_key_exists('accountReference', $data) && $data['accountReference'] !== null) {
             $accountReferenceRaw = $data['accountReference'];
             if (!is_string($accountReferenceRaw)) {
                 throw new MalformedDataException(
@@ -212,6 +216,8 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
                 );
             }
             $accountReference = Some::create($accountReferenceRaw);
+            unset($data['accountReference']);
+        } elseif (array_key_exists('accountReference', $data)) {
             unset($data['accountReference']);
         }
         if (array_key_exists('transferNote1', $data)) {
@@ -224,7 +230,7 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
             $transferNote1 = $transferNote1Raw;
             unset($data['transferNote1']);
         }
-        if (array_key_exists('transferNote2', $data)) {
+        if (array_key_exists('transferNote2', $data) && $data['transferNote2'] !== null) {
             $transferNote2Raw = $data['transferNote2'];
             if (!is_string($transferNote2Raw)) {
                 throw new MalformedDataException(
@@ -232,6 +238,8 @@ final readonly class VASCashOnDelivery implements SelfNormalizingModel
                 );
             }
             $transferNote2 = Some::create($transferNote2Raw);
+            unset($data['transferNote2']);
+        } elseif (array_key_exists('transferNote2', $data)) {
             unset($data['transferNote2']);
         }
         $additionalProperties = $data;

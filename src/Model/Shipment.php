@@ -435,7 +435,7 @@ final readonly class Shipment implements SelfNormalizingModel
         $details = None::create();
         $services = None::create();
         $customs = None::create();
-        if (array_key_exists('product', $data)) {
+        if (array_key_exists('product', $data) && $data['product'] !== null) {
             $productRaw = $data['product'];
             if (!is_string($productRaw)) {
                 throw new MalformedDataException(
@@ -447,8 +447,10 @@ final readonly class Shipment implements SelfNormalizingModel
                     ?? throw new MalformedDataException(sprintf('"%s" is not a valid Product.', $productRaw)),
             );
             unset($data['product']);
+        } elseif (array_key_exists('product', $data)) {
+            unset($data['product']);
         }
-        if (array_key_exists('billingNumber', $data)) {
+        if (array_key_exists('billingNumber', $data) && $data['billingNumber'] !== null) {
             $billingNumberRaw = $data['billingNumber'];
             if (!is_string($billingNumberRaw)) {
                 throw new MalformedDataException(
@@ -457,8 +459,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $billingNumber = Some::create($billingNumberRaw);
             unset($data['billingNumber']);
+        } elseif (array_key_exists('billingNumber', $data)) {
+            unset($data['billingNumber']);
         }
-        if (array_key_exists('refNo', $data)) {
+        if (array_key_exists('refNo', $data) && $data['refNo'] !== null) {
             $refNoRaw = $data['refNo'];
             if (!is_string($refNoRaw)) {
                 throw new MalformedDataException(
@@ -467,8 +471,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $refNo = Some::create($refNoRaw);
             unset($data['refNo']);
+        } elseif (array_key_exists('refNo', $data)) {
+            unset($data['refNo']);
         }
-        if (array_key_exists('costCenter', $data)) {
+        if (array_key_exists('costCenter', $data) && $data['costCenter'] !== null) {
             $costCenterRaw = $data['costCenter'];
             if (!is_string($costCenterRaw)) {
                 throw new MalformedDataException(
@@ -477,8 +483,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $costCenter = Some::create($costCenterRaw);
             unset($data['costCenter']);
+        } elseif (array_key_exists('costCenter', $data)) {
+            unset($data['costCenter']);
         }
-        if (array_key_exists('creationSoftware', $data)) {
+        if (array_key_exists('creationSoftware', $data) && $data['creationSoftware'] !== null) {
             $creationSoftwareRaw = $data['creationSoftware'];
             if (!is_string($creationSoftwareRaw)) {
                 throw new MalformedDataException(
@@ -490,8 +498,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $creationSoftware = Some::create($creationSoftwareRaw);
             unset($data['creationSoftware']);
+        } elseif (array_key_exists('creationSoftware', $data)) {
+            unset($data['creationSoftware']);
         }
-        if (array_key_exists('shipDate', $data)) {
+        if (array_key_exists('shipDate', $data) && $data['shipDate'] !== null) {
             $shipDateRaw = $data['shipDate'];
             if (!is_string($shipDateRaw)) {
                 throw new MalformedDataException(
@@ -504,8 +514,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $shipDate = Some::create($date->setTime(0, 0, 0));
             unset($data['shipDate']);
+        } elseif (array_key_exists('shipDate', $data)) {
+            unset($data['shipDate']);
         }
-        if (array_key_exists('shipper', $data)) {
+        if (array_key_exists('shipper', $data) && $data['shipper'] !== null) {
             if (!is_array($data['shipper'])) {
                 throw new MalformedDataException(
                     'Property "shipper" matched none of the expected shapes: Shipper, ShipperReference.',
@@ -535,8 +547,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $shipper = Some::create($value);
             unset($data['shipper']);
+        } elseif (array_key_exists('shipper', $data)) {
+            unset($data['shipper']);
         }
-        if (array_key_exists('consignee', $data)) {
+        if (array_key_exists('consignee', $data) && $data['consignee'] !== null) {
             if (!is_array($data['consignee'])) {
                 throw new MalformedDataException('Property "consignee" matched none of the expected shapes: ContactAddress, Locker, PostOffice, POBox.');
             }
@@ -582,8 +596,10 @@ final readonly class Shipment implements SelfNormalizingModel
             }
             $consignee = Some::create($value_1);
             unset($data['consignee']);
+        } elseif (array_key_exists('consignee', $data)) {
+            unset($data['consignee']);
         }
-        if (array_key_exists('details', $data)) {
+        if (array_key_exists('details', $data) && $data['details'] !== null) {
             $detailsRaw = $data['details'];
             if (!is_array($detailsRaw)) {
                 throw new MalformedDataException(
@@ -594,8 +610,10 @@ final readonly class Shipment implements SelfNormalizingModel
             $detailsRawTyped = $detailsRaw;
             $details = Some::create(ShipmentDetails::fromArray($detailsRawTyped));
             unset($data['details']);
+        } elseif (array_key_exists('details', $data)) {
+            unset($data['details']);
         }
-        if (array_key_exists('services', $data)) {
+        if (array_key_exists('services', $data) && $data['services'] !== null) {
             $servicesRaw = $data['services'];
             if (!is_array($servicesRaw)) {
                 throw new MalformedDataException(
@@ -606,8 +624,10 @@ final readonly class Shipment implements SelfNormalizingModel
             $servicesRawTyped = $servicesRaw;
             $services = Some::create(VAS::fromArray($servicesRawTyped));
             unset($data['services']);
+        } elseif (array_key_exists('services', $data)) {
+            unset($data['services']);
         }
-        if (array_key_exists('customs', $data)) {
+        if (array_key_exists('customs', $data) && $data['customs'] !== null) {
             $customsRaw = $data['customs'];
             if (!is_array($customsRaw)) {
                 throw new MalformedDataException(
@@ -617,6 +637,8 @@ final readonly class Shipment implements SelfNormalizingModel
             /** @var array<string, mixed> $customsRawTyped */
             $customsRawTyped = $customsRaw;
             $customs = Some::create(CustomsDetails::fromArray($customsRawTyped));
+            unset($data['customs']);
+        } elseif (array_key_exists('customs', $data)) {
             unset($data['customs']);
         }
         $additionalProperties = $data;

@@ -123,7 +123,7 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
         $env = None::create();
         $version = None::create();
         $rev = None::create();
-        if (array_key_exists('name', $data)) {
+        if (array_key_exists('name', $data) && $data['name'] !== null) {
             $nameRaw = $data['name'];
             if (!is_string($nameRaw)) {
                 throw new MalformedDataException(
@@ -132,8 +132,10 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
             }
             $name = Some::create($nameRaw);
             unset($data['name']);
+        } elseif (array_key_exists('name', $data)) {
+            unset($data['name']);
         }
-        if (array_key_exists('env', $data)) {
+        if (array_key_exists('env', $data) && $data['env'] !== null) {
             $envRaw = $data['env'];
             if (!is_string($envRaw)) {
                 throw new MalformedDataException(
@@ -142,8 +144,10 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
             }
             $env = Some::create($envRaw);
             unset($data['env']);
+        } elseif (array_key_exists('env', $data)) {
+            unset($data['env']);
         }
-        if (array_key_exists('version', $data)) {
+        if (array_key_exists('version', $data) && $data['version'] !== null) {
             $versionRaw = $data['version'];
             if (!is_string($versionRaw)) {
                 throw new MalformedDataException(
@@ -152,8 +156,10 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
             }
             $version = Some::create($versionRaw);
             unset($data['version']);
+        } elseif (array_key_exists('version', $data)) {
+            unset($data['version']);
         }
-        if (array_key_exists('rev', $data)) {
+        if (array_key_exists('rev', $data) && $data['rev'] !== null) {
             $revRaw = $data['rev'];
             if (!is_string($revRaw)) {
                 throw new MalformedDataException(
@@ -161,6 +167,8 @@ final readonly class ServiceInformationAmp implements SelfNormalizingModel
                 );
             }
             $rev = Some::create($revRaw);
+            unset($data['rev']);
+        } elseif (array_key_exists('rev', $data)) {
             unset($data['rev']);
         }
         $additionalProperties = $data;

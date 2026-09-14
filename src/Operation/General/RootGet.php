@@ -12,6 +12,8 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Operation\General;
 
 use Override;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedResponseException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ResponseValidationException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetInternalServerErrorException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetTooManyRequestsException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\RootGetUnauthorizedException;
@@ -22,6 +24,7 @@ use Prefabcortex\DhlParcelDeShippingV2\Http\JsonBody;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
 use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
 use Prefabcortex\DhlParcelDeShippingV2\Model\RootGetAccept;
 use Prefabcortex\DhlParcelDeShippingV2\Model\ServiceInformation;
@@ -101,48 +104,67 @@ final class RootGet implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): ServiceInformation
-    {
+    protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
+    ): ServiceInformation {
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
         if (200 === $status && $contentType->is('application/json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, ServiceInformationConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, ServiceInformationConstraint::constraints());
+            }
 
             return ServiceInformation::fromArray($typedData);
         }
         if (401 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new RootGetUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (429 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new RootGetTooManyRequestsException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (500 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new RootGetInternalServerErrorException(RequestStatus::fromArray($typedData), $response, $body);
         }
         throw new UnexpectedStatusCodeException($response, $body);
     }
 
     /**
-     * @throws ValidationException
-     * @throws MalformedDataException
+     * @throws ResponseValidationException
+     * @throws MalformedResponseException
      * @throws RootGetUnauthorizedException
      * @throws RootGetTooManyRequestsException
      * @throws RootGetInternalServerErrorException
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    public function parseResponse(ResponseInterface $response): ServiceInformation
-    {
+    public function parseResponse(
+        ResponseInterface $response,
+        ResponseValidation $responseValidation,
+    ): ServiceInformation {
         $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
-
-        return $this->transformResponseBody($response, $contentType);
+        $body = (string) $response->getBody();
+        try {
+            return $this->transformResponseBody($response, $contentType, $body, $responseValidation);
+        } catch (ValidationException $exception) {
+            throw new ResponseValidationException($exception->getViolationList(), $response, $body);
+        } catch (MalformedDataException $exception) {
+            throw new MalformedResponseException($exception, $response, $body);
+        }
     }
 
     /** @return list<list<string>> */

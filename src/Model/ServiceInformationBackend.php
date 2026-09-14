@@ -84,7 +84,7 @@ final readonly class ServiceInformationBackend implements SelfNormalizingModel
     {
         $env = None::create();
         $version = None::create();
-        if (array_key_exists('env', $data)) {
+        if (array_key_exists('env', $data) && $data['env'] !== null) {
             $envRaw = $data['env'];
             if (!is_string($envRaw)) {
                 throw new MalformedDataException(
@@ -93,8 +93,10 @@ final readonly class ServiceInformationBackend implements SelfNormalizingModel
             }
             $env = Some::create($envRaw);
             unset($data['env']);
+        } elseif (array_key_exists('env', $data)) {
+            unset($data['env']);
         }
-        if (array_key_exists('version', $data)) {
+        if (array_key_exists('version', $data) && $data['version'] !== null) {
             $versionRaw = $data['version'];
             if (!is_string($versionRaw)) {
                 throw new MalformedDataException(
@@ -102,6 +104,8 @@ final readonly class ServiceInformationBackend implements SelfNormalizingModel
                 );
             }
             $version = Some::create($versionRaw);
+            unset($data['version']);
+        } elseif (array_key_exists('version', $data)) {
             unset($data['version']);
         }
         $additionalProperties = $data;

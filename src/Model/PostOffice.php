@@ -263,7 +263,7 @@ final readonly class PostOffice implements SelfNormalizingModel
             $retailID = $retailIDRaw;
             unset($data['retailID']);
         }
-        if (array_key_exists('postNumber', $data)) {
+        if (array_key_exists('postNumber', $data) && $data['postNumber'] !== null) {
             $postNumberRaw = $data['postNumber'];
             if (!is_string($postNumberRaw)) {
                 throw new MalformedDataException(
@@ -272,8 +272,10 @@ final readonly class PostOffice implements SelfNormalizingModel
             }
             $postNumber = Some::create($postNumberRaw);
             unset($data['postNumber']);
+        } elseif (array_key_exists('postNumber', $data)) {
+            unset($data['postNumber']);
         }
-        if (array_key_exists('email', $data)) {
+        if (array_key_exists('email', $data) && $data['email'] !== null) {
             $emailRaw = $data['email'];
             if (!is_string($emailRaw)) {
                 throw new MalformedDataException(
@@ -281,6 +283,8 @@ final readonly class PostOffice implements SelfNormalizingModel
                 );
             }
             $email = Some::create($emailRaw);
+            unset($data['email']);
+        } elseif (array_key_exists('email', $data)) {
             unset($data['email']);
         }
         if (array_key_exists('city', $data)) {
@@ -293,7 +297,7 @@ final readonly class PostOffice implements SelfNormalizingModel
             $city = $cityRaw;
             unset($data['city']);
         }
-        if (array_key_exists('country', $data)) {
+        if (array_key_exists('country', $data) && $data['country'] !== null) {
             $countryRaw = $data['country'];
             if (!is_string($countryRaw)) {
                 throw new MalformedDataException(
@@ -304,6 +308,8 @@ final readonly class PostOffice implements SelfNormalizingModel
                 Country::tryFrom($countryRaw)
                     ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw)),
             );
+            unset($data['country']);
+        } elseif (array_key_exists('country', $data)) {
             unset($data['country']);
         }
         if (array_key_exists('postalCode', $data)) {

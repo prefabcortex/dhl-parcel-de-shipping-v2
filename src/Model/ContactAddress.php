@@ -544,7 +544,7 @@ final readonly class ContactAddress implements SelfNormalizingModel
 
     /**
      * Please note that, in accordance with Art. 4 No. 11 GDPR, you must obtain the recipient's
-     * consent to forward their e-mail address to Deutsche Post DHL Group.Â For shipments within
+     * consent to forward their e-mail address to Deutsche Post DHL Group. For shipments within
      * Germany, the e-mail address is used to send a DHL Parcel Notification to the recipient. The
      * e-mail address is not mandatory for shipments within Germany. In some countries the provision
      * of a telephone number and/or e-mail address is mandatory for a delivery to a droppoint. If
@@ -618,7 +618,7 @@ final readonly class ContactAddress implements SelfNormalizingModel
             $name1 = $name1Raw;
             unset($data['name1']);
         }
-        if (array_key_exists('name2', $data)) {
+        if (array_key_exists('name2', $data) && $data['name2'] !== null) {
             $name2Raw = $data['name2'];
             if (!is_string($name2Raw)) {
                 throw new MalformedDataException(
@@ -627,8 +627,10 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $name2 = Some::create($name2Raw);
             unset($data['name2']);
+        } elseif (array_key_exists('name2', $data)) {
+            unset($data['name2']);
         }
-        if (array_key_exists('name3', $data)) {
+        if (array_key_exists('name3', $data) && $data['name3'] !== null) {
             $name3Raw = $data['name3'];
             if (!is_string($name3Raw)) {
                 throw new MalformedDataException(
@@ -637,8 +639,10 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $name3 = Some::create($name3Raw);
             unset($data['name3']);
+        } elseif (array_key_exists('name3', $data)) {
+            unset($data['name3']);
         }
-        if (array_key_exists('dispatchingInformation', $data)) {
+        if (array_key_exists('dispatchingInformation', $data) && $data['dispatchingInformation'] !== null) {
             $dispatchingInformationRaw = $data['dispatchingInformation'];
             if (!is_string($dispatchingInformationRaw)) {
                 throw new MalformedDataException(
@@ -649,6 +653,8 @@ final readonly class ContactAddress implements SelfNormalizingModel
                 );
             }
             $dispatchingInformation = Some::create($dispatchingInformationRaw);
+            unset($data['dispatchingInformation']);
+        } elseif (array_key_exists('dispatchingInformation', $data)) {
             unset($data['dispatchingInformation']);
         }
         if (array_key_exists('addressStreet', $data)) {
@@ -661,7 +667,7 @@ final readonly class ContactAddress implements SelfNormalizingModel
             $addressStreet = $addressStreetRaw;
             unset($data['addressStreet']);
         }
-        if (array_key_exists('addressHouse', $data)) {
+        if (array_key_exists('addressHouse', $data) && $data['addressHouse'] !== null) {
             $addressHouseRaw = $data['addressHouse'];
             if (!is_string($addressHouseRaw)) {
                 throw new MalformedDataException(
@@ -670,8 +676,13 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $addressHouse = Some::create($addressHouseRaw);
             unset($data['addressHouse']);
+        } elseif (array_key_exists('addressHouse', $data)) {
+            unset($data['addressHouse']);
         }
-        if (array_key_exists('additionalAddressInformation1', $data)) {
+        if (
+            array_key_exists('additionalAddressInformation1', $data)
+            && $data['additionalAddressInformation1'] !== null
+        ) {
             $additionalAddressInformation1Raw = $data['additionalAddressInformation1'];
             if (!is_string($additionalAddressInformation1Raw)) {
                 throw new MalformedDataException(
@@ -683,8 +694,13 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $additionalAddressInformation1 = Some::create($additionalAddressInformation1Raw);
             unset($data['additionalAddressInformation1']);
+        } elseif (array_key_exists('additionalAddressInformation1', $data)) {
+            unset($data['additionalAddressInformation1']);
         }
-        if (array_key_exists('additionalAddressInformation2', $data)) {
+        if (
+            array_key_exists('additionalAddressInformation2', $data)
+            && $data['additionalAddressInformation2'] !== null
+        ) {
             $additionalAddressInformation2Raw = $data['additionalAddressInformation2'];
             if (!is_string($additionalAddressInformation2Raw)) {
                 throw new MalformedDataException(
@@ -696,8 +712,10 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $additionalAddressInformation2 = Some::create($additionalAddressInformation2Raw);
             unset($data['additionalAddressInformation2']);
+        } elseif (array_key_exists('additionalAddressInformation2', $data)) {
+            unset($data['additionalAddressInformation2']);
         }
-        if (array_key_exists('postalCode', $data)) {
+        if (array_key_exists('postalCode', $data) && $data['postalCode'] !== null) {
             $postalCodeRaw = $data['postalCode'];
             if (!is_string($postalCodeRaw)) {
                 throw new MalformedDataException(
@@ -705,6 +723,8 @@ final readonly class ContactAddress implements SelfNormalizingModel
                 );
             }
             $postalCode = Some::create($postalCodeRaw);
+            unset($data['postalCode']);
+        } elseif (array_key_exists('postalCode', $data)) {
             unset($data['postalCode']);
         }
         if (array_key_exists('city', $data)) {
@@ -717,7 +737,7 @@ final readonly class ContactAddress implements SelfNormalizingModel
             $city = $cityRaw;
             unset($data['city']);
         }
-        if (array_key_exists('state', $data)) {
+        if (array_key_exists('state', $data) && $data['state'] !== null) {
             $stateRaw = $data['state'];
             if (!is_string($stateRaw)) {
                 throw new MalformedDataException(
@@ -725,6 +745,8 @@ final readonly class ContactAddress implements SelfNormalizingModel
                 );
             }
             $state = Some::create($stateRaw);
+            unset($data['state']);
+        } elseif (array_key_exists('state', $data)) {
             unset($data['state']);
         }
         if (array_key_exists('country', $data)) {
@@ -738,7 +760,7 @@ final readonly class ContactAddress implements SelfNormalizingModel
                 ?? throw new MalformedDataException(sprintf('"%s" is not a valid Country.', $countryRaw));
             unset($data['country']);
         }
-        if (array_key_exists('contactName', $data)) {
+        if (array_key_exists('contactName', $data) && $data['contactName'] !== null) {
             $contactNameRaw = $data['contactName'];
             if (!is_string($contactNameRaw)) {
                 throw new MalformedDataException(
@@ -747,8 +769,10 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $contactName = Some::create($contactNameRaw);
             unset($data['contactName']);
+        } elseif (array_key_exists('contactName', $data)) {
+            unset($data['contactName']);
         }
-        if (array_key_exists('phone', $data)) {
+        if (array_key_exists('phone', $data) && $data['phone'] !== null) {
             $phoneRaw = $data['phone'];
             if (!is_string($phoneRaw)) {
                 throw new MalformedDataException(
@@ -757,8 +781,10 @@ final readonly class ContactAddress implements SelfNormalizingModel
             }
             $phone = Some::create($phoneRaw);
             unset($data['phone']);
+        } elseif (array_key_exists('phone', $data)) {
+            unset($data['phone']);
         }
-        if (array_key_exists('email', $data)) {
+        if (array_key_exists('email', $data) && $data['email'] !== null) {
             $emailRaw = $data['email'];
             if (!is_string($emailRaw)) {
                 throw new MalformedDataException(
@@ -766,6 +792,8 @@ final readonly class ContactAddress implements SelfNormalizingModel
                 );
             }
             $email = Some::create($emailRaw);
+            unset($data['email']);
+        } elseif (array_key_exists('email', $data)) {
             unset($data['email']);
         }
         $additionalProperties = $data;

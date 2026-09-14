@@ -12,10 +12,12 @@ namespace Prefabcortex\DhlParcelDeShippingV2\Operation\ShipmentsAndLabels;
 
 use Override;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedDataException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\MalformedResponseException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteBadRequestException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteInternalServerErrorException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteTooManyRequestsException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\OrdersAccountDeleteUnauthorizedException;
+use Prefabcortex\DhlParcelDeShippingV2\Exception\ResponseValidationException;
 use Prefabcortex\DhlParcelDeShippingV2\Exception\UnexpectedStatusCodeException;
 use Prefabcortex\DhlParcelDeShippingV2\Http\BaseOperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\ContentType;
@@ -25,6 +27,7 @@ use Prefabcortex\DhlParcelDeShippingV2\Http\Operation;
 use Prefabcortex\DhlParcelDeShippingV2\Http\OperationTrait;
 use Prefabcortex\DhlParcelDeShippingV2\Http\Payload;
 use Prefabcortex\DhlParcelDeShippingV2\Http\QueryParameters;
+use Prefabcortex\DhlParcelDeShippingV2\Http\ResponseValidation;
 use Prefabcortex\DhlParcelDeShippingV2\Model\LabelDataResponse;
 use Prefabcortex\DhlParcelDeShippingV2\Model\OrdersAccountDeleteAccept;
 use Prefabcortex\DhlParcelDeShippingV2\Model\RequestStatus;
@@ -131,10 +134,13 @@ final class OrdersAccountDelete implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    protected function transformResponseBody(ResponseInterface $response, ContentType $contentType): LabelDataResponse
-    {
+    protected function transformResponseBody(
+        ResponseInterface $response,
+        ContentType $contentType,
+        string $body,
+        ResponseValidation $responseValidation,
+    ): LabelDataResponse {
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
         // 200: Response for requests with a single element
         // 207: Response for requests taking multiple input elements
         if (
@@ -142,13 +148,17 @@ final class OrdersAccountDelete implements Operation
             && $contentType->isAnyOf(['application/json', 'application/problem+json'])
         ) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
 
             return LabelDataResponse::fromArray($typedData);
         }
         if (400 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, LabelDataResponseConstraint::constraints());
+            }
             throw new OrdersAccountDeleteBadRequestException(
                 LabelDataResponse::fromArray($typedData),
                 $response,
@@ -157,12 +167,16 @@ final class OrdersAccountDelete implements Operation
         }
         if (401 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new OrdersAccountDeleteUnauthorizedException(RequestStatus::fromArray($typedData), $response, $body);
         }
         if (429 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new OrdersAccountDeleteTooManyRequestsException(
                 RequestStatus::fromArray($typedData),
                 $response,
@@ -171,7 +185,9 @@ final class OrdersAccountDelete implements Operation
         }
         if (500 === $status && $contentType->is('application/problem+json')) {
             $typedData = JsonBody::toArray($body);
-            $this->validate($typedData, RequestStatusConstraint::constraints());
+            if (ResponseValidation::Strict === $responseValidation) {
+                $this->validate($typedData, RequestStatusConstraint::constraints());
+            }
             throw new OrdersAccountDeleteInternalServerErrorException(
                 RequestStatus::fromArray($typedData),
                 $response,
@@ -182,8 +198,8 @@ final class OrdersAccountDelete implements Operation
     }
 
     /**
-     * @throws ValidationException
-     * @throws MalformedDataException
+     * @throws ResponseValidationException
+     * @throws MalformedResponseException
      * @throws OrdersAccountDeleteBadRequestException
      * @throws OrdersAccountDeleteUnauthorizedException
      * @throws OrdersAccountDeleteTooManyRequestsException
@@ -191,11 +207,19 @@ final class OrdersAccountDelete implements Operation
      * @throws UnexpectedStatusCodeException
      */
     #[Override]
-    public function parseResponse(ResponseInterface $response): LabelDataResponse
-    {
+    public function parseResponse(
+        ResponseInterface $response,
+        ResponseValidation $responseValidation,
+    ): LabelDataResponse {
         $contentType = ContentType::fromHeader($response->getHeader('Content-Type')[0] ?? '');
-
-        return $this->transformResponseBody($response, $contentType);
+        $body = (string) $response->getBody();
+        try {
+            return $this->transformResponseBody($response, $contentType, $body, $responseValidation);
+        } catch (ValidationException $exception) {
+            throw new ResponseValidationException($exception->getViolationList(), $response, $body);
+        } catch (MalformedDataException $exception) {
+            throw new MalformedResponseException($exception, $response, $body);
+        }
     }
 
     /** @return list<list<string>> */

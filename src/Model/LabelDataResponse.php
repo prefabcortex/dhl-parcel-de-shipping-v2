@@ -90,7 +90,7 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
     {
         $status = None::create();
         $items = None::create();
-        if (array_key_exists('status', $data)) {
+        if (array_key_exists('status', $data) && $data['status'] !== null) {
             $statusRaw = $data['status'];
             if (!is_array($statusRaw)) {
                 throw new MalformedDataException(
@@ -101,8 +101,10 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
             $statusRawTyped = $statusRaw;
             $status = Some::create(RequestStatus::fromArray($statusRawTyped));
             unset($data['status']);
+        } elseif (array_key_exists('status', $data)) {
+            unset($data['status']);
         }
-        if (array_key_exists('items', $data)) {
+        if (array_key_exists('items', $data) && $data['items'] !== null) {
             $itemsRaw = $data['items'];
             if (!(is_array($itemsRaw) && array_is_list($itemsRaw))) {
                 throw new MalformedDataException(
@@ -120,6 +122,8 @@ final readonly class LabelDataResponse implements SelfNormalizingModel
 
                 return ResponseItem::fromArray($valueTyped);
             }, $itemsRaw));
+            unset($data['items']);
+        } elseif (array_key_exists('items', $data)) {
             unset($data['items']);
         }
         $additionalProperties = $data;

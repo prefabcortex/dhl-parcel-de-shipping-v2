@@ -120,7 +120,7 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
         $property = None::create();
         $validationMessage = None::create();
         $validationState = None::create();
-        if (array_key_exists('property', $data)) {
+        if (array_key_exists('property', $data) && $data['property'] !== null) {
             $propertyRaw = $data['property'];
             if (!is_string($propertyRaw)) {
                 throw new MalformedDataException(
@@ -129,8 +129,10 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
             }
             $property = Some::create($propertyRaw);
             unset($data['property']);
+        } elseif (array_key_exists('property', $data)) {
+            unset($data['property']);
         }
-        if (array_key_exists('validationMessage', $data)) {
+        if (array_key_exists('validationMessage', $data) && $data['validationMessage'] !== null) {
             $validationMessageRaw = $data['validationMessage'];
             if (!is_string($validationMessageRaw)) {
                 throw new MalformedDataException(
@@ -142,8 +144,10 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
             }
             $validationMessage = Some::create($validationMessageRaw);
             unset($data['validationMessage']);
+        } elseif (array_key_exists('validationMessage', $data)) {
+            unset($data['validationMessage']);
         }
-        if (array_key_exists('validationState', $data)) {
+        if (array_key_exists('validationState', $data) && $data['validationState'] !== null) {
             $validationStateRaw = $data['validationState'];
             if (!is_string($validationStateRaw)) {
                 throw new MalformedDataException(
@@ -151,6 +155,8 @@ final readonly class ValidationMessageItem implements SelfNormalizingModel
                 );
             }
             $validationState = Some::create($validationStateRaw);
+            unset($data['validationState']);
+        } elseif (array_key_exists('validationState', $data)) {
             unset($data['validationState']);
         }
         $additionalProperties = $data;

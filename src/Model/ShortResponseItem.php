@@ -81,7 +81,7 @@ final readonly class ShortResponseItem implements SelfNormalizingModel
     {
         $shipmentNo = None::create();
         $sstatus = null;
-        if (array_key_exists('shipmentNo', $data)) {
+        if (array_key_exists('shipmentNo', $data) && $data['shipmentNo'] !== null) {
             $shipmentNoRaw = $data['shipmentNo'];
             if (!is_string($shipmentNoRaw)) {
                 throw new MalformedDataException(
@@ -89,6 +89,8 @@ final readonly class ShortResponseItem implements SelfNormalizingModel
                 );
             }
             $shipmentNo = Some::create($shipmentNoRaw);
+            unset($data['shipmentNo']);
+        } elseif (array_key_exists('shipmentNo', $data)) {
             unset($data['shipmentNo']);
         }
         if (array_key_exists('sstatus', $data)) {

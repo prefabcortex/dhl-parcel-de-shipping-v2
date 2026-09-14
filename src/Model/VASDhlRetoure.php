@@ -154,7 +154,7 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
             $billingNumber = $billingNumberRaw;
             unset($data['billingNumber']);
         }
-        if (array_key_exists('refNo', $data)) {
+        if (array_key_exists('refNo', $data) && $data['refNo'] !== null) {
             $refNoRaw = $data['refNo'];
             if (!is_string($refNoRaw)) {
                 throw new MalformedDataException(
@@ -163,8 +163,10 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
             }
             $refNo = Some::create($refNoRaw);
             unset($data['refNo']);
+        } elseif (array_key_exists('refNo', $data)) {
+            unset($data['refNo']);
         }
-        if (array_key_exists('returnAddress', $data)) {
+        if (array_key_exists('returnAddress', $data) && $data['returnAddress'] !== null) {
             $returnAddressRaw = $data['returnAddress'];
             if (!is_array($returnAddressRaw)) {
                 throw new MalformedDataException(
@@ -175,8 +177,10 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
             $returnAddressRawTyped = $returnAddressRaw;
             $returnAddress = Some::create(ContactAddress::fromArray($returnAddressRawTyped));
             unset($data['returnAddress']);
+        } elseif (array_key_exists('returnAddress', $data)) {
+            unset($data['returnAddress']);
         }
-        if (array_key_exists('goGreenPlus', $data)) {
+        if (array_key_exists('goGreenPlus', $data) && $data['goGreenPlus'] !== null) {
             $goGreenPlusRaw = $data['goGreenPlus'];
             if (!is_bool($goGreenPlusRaw)) {
                 throw new MalformedDataException(
@@ -184,6 +188,8 @@ final readonly class VASDhlRetoure implements SelfNormalizingModel
                 );
             }
             $goGreenPlus = Some::create($goGreenPlusRaw);
+            unset($data['goGreenPlus']);
+        } elseif (array_key_exists('goGreenPlus', $data)) {
             unset($data['goGreenPlus']);
         }
         $additionalProperties = $data;

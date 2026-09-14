@@ -48,7 +48,7 @@ final class VASConstraint implements ConstraintProviderInterface
                 'bulkyGoods' => new Optional([new Type(['bool']), new NotNull()]),
                 'cashOnDelivery' => new Optional([new NotNull(), ...VASCashOnDeliveryConstraint::constraints()]),
                 'individualSenderRequirement' => new Optional([
-                    new Regex('#[a-zA-Z0-9]{2}#'),
+                    new Regex('#[a-zA-Z0-9]{2}#Du'),
                     new NotBlank(null, null, null),
                     new Type(['string']),
                     new NotNull(),

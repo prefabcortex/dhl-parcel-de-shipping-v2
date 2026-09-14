@@ -31,9 +31,9 @@ final class OrdersAccountDeleteExample
      *
      * Usage: pass an already-authenticated Client (see examples/Auth/).
      *
-     *   $client = Client::withBasicAuth(...); // withApiKey/withOAuth also available, see examples/Auth/
-     *   $queryParameters = new OrdersAccountDeleteQueryParameters(...);
-     *   $headerParameters = new OrdersAccountDeleteHeaderParameters(...);
+     *   $client = Client::withBasicAuth($username, $password, $config); // withApiKey/withOAuth also available, see examples/Auth/
+     *   $queryParameters = new OrdersAccountDeleteQueryParameters($profile, $shipment);
+     *   $headerParameters = new OrdersAccountDeleteHeaderParameters();
      *   OrdersAccountDeleteExample::ordersAccountDelete($client, $queryParameters, $headerParameters);
      *
      * @throws ApiException

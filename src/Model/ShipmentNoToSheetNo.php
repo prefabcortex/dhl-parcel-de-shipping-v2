@@ -98,7 +98,7 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
         $shipmentNo = None::create();
         $sheetNo = None::create();
         $sstatus = None::create();
-        if (array_key_exists('shipmentNo', $data)) {
+        if (array_key_exists('shipmentNo', $data) && $data['shipmentNo'] !== null) {
             $shipmentNoRaw = $data['shipmentNo'];
             if (!is_string($shipmentNoRaw)) {
                 throw new MalformedDataException(
@@ -107,8 +107,10 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
             }
             $shipmentNo = Some::create($shipmentNoRaw);
             unset($data['shipmentNo']);
+        } elseif (array_key_exists('shipmentNo', $data)) {
+            unset($data['shipmentNo']);
         }
-        if (array_key_exists('sheetNo', $data)) {
+        if (array_key_exists('sheetNo', $data) && $data['sheetNo'] !== null) {
             $sheetNoRaw = $data['sheetNo'];
             if (!is_string($sheetNoRaw)) {
                 throw new MalformedDataException(
@@ -117,8 +119,10 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
             }
             $sheetNo = Some::create($sheetNoRaw);
             unset($data['sheetNo']);
+        } elseif (array_key_exists('sheetNo', $data)) {
+            unset($data['sheetNo']);
         }
-        if (array_key_exists('sstatus', $data)) {
+        if (array_key_exists('sstatus', $data) && $data['sstatus'] !== null) {
             $sstatusRaw = $data['sstatus'];
             if (!is_array($sstatusRaw)) {
                 throw new MalformedDataException(
@@ -128,6 +132,8 @@ final readonly class ShipmentNoToSheetNo implements SelfNormalizingModel
             /** @var array<string, mixed> $sstatusRawTyped */
             $sstatusRawTyped = $sstatusRaw;
             $sstatus = Some::create(RequestStatus::fromArray($sstatusRawTyped));
+            unset($data['sstatus']);
+        } elseif (array_key_exists('sstatus', $data)) {
             unset($data['sstatus']);
         }
         $additionalProperties = $data;

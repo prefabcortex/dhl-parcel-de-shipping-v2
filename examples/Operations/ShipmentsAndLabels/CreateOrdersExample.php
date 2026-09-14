@@ -80,9 +80,9 @@ final class CreateOrdersExample
      * buildDHLPaketInternationalWithCustoms(), buildDHLKleinpaket(),
      * buildWarenpostInternationalWithCustoms().
      *
-     *   $client = Client::withBasicAuth(...); // withApiKey/withOAuth also available, see examples/Auth/
-     *   $queryParameters = new CreateOrdersQueryParameters(...);
-     *   $headerParameters = new CreateOrdersHeaderParameters(...);
+     *   $client = Client::withBasicAuth($username, $password, $config); // withApiKey/withOAuth also available, see examples/Auth/
+     *   $queryParameters = new CreateOrdersQueryParameters();
+     *   $headerParameters = new CreateOrdersHeaderParameters();
      *   CreateOrdersExample::createOrders($client, CreateOrdersExample::buildDHLPaket(), $queryParameters, $headerParameters);
      *
      * @throws ApiException
